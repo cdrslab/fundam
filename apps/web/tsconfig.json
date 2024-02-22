@@ -1,0 +1,4 @@
+{
+  "extends": "@fundam/tsconfig/vite.json",
+  "include": ["src"]
+}

@@ -1,0 +1,24 @@
+{
+  "name": "web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint \"src/**/*.ts\""
+  },
+  "dependencies": {
+    "@ant-design/icons": "^5.2.5",
+    "antd": "^5.8.4"
+  },
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "@fundam/eslint-config-custom": "*",
+    "@fundam/tsconfig": "*",
+    "@types/antd": "^1.0.0",
+    "typescript": "^4.9.4",
+    "vite": "^4.0.3"
+  }
+}
