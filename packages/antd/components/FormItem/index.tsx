@@ -3,6 +3,7 @@ import { Form, Col } from 'antd'
 import { FormItemProps as AntFormItemProps } from 'antd/es/form/FormItem'
 
 import useForm from '../../hooks/useForm'
+import { validateRowCol } from '../../shared/utils'
 
 interface FormItemProps extends AntFormItemProps {
   // TODO 自定义props？
@@ -12,11 +13,13 @@ interface FormItemProps extends AntFormItemProps {
 }
 
 export const FormItem: React.FC<FormItemProps> = ({ children, ...antProps}) => {
-  const { direction } = useForm()
+  const { direction, rowCol  } = useForm()
   const formItem = <Form.Item {...antProps}>{children}</Form.Item>
 
   if (direction === 'horizontal') {
-    return <Col>{formItem}</Col>
+    validateRowCol(rowCol)
+    const colSpan = 24 / rowCol
+    return <Col span={colSpan}>{formItem}</Col>
   }
   return formItem
 }

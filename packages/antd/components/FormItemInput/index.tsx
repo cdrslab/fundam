@@ -2,16 +2,16 @@ import React from 'react'
 import { Input as AntInput } from 'antd'
 import { InputProps as AntInputProps } from 'antd/es/input/Input'
 
-interface InputProps extends AntInputProps {
+interface FormItemInputProps extends AntInputProps {
 }
 
-export const Input: React.FC<InputProps> = ({
+export const FormItemInput: React.FC<FormItemInputProps> = ({
   placeholder,
   ...antProps
 }) => {
   return <AntInput placeholder={placeholder} {...antProps}/>
 }
 
-Input.defaultProps = {
+FormItemInput.defaultProps = {
   placeholder: '请输入'
 }
