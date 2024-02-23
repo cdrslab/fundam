@@ -11,13 +11,18 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.2.5",
-    "antd": "^5.8.4"
+    "antd": "^5.8.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "eslint": "^7.32.0",
     "@fundam/eslint-config-custom": "*",
     "@fundam/tsconfig": "*",
     "@types/antd": "^1.0.0",
+    "@types/react": "^18.2.57",
+    "@types/react-dom": "^18.2.19",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^7.32.0",
     "typescript": "^4.9.4",
     "vite": "^4.0.3"
   }

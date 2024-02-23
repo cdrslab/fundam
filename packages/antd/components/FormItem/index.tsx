@@ -11,7 +11,7 @@ interface FormItemProps extends AntFormItemProps {
   // children?: React.ReactNode
 }
 
-const FormItem: React.FC<FormItemProps> = ({ children, ...antProps}) => {
+export const FormItem: React.FC<FormItemProps> = ({ children, ...antProps}) => {
   const { direction } = useForm()
   const formItem = <Form.Item {...antProps}>{children}</Form.Item>
 
@@ -20,5 +20,3 @@ const FormItem: React.FC<FormItemProps> = ({ children, ...antProps}) => {
   }
   return formItem
 }
-
-export default FormItem
