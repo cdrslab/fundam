@@ -1,18 +1,21 @@
 import React from 'react'
 import { Form as AntForm, Row } from 'antd'
+import { FormProps as AntFormProps } from 'antd/es/form/Form'
 
-import FormContext from '../../shared/FormContext'
+import './index.less'
+import FormContext, { FormContextProps } from '../../shared/FormContext'
 
-interface FormProviderProps {
+interface FormProviderProps extends Partial<Omit<FormContextProps, 'form'>>, Omit<AntFormProps, 'form'> {
   children: React.ReactNode
-  direction: 'horizontal' | 'vertical'
-  rowCol: 1 | 2 | 3 | 4 | 6 | 8 | 12 | 24
 }
 
 export const Form: React.FC<FormProviderProps> = ({
   children,
-  direction,
-  rowCol,
+  // 注释说明见FormContextProps
+  direction = 'horizontal',
+  rowCol = 4,
+  showValidateMessagesRow = true,
+  onFinish,
   ...antProps
 }) => {
   const [form] = AntForm.useForm()
@@ -21,14 +24,34 @@ export const Form: React.FC<FormProviderProps> = ({
     form,
     direction,
     rowCol,
+    showValidateMessagesRow
+  }
+
+  const onFormFinish = (values: any) => {
+    // TODO 待定
+    onFinish && onFinish(values)
+  }
+
+  let currentLabelCol
+  let currentWrapperCol
+  if (direction === 'vertical') {
+    currentLabelCol = antProps.labelCol || { span: 6 }
+    currentWrapperCol = antProps.wrapperCol || { span: 12 }
   }
 
   return (
     <FormContext.Provider value={providerValue}>
-      <AntForm form={form} {...antProps}>
+      <AntForm
+        onFinish={onFormFinish}
+        form={form}
+        labelCol={currentLabelCol}
+        wrapperCol={currentWrapperCol}
+        {...antProps}
+        className={showValidateMessagesRow ? '' : 'fun-form-validate-messages-row-hidden'}
+      >
         {
           direction === 'horizontal' ?
-            <Row gutter={24}>
+            <Row gutter={[24, 12]}>
               {children}
             </Row>
             : children
@@ -36,9 +59,4 @@ export const Form: React.FC<FormProviderProps> = ({
       </AntForm>
     </FormContext.Provider>
   )
-}
-
-Form.defaultProps = {
-  direction: 'horizontal',
-  rowCol: 4
 }
