@@ -56,9 +56,13 @@ export const FormItemInput: React.FC<FormItemInputProps> = ({
   const currentRules = required ? (rules || [{ required: true, message: `请输入${antFormItemProps.label}` }]) : []
   // 优先展示当前FormItem设置的属性
   const currentDisplayType = displayType || formDisplayType
-  const currentDisplayTextEmpty = displayTextEmpty || displayTextEmpty
+  const currentDisplayTextEmpty = displayTextEmpty || formDisplayTextEmpty
 
   const getCurrentDisplayValue = () => {
+    console.log('-----form')
+    console.log(form)
+    console.log(antFormItemProps.name)
+    console.log(form.getFieldValue(antFormItemProps.name))
     const formItemValue = form.getFieldValue(antFormItemProps.name)
     return isDef(formItemValue) ? formItemValue : currentDisplayTextEmpty
   }

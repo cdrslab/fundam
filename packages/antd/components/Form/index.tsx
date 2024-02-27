@@ -1,15 +1,18 @@
 import React from 'react'
 import { Form as AntForm, Row } from 'antd'
 import { FormProps as AntFormProps } from 'antd/es/form/Form'
+import { FormInstance } from 'antd/es/form'
 
 import './index.less'
 import FormContext, { FormContextProps } from '../../shared/FormContext'
 
 interface FormProviderProps extends Partial<Omit<FormContextProps, 'form'>>, Omit<AntFormProps, 'form'> {
+  form: FormInstance
   children: React.ReactNode
 }
 
 export const Form: React.FC<FormProviderProps> = ({
+  form,
   children,
   // 注释说明见FormContextProps
   direction = 'horizontal',
@@ -23,7 +26,6 @@ export const Form: React.FC<FormProviderProps> = ({
   wrapperCol,
   ...antProps
 }) => {
-  const [form] = AntForm.useForm()
 
   const providerValue = {
     form,
