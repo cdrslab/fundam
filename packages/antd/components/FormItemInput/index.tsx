@@ -1,5 +1,6 @@
 import React from 'react'
 import { Input as AntInput, Form as AntForm, Col } from 'antd'
+import { isDef } from '@fundam/utils'
 import { InputProps as AntInputProps } from 'antd/es/input/Input'
 import { FormItemProps as AntFormItemProps } from 'antd/es/form/FormItem'
 
@@ -57,7 +58,10 @@ export const FormItemInput: React.FC<FormItemInputProps> = ({
   const currentDisplayType = displayType || formDisplayType
   const currentDisplayTextEmpty = displayTextEmpty || displayTextEmpty
 
-  const getCurrentValue = () => form.getFieldValue(antFormItemProps.name)
+  const getCurrentDisplayValue = () => {
+    const formItemValue = form.getFieldValue(antFormItemProps.name)
+    return isDef(formItemValue) ? formItemValue : currentDisplayTextEmpty
+  }
 
   const buildFormItem = () => {
     if (currentDisplayType === 'default' || currentDisplayType === 'disabled') {
@@ -89,7 +93,7 @@ export const FormItemInput: React.FC<FormItemInputProps> = ({
     // 文字展示
     return (
       <AntFormItem className={direction === 'vertical' ? 'fun-form-item-vertical' : ''} rules={currentRules} {...antFormItemProps}>
-        <div className="fun-form-item-display-text">{getCurrentValue() || currentDisplayTextEmpty}</div>
+        <div className="fun-form-item-display-text">{getCurrentDisplayValue()}</div>
       </AntFormItem>
     )
   }
