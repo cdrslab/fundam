@@ -15,7 +15,12 @@ export const Form: React.FC<FormProviderProps> = ({
   direction = 'horizontal',
   rowCol = 4,
   showValidateMessagesRow = true,
+  displayType = 'default',
+  displayTextEmpty = '-',
+  // antd props
   onFinish,
+  labelCol,
+  wrapperCol,
   ...antProps
 }) => {
   const [form] = AntForm.useForm()
@@ -24,7 +29,9 @@ export const Form: React.FC<FormProviderProps> = ({
     form,
     direction,
     rowCol,
-    showValidateMessagesRow
+    showValidateMessagesRow,
+    displayType,
+    displayTextEmpty
   }
 
   const onFormFinish = (values: any) => {
@@ -32,12 +39,9 @@ export const Form: React.FC<FormProviderProps> = ({
     onFinish && onFinish(values)
   }
 
-  let currentLabelCol
-  let currentWrapperCol
-  if (direction === 'vertical') {
-    currentLabelCol = antProps.labelCol || { span: 6 }
-    currentWrapperCol = antProps.wrapperCol || { span: 12 }
-  }
+  // TODO 读取项目中的 .funconfig 基础配置 或者类似 antd 的 config provider 处理，最终 merge 系统配置替换下面 { span: 6 }....，待实现
+  const currentLabelCol = direction === 'vertical' ? labelCol || { span: 6 } : labelCol
+  const currentWrapperCol = direction === 'vertical' ? wrapperCol || { span: 12 } : wrapperCol
 
   return (
     <FormContext.Provider value={providerValue}>
