@@ -14,7 +14,7 @@ export default () => {
       id: '123',
       id3: '333'
     })
-    setFormDisplayType('text')
+    // setFormDisplayType('text')
   }, [])
 
   return (
@@ -25,8 +25,8 @@ export default () => {
         showValidateMessagesRow={false}
         displayType={formDisplayType}
       >
-        <FormItemInput name="id" label="ID" placeholder="请输入ID" />
-        <FormItemInput name="id2" label="ID" placeholder="请输入ID" />
+        <FormItemInput name="id" label="ID" placeholder="请输入ID"/>
+        <FormItemInput name="id2" label="ID2" />
         <FormItemInput name="id3" label="ID" placeholder="请输入ID" />
         <FormItemInput name="id4" label="ID" placeholder="请输入ID" />
         <FormItemInput name="id5" label="ID" placeholder="请输入ID" />

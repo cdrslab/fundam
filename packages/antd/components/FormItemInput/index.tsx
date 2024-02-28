@@ -21,7 +21,7 @@ export const FormItemInput: React.FC<FormItemInputProps> = ({
   displayTextEmpty,
   // Antd Input Props: https://ant.design/components/input-cn#input
   // 移除与FormItem冲突的 defaultValue、value、status 属性
-  placeholder,
+  placeholder = '请输入',
   addonBefore,
   addonAfter,
   allowClear,
@@ -59,10 +59,6 @@ export const FormItemInput: React.FC<FormItemInputProps> = ({
   const currentDisplayTextEmpty = displayTextEmpty || formDisplayTextEmpty
 
   const getCurrentDisplayValue = () => {
-    console.log('-----form')
-    console.log(form)
-    console.log(antFormItemProps.name)
-    console.log(form.getFieldValue(antFormItemProps.name))
     const formItemValue = form.getFieldValue(antFormItemProps.name)
     return isDef(formItemValue) ? formItemValue : currentDisplayTextEmpty
   }
@@ -70,7 +66,12 @@ export const FormItemInput: React.FC<FormItemInputProps> = ({
   const buildFormItem = () => {
     if (currentDisplayType === 'default' || currentDisplayType === 'disabled') {
       return (
-        <AntFormItem className={direction === 'vertical' ? 'fun-form-item-vertical' : ''} rules={currentRules} {...antFormItemProps}>
+        <AntFormItem
+          className={direction === 'vertical' ? 'fun-form-item-vertical' : ''}
+          required={required}
+          rules={currentRules}
+          {...antFormItemProps}
+        >
           <AntInput
             onPressEnter={onPressEnter}
             placeholder={placeholder}
@@ -96,7 +97,11 @@ export const FormItemInput: React.FC<FormItemInputProps> = ({
     }
     // 文字展示
     return (
-      <AntFormItem className={direction === 'vertical' ? 'fun-form-item-vertical' : ''} rules={currentRules} {...antFormItemProps}>
+      <AntFormItem
+        className={direction === 'vertical' ? 'fun-form-item-vertical' : ''}
+        required={required}
+        {...antFormItemProps}
+      >
         <div className="fun-form-item-display-text">{getCurrentDisplayValue()}</div>
       </AntFormItem>
     )
@@ -111,8 +116,4 @@ export const FormItemInput: React.FC<FormItemInputProps> = ({
     return <Col span={colSpan}>{formItem}</Col>
   }
   return formItem
-}
-
-FormItemInput.defaultProps = {
-  placeholder: '请输入'
 }

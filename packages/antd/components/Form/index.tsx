@@ -1,10 +1,11 @@
 import React from 'react'
-import { Form as AntForm, Row } from 'antd'
+import { Button, Form as AntForm, Row, Col } from 'antd'
 import { FormProps as AntFormProps } from 'antd/es/form/Form'
 import { FormInstance } from 'antd/es/form'
 
 import './index.less'
 import FormContext, { FormContextProps } from '../../shared/FormContext'
+import { DownOutlined } from '@ant-design/icons';
 
 interface FormProviderProps extends Partial<Omit<FormContextProps, 'form'>>, Omit<AntFormProps, 'form'> {
   form: FormInstance
@@ -59,6 +60,17 @@ export const Form: React.FC<FormProviderProps> = ({
           direction === 'horizontal' ?
             <Row gutter={[24, 12]}>
               {children}
+              <Col span={6}>
+                <Button type="default" style={{ marginRight: 8 }} onClick={() => form.resetFields()}>
+                  重置
+                </Button>
+                <Button type="primary" onClick={() => form.submit()}>
+                  查询
+                </Button>
+                <Button type="link" style={{ paddingLeft: 8 }} onClick={() => form.submit()}>
+                  更多<DownOutlined style={{ marginInlineStart: 0 }} />
+                </Button>
+              </Col>
             </Row>
             : children
         }
