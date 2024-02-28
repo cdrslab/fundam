@@ -1,20 +1,26 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Button, Form as AntForm, Row, Col } from 'antd'
 import { FormProps as AntFormProps } from 'antd/es/form/Form'
 import { FormInstance } from 'antd/es/form'
 
 import './index.less'
 import FormContext, { FormContextProps } from '../../shared/FormContext'
-import { DownOutlined } from '@ant-design/icons';
+import { DownOutlined, UpOutlined } from '@ant-design/icons';
 
 interface FormProviderProps extends Partial<Omit<FormContextProps, 'form'>>, Omit<AntFormProps, 'form'> {
   form: FormInstance
   children: React.ReactNode
+  defaultButtonText?: string // 白色按钮文案，不传则不展示
+  primaryButtonText?: string // 蓝色按钮文案，默认：提交
+  collapseNames?: Array<string> // 收起的表单项（name区分）
 }
 
 export const Form: React.FC<FormProviderProps> = ({
   form,
   children,
+  defaultButtonText,
+  collapseNames = [],
+  primaryButtonText = '提交',
   // 注释说明见FormContextProps
   direction = 'horizontal',
   rowCol = 4,
@@ -27,6 +33,7 @@ export const Form: React.FC<FormProviderProps> = ({
   wrapperCol,
   ...antProps
 }) => {
+  const [formCollapse, setFormCollapse] = useState(true) // 表单展开收起（默认收起）
 
   const providerValue = {
     form,
@@ -34,10 +41,13 @@ export const Form: React.FC<FormProviderProps> = ({
     rowCol,
     showValidateMessagesRow,
     displayType,
-    displayTextEmpty
+    displayTextEmpty,
+    collapseNames,
+    formCollapse
   }
 
   const onFormFinish = (values: any) => {
+    console.log(values)
     // TODO 待定
     onFinish && onFinish(values)
   }
@@ -61,18 +71,47 @@ export const Form: React.FC<FormProviderProps> = ({
             <Row gutter={[24, 12]}>
               {children}
               <Col span={6}>
-                <Button type="default" style={{ marginRight: 8 }} onClick={() => form.resetFields()}>
-                  重置
-                </Button>
+                {
+                  defaultButtonText ?
+                    <Button type="default" style={{ marginRight: 8 }} onClick={() => form.resetFields()}>
+                      {defaultButtonText}
+                    </Button>
+                    :
+                    null
+                }
                 <Button type="primary" onClick={() => form.submit()}>
-                  查询
+                  {primaryButtonText}
                 </Button>
-                <Button type="link" style={{ paddingLeft: 8 }} onClick={() => form.submit()}>
-                  更多<DownOutlined style={{ marginInlineStart: 0 }} />
-                </Button>
+                {
+                  collapseNames?.length ?
+                    <Button type="link" style={{ paddingLeft: 8 }} onClick={() => setFormCollapse(!formCollapse)}>
+                      更多
+                      {
+                        formCollapse ? <DownOutlined style={{ marginInlineStart: 0 }} /> : <UpOutlined style={{ marginInlineStart: 0 }} />
+                      }
+                    </Button>
+                    :
+                    null
+                }
               </Col>
             </Row>
-            : children
+            : (
+              <>
+                {children}
+                <AntForm.Item label=" " colon={false}>
+                  {
+                    defaultButtonText ?
+                      <Button type="default" style={{ marginRight: 8 }} onClick={() => form.resetFields()}>
+                        {defaultButtonText}
+                      </Button>
+                      : null
+                  }
+                  <Button type="primary" onClick={() => form.submit()}>
+                    {primaryButtonText}
+                  </Button>
+                </AntForm.Item>
+              </>
+            )
         }
       </AntForm>
     </FormContext.Provider>

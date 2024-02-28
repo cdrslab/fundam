@@ -12,6 +12,7 @@ interface FormItemInputProps extends AntFormItemProps, Omit<AntInputProps, 'chil
   rowCol?: FormRowCol
   displayType?: FormDisplayType
   displayTextEmpty?: string
+  isNumber?: Boolean
 }
 
 const AntFormItem = AntForm.Item
@@ -19,6 +20,7 @@ export const FormItemInput: React.FC<FormItemInputProps> = ({
   rowCol,
   displayType,
   displayTextEmpty,
+  isNumber = false, // 输入的内容自动转换为数字
   // Antd Input Props: https://ant.design/components/input-cn#input
   // 移除与FormItem冲突的 defaultValue、value、status 属性
   placeholder = '请输入',
@@ -48,6 +50,8 @@ export const FormItemInput: React.FC<FormItemInputProps> = ({
   const {
     form,
     direction,
+    collapseNames,
+    formCollapse,
     rowCol: formRowCol,
     displayType: formDisplayType,
     displayTextEmpty: formDisplayTextEmpty
@@ -70,6 +74,7 @@ export const FormItemInput: React.FC<FormItemInputProps> = ({
           className={direction === 'vertical' ? 'fun-form-item-vertical' : ''}
           required={required}
           rules={currentRules}
+          hidden={formCollapse && collapseNames.includes(antFormItemProps.name) || antFormItemProps.hidden}
           {...antFormItemProps}
         >
           <AntInput
@@ -109,7 +114,7 @@ export const FormItemInput: React.FC<FormItemInputProps> = ({
 
   const formItem = buildFormItem()
 
-  if (direction === 'horizontal') {
+  if (direction === 'horizontal' && !(formCollapse && collapseNames.includes(antFormItemProps.name) || antFormItemProps.hidden)) {
     const currentRowCol = rowCol || formRowCol
     validateRowCol(currentRowCol)
     const colSpan = 24 / currentRowCol
