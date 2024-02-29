@@ -67,6 +67,46 @@ export const FormItemInput: React.FC<FormItemInputProps> = ({
     return isDef(formItemValue) ? formItemValue : currentDisplayTextEmpty
   }
 
+  // Input兼容输入数字
+  // const handleGetValueFromEvent = (event: any) => {
+  //   const { value } = event.target
+  //   return /^[1-9][0-9]*$/.test(value) ? parseInt(value) : null
+  // }
+  // if (isNumber) {
+  //   if (antFormItemProps.getValueFromEvent) {
+  //     const propGetValueFromEvent = antFormItemProps.getValueFromEvent
+  //     antFormItemProps.getValueFromEvent = (event) => {
+  //       event.target.value = handleGetValueFromEvent(event)
+  //       return propGetValueFromEvent(event)
+  //     }
+  //   } else {
+  //     antFormItemProps.getValueFromEvent = handleGetValueFromEvent
+  //   }
+  // }
+
+  const defaultNormalize = (value: any, prevValue: any, prevValues: any) => {
+    if (!isNumber) return value
+    if (value === '') return null
+    // 兼容Input输入数字
+    if (/^[1-9][0-9]*$/.test(value)) {
+      return parseInt(value)
+    } else {
+      return prevValue
+    }
+  }
+
+  // 仅form.setFieldsValue会触发，setFieldValue不会触发
+  const defaultShouldUpdate = (prevValue: any, curValue: any) => {
+    if (prevValue[antFormItemProps.name] === curValue[antFormItemProps.name]) return false
+    if (isNumber) {
+      const currentFormItemValue = curValue[antFormItemProps.name]
+      if (typeof currentFormItemValue === 'string') {
+        curValue[antFormItemProps.name] = parseInt(currentFormItemValue)
+      }
+    }
+    return true
+  }
+
   const buildFormItem = () => {
     if (currentDisplayType === 'default' || currentDisplayType === 'disabled') {
       return (
@@ -74,7 +114,9 @@ export const FormItemInput: React.FC<FormItemInputProps> = ({
           className={direction === 'vertical' ? 'fun-form-item-vertical' : ''}
           required={required}
           rules={currentRules}
-          hidden={formCollapse && collapseNames.includes(antFormItemProps.name) || antFormItemProps.hidden}
+          hidden={formCollapse && collapseNames.includes(antFormItemProps.name) && direction === 'horizontal' || antFormItemProps.hidden}
+          normalize={defaultNormalize}
+          shouldUpdate={defaultShouldUpdate}
           {...antFormItemProps}
         >
           <AntInput
@@ -87,7 +129,7 @@ export const FormItemInput: React.FC<FormItemInputProps> = ({
             count={count}
             disabled={disabled || currentDisplayType === 'disabled'}
             id={id}
-            maxLength={maxLength}
+            maxLength={isNumber ? 16 : maxLength}
             prefix={prefix}
             showCount={showCount}
             styles={styles}
