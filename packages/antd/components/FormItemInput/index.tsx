@@ -67,23 +67,6 @@ export const FormItemInput: React.FC<FormItemInputProps> = ({
     return isDef(formItemValue) ? formItemValue : currentDisplayTextEmpty
   }
 
-  // Input兼容输入数字
-  // const handleGetValueFromEvent = (event: any) => {
-  //   const { value } = event.target
-  //   return /^[1-9][0-9]*$/.test(value) ? parseInt(value) : null
-  // }
-  // if (isNumber) {
-  //   if (antFormItemProps.getValueFromEvent) {
-  //     const propGetValueFromEvent = antFormItemProps.getValueFromEvent
-  //     antFormItemProps.getValueFromEvent = (event) => {
-  //       event.target.value = handleGetValueFromEvent(event)
-  //       return propGetValueFromEvent(event)
-  //     }
-  //   } else {
-  //     antFormItemProps.getValueFromEvent = handleGetValueFromEvent
-  //   }
-  // }
-
   const defaultNormalize = (value: any, prevValue: any, prevValues: any) => {
     if (!isNumber) return value
     if (value === '') return null
