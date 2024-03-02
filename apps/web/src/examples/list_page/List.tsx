@@ -10,9 +10,8 @@ export default () => {
 
   useEffect(() => {
     form.setFieldsValue({
-      id1: '123', // isNumber后自动转换为数字
-      id3: '333',
-      id4: '44'
+      id: '123', // isNumber后自动转换为数字
+      name: '333'
     })
 
     setTimeout(() => {
@@ -34,26 +33,31 @@ export default () => {
   // TODO 兼容name为List的情况
   // TODO 搭建时，考虑该组件的三种状态不同的按钮及点击后效果展示：default、text、disabled
   return (
-    <Card>
-      <Form
-        form={form}
-        direction="vertical"
-        showValidateMessagesRow={false}
-        displayType={formDisplayType}
-        defaultButtonText="重置"
-        defaultButtonClick={onReset}
-        primaryButtonText="查询"
-        primaryButtonClick={onSubmit}
-        collapseNames={['id2', 'id3']}
-      >
-        {/*仅支持简单的正整数输入，其它小数、负数等请使用InputNumber*/}
-        <FormItemInput name="id1" label="ID1" placeholder="请输入ID" isNumber />
-        <FormItemInput name="id2" label="ID2" />
-        <FormItemInput name="id3" label="ID3" placeholder="请输入ID" />
-        <FormItemInput name="id4" label="ID4" placeholder="请输入ID" hidden />
-        <FormItemInput name="id5" label="ID5" placeholder="请输入ID" />
-        <FormItemInput name="id6" label="ID6" placeholder="请输入ID" tooltip="xxx" />
-      </Form>
-    </Card>
+    <div className="fun-page-list">
+      <Card style={{ marginBottom: 24 }}>
+        <Form
+          form={form}
+          direction="horizontal"
+          showValidateMessagesRow={false}
+          displayType={formDisplayType}
+          defaultButtonText="重置"
+          defaultButtonClick={onReset}
+          primaryButtonText="查询"
+          primaryButtonClick={onSubmit}
+          collapseNames={['xxx']}
+        >
+          {/*仅支持简单的正整数输入，其它小数、负数等请使用InputNumber*/}
+          <FormItemInput name="id" label="ID" placeholder="请输入ID" isNumber />
+          <FormItemInput name="name" label="姓名" />
+          <FormItemInput name="phone" label="手机号" />
+          <FormItemInput name="gender" label="性别" />
+          <FormItemInput name="id5" label="ID5" />
+          <FormItemInput name="xxx" label="收起测试" tooltip="xxx" />
+        </Form>
+      </Card>
+      <Card title="用户列表">
+
+      </Card>
+    </div>
   )
 }
