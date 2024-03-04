@@ -1,5 +1,4 @@
 import React from 'react'
-import { FormInstance } from 'antd/es/form'
 
 import { FormDirection, FormDisplayType, FormRowCol, FunFormInstance } from './types';
 

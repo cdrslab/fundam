@@ -12,6 +12,7 @@
   "dependencies": {
     "@ant-design/icons": "^5.2.5",
     "antd": "^5.8.4",
+    "mockjs": "^1.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
@@ -25,6 +26,7 @@
     "eslint": "^7.32.0",
     "less": "^4.2.0",
     "typescript": "^4.9.4",
-    "vite": "^4.0.3"
+    "vite": "^4.0.3",
+    "vite-plugin-fake-server": "^2.1.1"
   }
 }

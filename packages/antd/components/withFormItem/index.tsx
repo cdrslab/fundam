@@ -1,20 +1,19 @@
 import React from 'react'
 import { Input as AntInput, Select as AntSelect, Form as AntForm, Col } from 'antd'
 import { isDef } from '@fundam/utils'
-import { InputProps as AntInputProps } from 'antd/es/input/Input'
 import { FormItemProps as AntFormItemProps } from 'antd/es/form/FormItem'
 
 import useForm from '../../hooks/useForm';
 import { validateRowCol } from '../../shared/utils';
 import { FormDisplayType, FormRowCol } from '../../shared/types';
 
-export interface FormItemCommonProps extends AntFormItemProps, Omit<AntInputProps, 'children' | 'name' | 'onReset' | 'status'> {
+export interface FunFormItemProps {
   rowCol?: FormRowCol
   displayType?: FormDisplayType
   displayTextEmpty?: string
-  // FormItemInput props
-  isNumber?: Boolean
 }
+
+export interface FormItemCommonProps extends AntFormItemProps, FunFormItemProps {}
 
 const getPlaceholder = (props: any, component: any): string => {
   let { placeholder } = props
@@ -29,7 +28,7 @@ const getPlaceholder = (props: any, component: any): string => {
 
 const AntFormItem = AntForm.Item
 export function withFormItem(WrappedComponent: React.FC<any>) {
-  return (props: FormItemCommonProps) => {
+  return (props: any) => {
     const {
       rowCol,
       displayType,
@@ -87,7 +86,11 @@ export function withFormItem(WrappedComponent: React.FC<any>) {
 
     const getCurrentDisplayValue = () => {
       const formItemValue = form.getFieldValue(name)
-      return isDef(formItemValue) ? formItemValue : currentDisplayTextEmpty
+      if (!isDef(formItemValue)) return currentDisplayTextEmpty
+      if (WrappedComponent === AntSelect) {
+        return wrappedComponentProps?.options?.find((item: any) => item?.value === formItemValue)?.label || currentDisplayTextEmpty
+      }
+      return formItemValue
     }
 
     const defaultNormalize = (value: any, prevValue: any, prevValues: any) => {

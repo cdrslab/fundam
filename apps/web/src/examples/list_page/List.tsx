@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Card, Form } from '@fundam/antd';
 import { FormItemInput } from '@fundam/antd/components/FormItemInput';
+import { FormItemSelect } from '@fundam/antd/components/FormItemSelect';
 import useAntFormInstance from '@fundam/antd/hooks/useAntFormInstance';
 import { FormDisplayType, FunFormInstance } from '@fundam/antd/shared/types';
 
@@ -11,7 +12,8 @@ export default () => {
   useEffect(() => {
     form.setFieldsValue({
       id: '123', // isNumber后自动转换为数字
-      name: '333'
+      name: '333',
+      // gender: 1,
     })
 
     setTimeout(() => {
@@ -19,7 +21,7 @@ export default () => {
         id1: '8888' // 设置isNumber后自动转换为数字
       })
     }, 3000)
-    // setFormDisplayType('text')
+    setFormDisplayType('text')
   }, [])
 
   const onReset = (formIns: FunFormInstance) => {
@@ -50,7 +52,25 @@ export default () => {
           <FormItemInput name="id" label="ID" placeholder="请输入ID" isNumber />
           <FormItemInput name="name" label="姓名" />
           <FormItemInput name="phone" label="手机号" />
-          <FormItemInput name="gender" label="性别" />
+          <FormItemSelect
+            name="gender"
+            label="性别"
+            initialValue={-1}
+            options={[
+              {
+                label: '全部',
+                value: -1
+              },
+              {
+                label: '男',
+                value: 1
+              },
+              {
+                label: '女',
+                value: 2
+              }
+            ]}
+          />
           <FormItemInput name="id5" label="ID5" />
           <FormItemInput name="xxx" label="收起测试" tooltip="xxx" />
         </Form>
