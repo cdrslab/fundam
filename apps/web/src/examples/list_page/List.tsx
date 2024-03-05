@@ -4,6 +4,9 @@ import { FormItemInput } from '@fundam/antd/components/FormItemInput';
 import { FormItemSelect } from '@fundam/antd/components/FormItemSelect';
 import useAntFormInstance from '@fundam/antd/hooks/useAntFormInstance';
 import { FormDisplayType, FunFormInstance } from '@fundam/antd/shared/types';
+import { FormItemRadio } from '@fundam/antd/components/FormItemRadio';
+import { FormItemCheckbox } from '@fundam/antd/components/FormItemCheckbox';
+import { FormItemCascade } from '@fundam/antd/components/FormItemCascader';
 
 export default () => {
   const [form] = useAntFormInstance()
@@ -18,10 +21,10 @@ export default () => {
 
     setTimeout(() => {
       form.setFieldsValue({
-        id1: '8888' // 设置isNumber后自动转换为数字
+        id: '8888' // 设置isNumber后自动转换为数字
       })
     }, 3000)
-    setFormDisplayType('text')
+    // setFormDisplayType('text')
   }, [])
 
   const onReset = (formIns: FunFormInstance) => {
@@ -71,7 +74,55 @@ export default () => {
               }
             ]}
           />
+          <FormItemSelect
+            mode="multiple"
+            name="genderRemote1"
+            label="性别-远程"
+            initialValue={[1]}
+            labelKey="name"
+            valueKey="id"
+            dataApi="/api/user/genders"
+            resDataPath="data.genders"
+          />
+          <FormItemRadio
+            name="genderRemote2"
+            label="性别-远程"
+            initialValue={2}
+            labelKey="name"
+            valueKey="id"
+            dataApi="/api/user/genders"
+            resDataPath="data.genders"
+          />
+          <FormItemCheckbox
+            name="genderRemote3"
+            label="性别-远程"
+            initialValue={[1, 2]}
+            labelKey="name"
+            valueKey="id"
+            dataApi="/api/user/genders"
+            resDataPath="data.genders"
+          />
           <FormItemInput name="id5" label="ID5" />
+          <FormItemCascade
+            multiple
+            name="location"
+            label="地址-远程"
+            rowCol={18}
+            displayType="text"
+            initialValue={[
+              ['510100', '510104'],
+              ['510100', '510105'],
+              ['510100', '510106'],
+              ['510100', '510108', '51010801'],
+              ['510300'],
+              ['510400', '510402']
+            ]}
+            labelKey="name"
+            valueKey="code"
+            childrenKey="districts"
+            dataApi="/api/location/list"
+            resDataPath="location"
+          />
           <FormItemInput name="xxx" label="收起测试" tooltip="xxx" />
         </Form>
       </Card>

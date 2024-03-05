@@ -1,39 +1,59 @@
-import React from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Input as AntInput, Select as AntSelect, Form as AntForm, Col } from 'antd'
 import { isDef } from '@fundam/utils'
 import { FormItemProps as AntFormItemProps } from 'antd/es/form/FormItem'
+import { get } from 'lodash'
 
 import useForm from '../../hooks/useForm';
-import { validateRowCol } from '../../shared/utils';
+import { formatDataToOptions, getDisplayText, validateRowCol } from '../../shared/utils';
 import { FormDisplayType, FormRowCol } from '../../shared/types';
+import useFun from '../../hooks/useFun';
 
 export interface FunFormItemProps {
-  rowCol?: FormRowCol
+  rowCol?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24
   displayType?: FormDisplayType
   displayTextEmpty?: string
 }
 
 export interface FormItemCommonProps extends AntFormItemProps, FunFormItemProps {}
 
-const getPlaceholder = (props: any, component: any): string => {
+// 可选择的组件，如：Select、Radio、Checkbox等
+export interface FormItemOptionalProps extends FormItemCommonProps {
+  labelKey?: string
+  valueKey?: string
+  childrenKey?: string
+}
+
+const getPlaceholder = (props: any, componentName: string): string => {
   let { placeholder } = props
   if (placeholder) return placeholder
-  if (component === AntInput) {
+  if (componentName === 'Input') {
     placeholder = '请输入'
-  } else if (component === AntSelect) {
+  }
+  if (['Select', 'Cascader'].includes(componentName)) {
     placeholder = '请选择'
   }
   return placeholder
 }
 
 const AntFormItem = AntForm.Item
-export function withFormItem(WrappedComponent: React.FC<any>) {
+export function withFormItem(WrappedComponent: any) {
   return (props: any) => {
     const {
       rowCol,
       displayType,
       displayTextEmpty,
-      isNumber ,
+      isNumber,
+      // 请求接口相关
+      dataFunc,
+      dataApi,
+      dataApiReqData = {},
+      dataApiMethod = 'get',
+      resDataPath,
+      // 可选组件相关
+      labelKey = 'label',
+      valueKey = 'value',
+      childrenKey = 'children',
       // Form.Item props: https://ant.design/components/form-cn#formitem
       colon,
       dependencies,
@@ -68,6 +88,11 @@ export function withFormItem(WrappedComponent: React.FC<any>) {
       ...wrappedComponentProps
     } = props
 
+    const [loading, setLoading] = useState(wrappedComponentProps.loading || false) // 加载中
+    const [options, setOptions] = useState(wrappedComponentProps.options || []) // 下拉组件等的options
+    const { request } = useFun()
+    const componentName = WrappedComponent.displayName as string
+
     const {
       form,
       direction,
@@ -78,20 +103,40 @@ export function withFormItem(WrappedComponent: React.FC<any>) {
       displayTextEmpty: formDisplayTextEmpty
     } = useForm()
 
+    useEffect(() => {
+      init()
+    }, []);
+
+    const init = async () => {
+      if (!dataApi && !dataFunc) return
+      try {
+        setLoading(true)
+        let res = dataApi ? await request[dataApiMethod](dataApi, dataApiReqData) : await dataFunc(dataApiReqData)
+        res = resDataPath ? get(res, resDataPath) : res
+        res = formatDataToOptions(res, labelKey, valueKey, childrenKey)
+        setOptions(res)
+      } catch (e) {
+        console.error(e)
+      } finally {
+        setLoading(false)
+      }
+    }
+
     const currentRules = required ? (rules || [{ required: true, message: `${label}为必填字段` }]) : []
 
     // displayType为text时，优先展示当前FormItem设置的属性
     const currentDisplayType = displayType || formDisplayType
     const currentDisplayTextEmpty = displayTextEmpty || formDisplayTextEmpty
 
-    const getCurrentDisplayValue = () => {
+    const displayValue = useMemo(() => {
       const formItemValue = form.getFieldValue(name)
       if (!isDef(formItemValue)) return currentDisplayTextEmpty
-      if (WrappedComponent === AntSelect) {
-        return wrappedComponentProps?.options?.find((item: any) => item?.value === formItemValue)?.label || currentDisplayTextEmpty
+      if (['Select', 'Cascader', 'Radio', 'Checkbox'].includes(componentName)) {
+        return getDisplayText(options, formItemValue, '，') || currentDisplayTextEmpty
+        // return options?.find((item: any) => item?.value === formItemValue)?.label || currentDisplayTextEmpty
       }
       return formItemValue
-    }
+    }, [options])
 
     const defaultNormalize = (value: any, prevValue: any, prevValues: any) => {
       if (!isNumber || WrappedComponent !== AntInput) return value
@@ -114,6 +159,40 @@ export function withFormItem(WrappedComponent: React.FC<any>) {
         }
       }
       return true
+    }
+
+    const buildComponent = () => {
+      if (['Select', 'Cascader'].includes(componentName)) {
+        return (
+          <WrappedComponent
+            {...wrappedComponentProps as any}
+            options={options}
+            loading={loading}
+            placeholder={getPlaceholder(props, componentName)}
+            disabled={wrappedComponentProps.disabled || currentDisplayType === 'disabled'}
+          />
+        )
+      } else if (['Radio', 'Checkbox'].includes(componentName)) {
+        return (
+          <WrappedComponent.Group
+            {...wrappedComponentProps as any}
+            disabled={wrappedComponentProps.disabled || currentDisplayType === 'disabled'}
+          >
+            {
+              options.map((item: any) => (
+                <WrappedComponent value={item.value} key={item.value}>{item.label}</WrappedComponent>
+              ))
+            }
+          </WrappedComponent.Group>
+        )
+      }
+      return (
+        <WrappedComponent
+          {...wrappedComponentProps as any}
+          placeholder={getPlaceholder(props, componentName)}
+          disabled={wrappedComponentProps.disabled || currentDisplayType === 'disabled'}
+        />
+      )
     }
 
     const buildFormItem = () => {
@@ -154,11 +233,7 @@ export function withFormItem(WrappedComponent: React.FC<any>) {
             normalize={normalize || defaultNormalize}
             shouldUpdate={shouldUpdate || defaultShouldUpdate}
           >
-            <WrappedComponent
-              {...wrappedComponentProps as any}
-              placeholder={getPlaceholder(props, WrappedComponent)}
-              disabled={wrappedComponentProps.disabled || currentDisplayType === 'disabled'}
-            />
+            {buildComponent()}
           </AntFormItem>
         )
       }
@@ -167,7 +242,7 @@ export function withFormItem(WrappedComponent: React.FC<any>) {
         <AntFormItem
           {...commonAntFormItemProps}
         >
-          <div className="fun-form-item-display-text">{getCurrentDisplayValue()}</div>
+          <div className="fun-form-item-display-text">{displayValue}</div>
         </AntFormItem>
       )
     }
@@ -175,9 +250,7 @@ export function withFormItem(WrappedComponent: React.FC<any>) {
     const formItem = buildFormItem()
 
     if (direction === 'horizontal' && !(formCollapse && collapseNames.includes(name) || hidden)) {
-      const currentRowCol = rowCol || formRowCol
-      validateRowCol(currentRowCol)
-      const colSpan = 24 / currentRowCol
+      const colSpan = rowCol ? rowCol : (24 / formRowCol)
       return <Col span={colSpan}>{formItem}</Col>
     }
     return formItem

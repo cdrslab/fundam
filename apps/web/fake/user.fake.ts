@@ -20,10 +20,22 @@ export default defineFakeRoute([
     url: '/api/user/genders',
     method: 'GET',
     response: () => {
+      // 多层提取模拟
       return Mock.mock({
         ok: true,
         result: {
-
+          data: {
+            genders: [
+              {
+                name: '男',
+                id: 1
+              },
+              {
+                name: '女',
+                id: 2
+              },
+            ]
+          }
         }
       })
     }
