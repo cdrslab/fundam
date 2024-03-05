@@ -3,6 +3,7 @@ import { Input as AntInput, Select as AntSelect, Form as AntForm, Col } from 'an
 import { isDef } from '@fundam/utils'
 import { FormItemProps as AntFormItemProps } from 'antd/es/form/FormItem'
 import { get } from 'lodash'
+import dayjs, { Dayjs } from 'dayjs'
 
 import useForm from '../../hooks/useForm';
 import { formatDataToOptions, getDisplayText, validateRowCol } from '../../shared/utils';
@@ -39,7 +40,7 @@ const getPlaceholder = (props: any, componentName: string): string => {
 const AntFormItem = AntForm.Item
 export function withFormItem(WrappedComponent: any) {
   return (props: any) => {
-    const {
+    let {
       rowCol,
       displayType,
       displayTextEmpty,
@@ -54,6 +55,12 @@ export function withFormItem(WrappedComponent: any) {
       labelKey = 'label',
       valueKey = 'value',
       childrenKey = 'children',
+      // 针对RangePicker可以拆分成两个字段
+      names,
+      format = 'YYYY-MM-DD HH:mm:ss',
+      showTime = {
+        defaultValue: [dayjs('00:00:00', 'HH:mm:ss'), dayjs('23:59:59', 'HH:mm:ss')]
+      },
       // Form.Item props: https://ant.design/components/form-cn#formitem
       colon,
       dependencies,
@@ -88,10 +95,12 @@ export function withFormItem(WrappedComponent: any) {
       ...wrappedComponentProps
     } = props
 
+    const componentName = WrappedComponent.displayName as string
+
     const [loading, setLoading] = useState(wrappedComponentProps.loading || false) // 加载中
     const [options, setOptions] = useState(wrappedComponentProps.options || []) // 下拉组件等的options
+    const [noFormItemNameValue, setNoFormItemNameValue] = useState<any>(componentName === 'RangePicker' && names?.length === 2 && initialValue?.length ? [dayjs(initialValue[0]), dayjs(initialValue[1])] : []) // 兼容 RangePicker names 等
     const { request } = useFun()
-    const componentName = WrappedComponent.displayName as string
 
     const {
       form,
@@ -128,15 +137,28 @@ export function withFormItem(WrappedComponent: any) {
     const currentDisplayType = displayType || formDisplayType
     const currentDisplayTextEmpty = displayTextEmpty || formDisplayTextEmpty
 
-    const displayValue = useMemo(() => {
+    // const displayValue = useMemo(() => {
+    //   const formItemValue = form.getFieldValue(name)
+    //   if (!isDef(formItemValue)) return currentDisplayTextEmpty
+    //   if (['Select', 'Cascader', 'Radio', 'Checkbox'].includes(componentName)) {
+    //     return getDisplayText(options, formItemValue, '，') || currentDisplayTextEmpty
+    //   }
+    //   return formItemValue
+    // }, [options, form, name])
+
+    const getDisplayValue = () => {
       const formItemValue = form.getFieldValue(name)
       if (!isDef(formItemValue)) return currentDisplayTextEmpty
-      if (['Select', 'Cascader', 'Radio', 'Checkbox'].includes(componentName)) {
+      if (['Select', 'Cascader', 'Radio', 'Checkbox'].includes(componentName) && options?.length) {
         return getDisplayText(options, formItemValue, '，') || currentDisplayTextEmpty
-        // return options?.find((item: any) => item?.value === formItemValue)?.label || currentDisplayTextEmpty
+      }
+      if (['RangePicker'].includes(componentName) && names?.length === 2) {
+        const start = form.getFieldValue(names[0]) || currentDisplayTextEmpty
+        const end = form.getFieldValue(names[1]) || currentDisplayTextEmpty
+        return start + ' ~ ' + end
       }
       return formItemValue
-    }, [options])
+    }
 
     const defaultNormalize = (value: any, prevValue: any, prevValues: any) => {
       if (!isNumber || WrappedComponent !== AntInput) return value
@@ -151,14 +173,31 @@ export function withFormItem(WrappedComponent: any) {
 
     // 仅form.setFieldsValue会触发，setFieldValue不会触发
     const defaultShouldUpdate = (prevValue: any, curValue: any) => {
-      if (prevValue[name] === curValue[name]) return false
-      if (isNumber && WrappedComponent === AntInput) {
+      if (!names && prevValue[name] === curValue[name]) return false
+      if (isNumber && componentName === 'Input') {
         const currentFormItemValue = curValue[name]
         if (typeof currentFormItemValue === 'string') {
           curValue[name] = parseInt(currentFormItemValue)
         }
       }
+      if (names?.length === 2 && componentName === 'RangePicker' && curValue[names[0]] && curValue[names[1]]) {
+        const startValue = curValue[names[0]]
+        const endValue = curValue[names[1]]
+        setNoFormItemNameValue([dayjs(startValue), dayjs(endValue)])
+      }
       return true
+    }
+
+    const handleRangeChange = (dates: [Dayjs, Dayjs] | null, dateStrings: [string, string]) => {
+      if (names?.length === 2 && dates) {
+        const [startTimeName, endTimeName] = names;
+        form.setFieldsValue({
+          [startTimeName]: dates[0].format(format),
+          [endTimeName]: dates[1].format(format),
+        })
+      }
+      setNoFormItemNameValue(dates)
+      wrappedComponentProps.onChange && wrappedComponentProps.onChange(dates, dateStrings)
     }
 
     const buildComponent = () => {
@@ -184,6 +223,42 @@ export function withFormItem(WrappedComponent: any) {
               ))
             }
           </WrappedComponent.Group>
+        )
+      } else if (['RangePicker'].includes(componentName)) {
+        if (names?.length === 2) {
+          return (
+            <>
+              {
+                names.map((n: any, index: number) =>
+                  <AntFormItem
+                    name={n}
+                    key={n}
+                    initialValue={initialValue?.[index]}
+                    hidden
+                    shouldUpdate={defaultShouldUpdate}
+                  />
+                )
+              }
+              <WrappedComponent
+                {...wrappedComponentProps as any}
+                showTime={showTime}
+                format={format}
+                onChange={wrappedComponentProps.onChange ? wrappedComponentProps.onChange : names ? handleRangeChange : undefined}
+                value={noFormItemNameValue}
+                placeholder={getPlaceholder(props, componentName)}
+                disabled={wrappedComponentProps.disabled || currentDisplayType === 'disabled'}
+              />
+            </>
+          )
+        }
+        return (
+          <WrappedComponent
+            {...wrappedComponentProps as any}
+            format={format}
+            onChange={wrappedComponentProps.onChange ? wrappedComponentProps.onChange : names ? handleRangeChange : undefined}
+            placeholder={getPlaceholder(props, componentName)}
+            disabled={wrappedComponentProps.disabled || currentDisplayType === 'disabled'}
+          />
         )
       }
       return (
@@ -242,7 +317,7 @@ export function withFormItem(WrappedComponent: any) {
         <AntFormItem
           {...commonAntFormItemProps}
         >
-          <div className="fun-form-item-display-text">{displayValue}</div>
+          <div className="fun-form-item-display-text">{getDisplayValue()}</div>
         </AntFormItem>
       )
     }

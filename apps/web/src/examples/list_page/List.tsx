@@ -7,15 +7,20 @@ import { FormDisplayType, FunFormInstance } from '@fundam/antd/shared/types';
 import { FormItemRadio } from '@fundam/antd/components/FormItemRadio';
 import { FormItemCheckbox } from '@fundam/antd/components/FormItemCheckbox';
 import { FormItemCascade } from '@fundam/antd/components/FormItemCascader';
+import { FormItemDatePicker } from '@fundam/antd/components/FormItemDatePickerRangePicker';
 
 export default () => {
   const [form] = useAntFormInstance()
   const [formDisplayType, setFormDisplayType] = useState<FormDisplayType>('default')
 
   useEffect(() => {
+    // @ts-ignore 方便调试
+    window.$form = form
     form.setFieldsValue({
       id: '123', // isNumber后自动转换为数字
       name: '333',
+      // startTime: '2024-03-05 00:00:00',
+      // endTime: '2024-03-07 23:59:59',
       // gender: 1,
     })
 
@@ -24,6 +29,7 @@ export default () => {
         id: '8888' // 设置isNumber后自动转换为数字
       })
     }, 3000)
+    // setFormDisplayType('disabled')
     // setFormDisplayType('text')
   }, [])
 
@@ -103,12 +109,18 @@ export default () => {
             resDataPath="data.genders"
           />
           <FormItemInput name="id5" label="ID5" />
+          <FormItemDatePicker
+            rowCol={10}
+            names={['startTime', 'endTime']}
+            label="时间"
+            initialValue={['2024-03-07 00:00:00', '2024-03-07 23:59:59']}
+          />
           <FormItemCascade
             multiple
             name="location"
             label="地址-远程"
             rowCol={18}
-            displayType="text"
+            // displayType="text"
             initialValue={[
               ['510100', '510104'],
               ['510100', '510105'],
