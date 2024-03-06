@@ -137,15 +137,6 @@ export function withFormItem(WrappedComponent: any) {
     const currentDisplayType = displayType || formDisplayType
     const currentDisplayTextEmpty = displayTextEmpty || formDisplayTextEmpty
 
-    // const displayValue = useMemo(() => {
-    //   const formItemValue = form.getFieldValue(name)
-    //   if (!isDef(formItemValue)) return currentDisplayTextEmpty
-    //   if (['Select', 'Cascader', 'Radio', 'Checkbox'].includes(componentName)) {
-    //     return getDisplayText(options, formItemValue, '，') || currentDisplayTextEmpty
-    //   }
-    //   return formItemValue
-    // }, [options, form, name])
-
     const getDisplayValue = () => {
       const formItemValue = form.getFieldValue(name)
       if (!isDef(formItemValue)) return currentDisplayTextEmpty
@@ -241,6 +232,7 @@ export function withFormItem(WrappedComponent: any) {
               }
               <WrappedComponent
                 {...wrappedComponentProps as any}
+                style={wrappedComponentProps.style || { width: '100%' }}
                 showTime={showTime}
                 format={format}
                 onChange={wrappedComponentProps.onChange ? wrappedComponentProps.onChange : names ? handleRangeChange : undefined}

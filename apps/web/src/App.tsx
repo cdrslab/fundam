@@ -1,9 +1,10 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import List from './examples/list_page/List';
+import BaseForm from './examples/form_page/BaseForm';
 
 import './app.css'
 import { FunConfigProvider } from '@fundam/antd/components/FunConfigProvider';
-import { message } from 'antd';
+import { Button, message } from 'antd';
 import { createAPI } from '@fundam/utils/request';
 
 // 模拟不同环境不同baseURL
@@ -12,7 +13,13 @@ const getBaseURL = () => {
   return '//localhost:5174'
 }
 
+const RenderComponents = {
+  list: List,
+  baseForm: BaseForm,
+}
+
 const App = () => {
+  const [renderComponent, setRenderComponent] = useState('baseForm')
   const request = useMemo(() => createAPI({
     baseURL: getBaseURL(),
   }, (res: any) => {
@@ -36,6 +43,8 @@ const App = () => {
     throw error
   }), [])
 
+  // @ts-ignore
+  const CurrentComponent = RenderComponents[renderComponent]
   return (
     <FunConfigProvider
       request={request}
@@ -43,9 +52,12 @@ const App = () => {
       <div className="app-container">
         <div className="menus">模拟菜单占位</div>
         <div className="main-content">
-          <div className="top-bar">模拟导航条占位</div>
+          <div className="top-bar">
+            <Button onClick={() => setRenderComponent('baseForm')} style={{ marginRight: 4 }}>基础表单</Button>
+            <Button onClick={() => setRenderComponent('list')}>列表</Button>
+          </div>
           <div className="content">
-            <List/>
+            <CurrentComponent />
           </div>
         </div>
       </div>

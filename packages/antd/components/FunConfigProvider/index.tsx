@@ -5,19 +5,20 @@ import ConfigContext, { ConfigContextProps } from '../../shared/ConfigContext'
 import { defaultConfig } from '../../shared/defaultConfig';
 
 export const FunConfigProvider: React.FC<ConfigContextProps & { children: any }> = ({ request, antd, children }) => {
+  const antConfigProviderMerge = {
+    ...defaultConfig.antd?.ConfigProviderProps,
+    ...antd?.ConfigProviderProps
+  }
   const providerValue = {
     antd: {
-      ConfigProviderProps: {
-        ...defaultConfig.antd?.ConfigProviderProps,
-        ...antd?.ConfigProviderProps
-      }
+      ConfigProviderProps: antConfigProviderMerge
     },
     request
   }
 
   return (
     <ConfigContext.Provider value={providerValue}>
-      <ConfigProvider {...antd?.ConfigProviderProps}>
+      <ConfigProvider {...antConfigProviderMerge}>
         {children}
       </ConfigProvider>
     </ConfigContext.Provider>
