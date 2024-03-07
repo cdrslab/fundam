@@ -4,10 +4,11 @@ import { UploadOutlined } from '@ant-design/icons';
 import { UploadProps, UploadChangeParam } from 'antd/lib/upload';
 import { FormItemProps } from 'antd/lib/form';
 import { get } from 'lodash';
-import axios from 'axios';
+
 import { GetData } from '../../shared/types';
 import useForm from '../../hooks/useForm';
 import useFun from '../../hooks/useFun';
+import './index.less'
 
 interface FormItemUploadImageProps extends FormItemProps, Omit<UploadProps, 'children' | 'name' | 'fileList'>, Omit<GetData, 'dataFunc'> {
   uploadName?: string // 发送给后台的文件参数名，因为给 Form.Item name冲突，故用uploadName
@@ -59,7 +60,6 @@ const FormItemUploadImage: React.FC<FormItemUploadImageProps> = ({
   const [visible, setVisible] = useState(false)
   const [current, setCurrent] = useState<number>(1)
   const [fileList, setFileList] = useState<any[]>([])
-  const [firstUploading, setFirstUploading] = useState<Boolean>(false) // 防止单张上传抖动的问题
   const {
     form,
     direction,
@@ -94,7 +94,6 @@ const FormItemUploadImage: React.FC<FormItemUploadImageProps> = ({
 
     if (info.file.status === 'uploading') {
       setFileList(newFileList);
-      // if (maxCount === 1) setFirstUploading(true)
       return;
     }
 
@@ -104,15 +103,12 @@ const FormItemUploadImage: React.FC<FormItemUploadImageProps> = ({
         newFileList = newFileList.map(file =>
           file.uid === info.file.uid ? { ...file, status: 'done', url: responseURL } : file
         );
-        setFirstUploading(false)
       } else {
         message.error('获取上传URL失败');
-        setFirstUploading(false)
         return;
       }
     } else if (info.file.status === 'error') {
       message.error(`${info.file.name} 文件上传失败`);
-      setFirstUploading(false)
       return;
     }
 
@@ -201,8 +197,10 @@ const FormItemUploadImage: React.FC<FormItemUploadImageProps> = ({
   return (
     <Form.Item {...formItemProps}>
       {/*@ts-ignore*/}
-      <Upload {...uploadProps}>
-        {fileList.length >= maxCount && !firstUploading ? null : <div><UploadOutlined/> 上传</div>}
+      <Upload
+        {...uploadProps}
+      >
+        {fileList.length >= maxCount ? null : <div><UploadOutlined/> 上传</div>}
       </Upload>
       <div style={{display: 'none'}}>
         <Image.PreviewGroup

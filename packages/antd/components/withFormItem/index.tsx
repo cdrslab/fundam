@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Input as AntInput, Select as AntSelect, Form as AntForm, Col } from 'antd'
+import { Input as AntInput, Select as AntSelect, Form as AntForm, Col, Input } from 'antd'
 import { isDef } from '@fundam/utils'
 import { FormItemProps as AntFormItemProps } from 'antd/es/form/FormItem'
 import { get } from 'lodash'
@@ -227,7 +227,7 @@ export function withFormItem(WrappedComponent: any) {
                     initialValue={initialValue?.[index]}
                     hidden
                     shouldUpdate={defaultShouldUpdate}
-                  />
+                  ><Input/></AntFormItem>
                 )
               }
               <WrappedComponent

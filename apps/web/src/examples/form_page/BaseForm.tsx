@@ -61,6 +61,7 @@ export default () => {
           />
           <Title content="核心信息" />
           <FormItemUploadImage
+            isString
             label="图片"
             name="images"
             dataApi="/api/file/upload"
