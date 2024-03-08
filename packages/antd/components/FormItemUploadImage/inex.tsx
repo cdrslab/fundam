@@ -12,14 +12,12 @@ import './index.less'
 
 interface FormItemUploadImageProps extends FormItemProps, Omit<UploadProps, 'children' | 'name' | 'fileList'>, Omit<GetData, 'dataFunc'> {
   uploadName?: string // 发送给后台的文件参数名，因为给 Form.Item name冲突，故用uploadName
-  // max?: number // 最多上传张数
   isString?: boolean // 上传成功后，form该中该表单项对应的值，数组 or 逗号分隔的字符串
   separator?: string // 配合isString使用
   maxErrorMessage?: string // 上传超限报错文案
 }
 
 const FormItemUploadImage: React.FC<FormItemUploadImageProps> = ({
-  // max = 1000,
   isString = false,
   separator = ',',
   dataApi,
