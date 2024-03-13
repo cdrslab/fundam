@@ -5,6 +5,7 @@ import { SelectProps as AntSelectProps } from 'antd/es/select/index'
 import { FormItemOptionalProps, withFormItem } from '../withFormItem'
 import { GetData } from '../../shared/types';
 
+// @ts-ignore
 export interface FormItemSelectProps extends GetData, FormItemOptionalProps, Omit<AntSelectProps, 'children' | 'name' | 'onReset' | 'status'> {
 }
 

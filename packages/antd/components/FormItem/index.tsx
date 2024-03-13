@@ -58,11 +58,17 @@ export const FormItem: React.FC<any> = ({
 
   if (isVisible === false) return null
 
+  // 默认为联动子项，靠近父级
+  const style = antProps.label === ' ' && observe?.length && visibleRule ? {
+    marginTop: '-24px'
+  } : {}
+
   return (
     <AntFormItem
       {...antProps}
       tooltip={curTooltip as any}
       extra={curExtra as any}
+      style={style}
     >
       {children}
     </AntFormItem>

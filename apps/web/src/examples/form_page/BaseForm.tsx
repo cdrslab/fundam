@@ -83,10 +83,9 @@ export default () => {
               },
             }}
           />
-          <Space>
-
-          </Space>
           <FormItemSelect
+            required
+            allowClear
             name={['audience', 'type']}
             label="投放"
             initialValue={-1}
@@ -108,8 +107,10 @@ export default () => {
             // visibleRule="zones[1].userList[0].name === '222'"
             // name={['zones', 1, 'userList', 0, 'status']}
             noLabel
-            observe={['audience']}
-            visibleRule="audience.type === 1"
+            observe={['name', 'audience']}
+            visibleRule="audience.type === 1 || name === '222'"
+            // observe={['audience']}
+            // visibleRule="audience.type === 1"
             name={['audience', 'filterType']}
             initialValue={1}
             options={[

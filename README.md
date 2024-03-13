@@ -17,14 +17,14 @@
 - [x] Select、Checkbox、Radio、Cascader远程数据支持
 - [x] 各项组件文字预览实现
 - [x] Upload实现
-- [ ] 封装[antd form item trigger（组合组件）](https://ant.design/components/form-cn#components-form-demo-customized-form-controls)
-- [ ] 表单联动实现
+- [x] 表单联动实现
 - [ ] 按钮联动实现
 - [ ] url支持 _displayType=text disabled default 设置页面的展示样式
 - [ ] 各项组件增加 copyable props，在Form displayType为text或者disabled时，末尾追加复制按钮，点击即可复制
 - [ ] 新增Table， column 增加 onClick、onCopy props，有onClick时，变为可点击的link，最多行数限制...，增加enum控制dataIndex数据展示
 - [ ] 新增TableForm组件，支持【点击修改】
 - [ ] 类formily [Editable](https://antd.formilyjs.org/components/editable)
+- [ ] 封装[antd form item trigger（组合组件）](https://ant.design/components/form-cn#components-form-demo-customized-form-controls)
 
 #### 基础功能
 
