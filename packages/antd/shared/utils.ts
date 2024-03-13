@@ -1,5 +1,7 @@
+import { get } from 'lodash'
+
 import { VALID_ROW_COLS } from './constants'
-import { get } from 'lodash';
+import { FormInstance } from 'antd/es/form';
 
 export const validateRowCol = (rowCol: number) => {
   if (!VALID_ROW_COLS.includes(rowCol)) {
@@ -74,7 +76,7 @@ export function getDisplayText(options: Option[], value: Value, separator: strin
 
 // form item 组件公共部分
 export const getFormItemDefaultData = (formItemProps: Record<string, any>, params = {}) => {
-  const currentRules = formItemProps.required ? (formItemProps.rules || [{ required: true, message: `${formItemProps.label}为必填字段` }]) : []
+  const currentRules = formItemProps.required ? (formItemProps.rules || [{ required: true, message: `${formItemProps.label || '该字段'}为必填字段` }]) : []
 
   return {
     currentRules
@@ -91,3 +93,27 @@ export const getData = async (data: any, request: any) => {
   return res
 }
 
+interface QueryParams {
+  [key: string]: any;
+}
+
+// 联动表达式执行
+export const evaluateExpression = (
+  expression: string,
+  form: FormInstance,
+  query: QueryParams = {},
+  names: string[] // TODO 多层name，Form.List中用到的？--暂不需要
+): any => {
+  const formValues = form.getFieldsValue()
+  const context = { ...query, ...formValues }
+  const contextKeys = Object.keys(context).join(", ")
+  const contextValues = Object.keys(context).map(key => context[key])
+
+  try {
+    const func = new Function(contextKeys, `return ${expression};`)
+    return func(...contextValues)
+  } catch (error) {
+    console.error('Error evaluating expression with Function:', error)
+    return undefined
+  }
+}

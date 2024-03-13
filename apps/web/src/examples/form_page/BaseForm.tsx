@@ -18,6 +18,8 @@ export default () => {
   useEffect(() => {
     // setFormDisplayType('text')
     // start: ['2024-03-07 00:00:00', '2024-03-07 23:59:59']
+    // @ts-ignore
+    window.$form = form
     form.setFieldsValue({
       // startEnd: ['2024-03-07 00:00:00', '2024-03-07 23:59:59'],
       // start: '2024-03-07 00:00:00',
@@ -52,6 +54,17 @@ export default () => {
             name="name"
             label="活动名"
           />
+          {/*Form.List模拟测试*/}
+          {/*<FormItemInput*/}
+          {/*  required*/}
+          {/*  name={['zones', 1, 'userList', 0, 'name']}*/}
+          {/*  label="活动名"*/}
+          {/*/>*/}
+          {/*<FormItemInput*/}
+          {/*  required*/}
+          {/*  name={['zones', 2, 'userList', 2, 'name']}*/}
+          {/*  label="活动名"*/}
+          {/*/>*/}
           <FormItemDatePicker
             required
             // name="startEnd"
@@ -77,6 +90,28 @@ export default () => {
               {
                 label: '部分',
                 value: 1
+              }
+            ]}
+          />
+          <FormItemRadio
+            // required
+            // 数组（Form.List）测试
+            // observe={['zones']}
+            // visibleRule="zones[1].userList[0].name === '222'"
+            // name={['zones', 1, 'userList', 0, 'status']}
+            noLabel
+            observe={['audience']}
+            visibleRule="audience.type === 1"
+            name={['audience', 'filterType']}
+            initialValue={1}
+            options={[
+              {
+                label: '按ID',
+                value: 1
+              },
+              {
+                label: '按标签',
+                value: 2
               }
             ]}
           />

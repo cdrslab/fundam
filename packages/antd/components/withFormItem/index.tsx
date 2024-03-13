@@ -14,11 +14,15 @@ export interface FunFormItemProps {
   rowCol?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24
   displayType?: FormDisplayType
   displayTextEmpty?: string
+  noLabel?: boolean // 不展示label（关联设置colon）
+  visibleRule?: (() => boolean) | string
+  observe?: Array<string>
 }
 
 export interface FormItemCommonProps extends Omit<AntFormItemProps, 'tooltip' | 'extra'>, FunFormItemProps {
   tooltip?: string | GetData | ReactNode
   extra?: string | GetData | ReactNode
+  options?: Array<any>
 }
 
 // 可选择的组件，如：Select、Radio、Checkbox等
@@ -43,9 +47,14 @@ const getPlaceholder = (props: any, componentName: string): string => {
 export function withFormItem(WrappedComponent: any) {
   return (props: any) => {
     const {
+      // formItem新增props
+      visibleRule, // 表达式 & Func 计算是否展示组件
+      observe, // 监听 变化 => 触发 visibleRule 重新计算
+
       rowCol,
       displayType,
       displayTextEmpty,
+      noLabel = false,
       isNumber,
       // 请求接口相关
       dataFunc,
@@ -126,7 +135,7 @@ export function withFormItem(WrappedComponent: any) {
       }
     }
 
-    const currentRules = required ? (rules || [{ required: true, message: `${label}为必填字段` }]) : []
+    const currentRules = required ? (rules || [{ required: true, message: `${label || '该字段'}为必填字段` }]) : []
 
     // displayType为text时，优先展示当前FormItem设置的属性
     const currentDisplayType = displayType || formDisplayType
@@ -231,10 +240,14 @@ export function withFormItem(WrappedComponent: any) {
         return (
           <FormItem
             {...commonAntFormItemProps}
+            visibleRule={visibleRule}
+            observe={observe}
             rules={currentRules}
             hidden={formCollapse && collapseNames.includes(name) && direction === 'horizontal' || hidden}
             normalize={normalize || defaultNormalize}
             shouldUpdate={shouldUpdate || defaultShouldUpdate}
+            label={noLabel ? ' ' : label}
+            colon={!noLabel}
           >
             {buildComponent()}
           </FormItem>
@@ -244,6 +257,10 @@ export function withFormItem(WrappedComponent: any) {
       return (
         <FormItem
           {...commonAntFormItemProps}
+          label={noLabel ? ' ' : label}
+          colon={!noLabel}
+          visibleRule={visibleRule}
+          observe={observe}
         >
           <div className="fun-form-item-display-text">{getDisplayValue()}</div>
         </FormItem>

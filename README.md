@@ -17,6 +17,7 @@
 - [x] Select、Checkbox、Radio、Cascader远程数据支持
 - [x] 各项组件文字预览实现
 - [x] Upload实现
+- [ ] 封装[antd form item trigger（组合组件）](https://ant.design/components/form-cn#components-form-demo-customized-form-controls)
 - [ ] 表单联动实现
 - [ ] 按钮联动实现
 - [ ] url支持 _displayType=text disabled default 设置页面的展示样式
