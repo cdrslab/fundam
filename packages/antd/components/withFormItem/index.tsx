@@ -1,14 +1,14 @@
-import React, { ReactNode, useEffect, useMemo, useState } from 'react'
+import React, { ReactNode, useEffect, useState } from 'react'
 import { Input as AntInput, Select as AntSelect, Form as AntForm, Col, Input } from 'antd'
 import { isDef } from '@fundam/utils'
 import { FormItemProps as AntFormItemProps } from 'antd/es/form/FormItem'
 import { get } from 'lodash'
 
-import useForm from '../../hooks/useForm';
-import { formatDataToOptions, getDisplayText, validateRowCol } from '../../shared/utils';
-import { FormDisplayType, FormRowCol, GetData } from '../../shared/types';
-import useFun from '../../hooks/useFun';
-import { FormItem } from '../FormItem';
+import { useForm } from '../../hooks/useForm';
+import { useFun } from '../../hooks/useFun'
+import { formatDataToOptions, getDisplayText } from '../../shared/utils'
+import { FormDisplayType, GetData } from '../../shared/types'
+import { FormItem } from '../FormItem'
 
 export interface FunFormItemProps {
   rowCol?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24

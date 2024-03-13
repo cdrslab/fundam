@@ -6,8 +6,8 @@ import { FormItemProps } from 'antd/lib/form';
 import { get } from 'lodash';
 
 import { GetData } from '../../shared/types';
-import useForm from '../../hooks/useForm';
-import useFun from '../../hooks/useFun';
+import { useForm } from '../../hooks/useForm';
+import { useFun } from '../../hooks/useFun';
 import './index.less'
 import { getFormItemDefaultData } from '../../shared/utils';
 
@@ -18,7 +18,7 @@ interface FormItemUploadImageProps extends FormItemProps, Omit<UploadProps, 'chi
   maxErrorMessage?: string // 上传超限报错文案
 }
 
-const FormItemUploadImage: React.FC<FormItemUploadImageProps> = ({
+export const FormItemUploadImage: React.FC<FormItemUploadImageProps> = ({
   isString = false,
   separator = ',',
   dataApi,
@@ -219,5 +219,3 @@ const FormItemUploadImage: React.FC<FormItemUploadImageProps> = ({
     </Form.Item>
 );
 };
-
-export default FormItemUploadImage;

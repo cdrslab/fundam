@@ -2,11 +2,11 @@ import React, { useState } from 'react'
 import { Button, Form as AntForm, Row, Col } from 'antd'
 import { FormProps as AntFormProps } from 'antd/es/form/Form'
 import { FormInstance } from 'antd/es/form'
+import { DownOutlined, UpOutlined } from '@ant-design/icons'
 
 import './index.less'
 import FormContext, { FormContextProps } from '../../shared/FormContext'
-import { DownOutlined, UpOutlined } from '@ant-design/icons';
-import { FunFormInstance } from '../../shared/types';
+import { FunFormInstance } from '../../shared/types'
 
 interface FormProviderProps extends Partial<Omit<FormContextProps, 'form'>>, Omit<AntFormProps, 'form'> {
   form: FunFormInstance // 原因见 useAntFormInstance

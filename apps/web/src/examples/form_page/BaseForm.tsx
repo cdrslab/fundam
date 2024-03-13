@@ -1,15 +1,20 @@
-import { useEffect, useState } from 'react';
-import { Card, Form } from '@fundam/antd';
-import { FormItemInput } from '@fundam/antd/components/FormItemInput';
-import { FormItemSelect } from '@fundam/antd/components/FormItemSelect';
-import useAntFormInstance from '@fundam/antd/hooks/useAntFormInstance';
-import { FormDisplayType, FunFormInstance } from '@fundam/antd/shared/types';
-import { FormItemRadio } from '@fundam/antd/components/FormItemRadio';
-import { FormItemCheckbox } from '@fundam/antd/components/FormItemCheckbox';
-import { FormItemCascade } from '@fundam/antd/components/FormItemCascader';
-import { FormItemDatePicker } from '@fundam/antd/components/FormItemDatePickerRangePicker';
-import { Title } from '@fundam/antd/components/Title';
-import FormItemUploadImage from '@fundam/antd/components/FormItemUploadImage/inex';
+import { useEffect, useState } from 'react'
+import {
+  Card,
+  Title,
+  Space,
+  Form,
+  FormItemUploadImage,
+  FormItemDatePickerRangePicker,
+  FormItemInput,
+  FormItemSelect,
+  FormItemRadio,
+  useAntFormInstance,
+  FormItemCheckbox,
+  FormItemCascade,
+  FormDisplayType,
+  FunFormInstance
+} from '@fundam/antd'
 
 export default () => {
   const [form] = useAntFormInstance()
@@ -65,7 +70,7 @@ export default () => {
           {/*  name={['zones', 2, 'userList', 2, 'name']}*/}
           {/*  label="活动名"*/}
           {/*/>*/}
-          <FormItemDatePicker
+          <FormItemDatePickerRangePicker
             required
             // name="startEnd"
             names={['start', 'end']}
@@ -78,6 +83,9 @@ export default () => {
               },
             }}
           />
+          <Space>
+
+          </Space>
           <FormItemSelect
             name={['audience', 'type']}
             label="投放"

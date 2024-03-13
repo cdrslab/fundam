@@ -4,8 +4,8 @@ import { isStringArray } from '@fundam/utils'
 import queryString from 'query-string'
 
 import { evaluateExpression, getData } from '../../shared/utils'
-import useFun from '../../hooks/useFun'
-import useForm from '../../hooks/useForm';
+import { useFun } from '../../hooks/useFun'
+import { useForm } from '../../hooks/useForm';
 import { useLocation } from '@fundam/hooks';
 
 const { Item: AntFormItem } = Form
