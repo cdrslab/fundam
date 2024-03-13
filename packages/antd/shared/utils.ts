@@ -1,4 +1,5 @@
 import { VALID_ROW_COLS } from './constants'
+import { get } from 'lodash';
 
 export const validateRowCol = (rowCol: number) => {
   if (!VALID_ROW_COLS.includes(rowCol)) {
@@ -79,3 +80,14 @@ export const getFormItemDefaultData = (formItemProps: Record<string, any>, param
     currentRules
   }
 }
+
+// 组件自适应请求
+export const getData = async (data: any, request: any) => {
+  if (!data || !request) return data
+  const { dataApi, dataFunc, dataApiReqData = {}, dataApiMethod = 'get', resDataPath = '' } = data as any
+  if (!dataApi && !dataFunc) return data
+  let res = dataApi ? await request[dataApiMethod](dataApi, dataApiReqData) : await dataFunc(dataApiReqData)
+  res = resDataPath ? get(res, resDataPath) : res
+  return res
+}
+

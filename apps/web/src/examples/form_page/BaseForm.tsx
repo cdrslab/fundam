@@ -16,7 +16,7 @@ export default () => {
   const [formDisplayType, setFormDisplayType] = useState<FormDisplayType>('default')
 
   useEffect(() => {
-    setFormDisplayType('text')
+    // setFormDisplayType('text')
     // start: ['2024-03-07 00:00:00', '2024-03-07 23:59:59']
     form.setFieldsValue({
       // startEnd: ['2024-03-07 00:00:00', '2024-03-07 23:59:59'],
@@ -47,13 +47,23 @@ export default () => {
           primaryButtonClick={onSubmit}
         >
           <Title content="基本信息" />
-          <FormItemInput name="name" label="活动名" required />
+          <FormItemInput
+            required
+            name="name"
+            label="活动名"
+          />
           <FormItemDatePicker
             required
             // name="startEnd"
             names={['start', 'end']}
             initialValue={['2024-03-07 00:00:00', '2024-03-08 23:59:59']}
             label="活动时间"
+            tooltip={{
+              dataApi: '/api/resource/period',
+              dataApiReqData: {
+                id: 123 // 真实场景从query、状态等取得
+              },
+            }}
           />
           <FormItemSelect
             name={['audience', 'type']}

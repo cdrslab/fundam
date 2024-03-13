@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { ReactNode, useEffect, useMemo, useState } from 'react'
 import { Input as AntInput, Select as AntSelect, Form as AntForm, Col, Input } from 'antd'
 import { isDef } from '@fundam/utils'
 import { FormItemProps as AntFormItemProps } from 'antd/es/form/FormItem'
@@ -6,8 +6,9 @@ import { get } from 'lodash'
 
 import useForm from '../../hooks/useForm';
 import { formatDataToOptions, getDisplayText, validateRowCol } from '../../shared/utils';
-import { FormDisplayType, FormRowCol } from '../../shared/types';
+import { FormDisplayType, FormRowCol, GetData } from '../../shared/types';
 import useFun from '../../hooks/useFun';
+import { FormItem } from '../FormItem';
 
 export interface FunFormItemProps {
   rowCol?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24
@@ -15,7 +16,10 @@ export interface FunFormItemProps {
   displayTextEmpty?: string
 }
 
-export interface FormItemCommonProps extends AntFormItemProps, FunFormItemProps {}
+export interface FormItemCommonProps extends Omit<AntFormItemProps, 'tooltip' | 'extra'>, FunFormItemProps {
+  tooltip?: string | GetData | ReactNode
+  extra?: string | GetData | ReactNode
+}
 
 // 可选择的组件，如：Select、Radio、Checkbox等
 export interface FormItemOptionalProps extends FormItemCommonProps {
@@ -36,7 +40,6 @@ const getPlaceholder = (props: any, componentName: string): string => {
   return placeholder
 }
 
-const AntFormItem = AntForm.Item
 export function withFormItem(WrappedComponent: any) {
   return (props: any) => {
     const {
@@ -226,7 +229,7 @@ export function withFormItem(WrappedComponent: any) {
       }
       if (currentDisplayType === 'default' || currentDisplayType === 'disabled') {
         return (
-          <AntFormItem
+          <FormItem
             {...commonAntFormItemProps}
             rules={currentRules}
             hidden={formCollapse && collapseNames.includes(name) && direction === 'horizontal' || hidden}
@@ -234,16 +237,16 @@ export function withFormItem(WrappedComponent: any) {
             shouldUpdate={shouldUpdate || defaultShouldUpdate}
           >
             {buildComponent()}
-          </AntFormItem>
+          </FormItem>
         )
       }
       // 文字展示
       return (
-        <AntFormItem
+        <FormItem
           {...commonAntFormItemProps}
         >
           <div className="fun-form-item-display-text">{getDisplayValue()}</div>
-        </AntFormItem>
+        </FormItem>
       )
     }
 

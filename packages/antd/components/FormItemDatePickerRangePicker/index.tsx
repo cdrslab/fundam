@@ -1,22 +1,25 @@
-import React, { useEffect, useState } from 'react'
+import React, { ReactNode, useEffect, useState } from 'react'
 import { DatePicker, Input, Form } from 'antd'
 import { RangePickerProps as AntDatePickerRangePickerProps } from 'antd/es/date-picker/index'
 
-import { FormItemCommonProps, withFormItem } from '../withFormItem'
+import { FormItemCommonProps } from '../withFormItem'
 import dayjs, { Dayjs } from 'dayjs';
 import { getFormItemDefaultData } from '../../shared/utils';
 import useForm from '../../hooks/useForm';
 import useFun from '../../hooks/useFun';
+import { FormItem } from '../FormItem';
+import { GetData } from '../../shared/types';
 
-const { Item: AntFormItem } = Form
-
-export interface FormItemDatePickerRangePickerProps extends Omit<FormItemCommonProps, 'name'>, Omit<AntDatePickerRangePickerProps, 'id' | 'children' | 'name' | 'onReset' | 'status'> {
+export interface FormItemDatePickerRangePickerProps extends Omit<FormItemCommonProps, 'name' | 'tooltip' | 'extra'>, Omit<AntDatePickerRangePickerProps, 'id' | 'children' | 'name' | 'onReset' | 'status'> {
   name?: string
   names?: Array<string> // 如：['startTime', ‘endTime’] 可以直接格式化两个字段
   format?: string
+  tooltip?: string | GetData | ReactNode
+  extra?: string | GetData | ReactNode
 }
 
 const { RangePicker } = DatePicker
+const { Item: AntFormItem } = Form
 
 export const FormItemDatePicker: React.FC<FormItemDatePickerRangePickerProps> = ({
   // 新增props
@@ -246,19 +249,19 @@ export const FormItemDatePicker: React.FC<FormItemDatePickerRangePickerProps> = 
   if (currentDisplayType === 'text') {
     // 文字展示
     return (
-      <AntFormItem
+      <FormItem
         {...formItemProps}
         className={formItemClass}
       >
         <div className="fun-form-item-display-text">{getDisplayValue()}</div>
-      </AntFormItem>
+      </FormItem>
     )
   }
 
   return (
     <>
       {buildIgnoreFormItem()}
-      <AntFormItem
+      <FormItem
         {...formItemProps}
         className={formItemClass}
         initialValue={formItemInitialValue}
@@ -270,7 +273,7 @@ export const FormItemDatePicker: React.FC<FormItemDatePickerRangePickerProps> = 
         <RangePicker
           {...rangePickerProps}
         />
-      </AntFormItem>
+      </FormItem>
     </>
   )
 }

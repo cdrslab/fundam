@@ -1,25 +1,39 @@
-import React from 'react'
-import { Form, Col } from 'antd'
-import { FormItemProps as AntFormItemProps } from 'antd/es/form/FormItem'
+import React, { useEffect, useState } from 'react'
+import { Form } from 'antd'
+import { isStringArray } from '@fundam/utils'
 
-import useForm from '../../hooks/useForm'
-import { validateRowCol } from '../../shared/utils'
+import { getData, validateRowCol } from '../../shared/utils'
+import useFun from '../../hooks/useFun'
 
-interface FormItemProps extends AntFormItemProps {
-  // TODO 自定义props？
-  // name: string
-  // label: string
-  // children?: React.ReactNode
-}
+const { Item: AntFormItem } = Form
+export const FormItem: React.FC<any> = ({
+  children,
+  tooltip,
+  extra,
+  ...antProps
+}) => {
+  const [curTooltip, setCurTooltip] = useState(null)
+  const [curExtra, setCurExtra] = useState(null)
+  const { request } = useFun()
 
-export const FormItem: React.FC<FormItemProps> = ({ children, ...antProps}) => {
-  const { direction, rowCol  } = useForm()
-  const formItem = <Form.Item {...antProps}>{children}</Form.Item>
+  useEffect(() => {
+    init()
+  }, []);
 
-  if (direction === 'horizontal') {
-    validateRowCol(rowCol)
-    const colSpan = 24 / rowCol
-    return <Col span={colSpan}>{formItem}</Col>
+  const init = async () => {
+    const tooltipRes = await getData(tooltip as any, request)
+    const extraRes = await getData(extra as any, request)
+    setCurTooltip(isStringArray(tooltipRes) ? tooltipRes.join('\n') : tooltipRes)
+    setCurExtra(isStringArray(extraRes) ? extraRes.join('\n') : extraRes)
   }
-  return formItem
+
+  return (
+    <AntFormItem
+      {...antProps}
+      tooltip={curTooltip as any}
+      extra={curExtra as any}
+    >
+      {children}
+    </AntFormItem>
+  )
 }

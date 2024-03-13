@@ -3,6 +3,7 @@ import { ConfigProvider } from 'antd'
 
 import ConfigContext, { ConfigContextProps } from '../../shared/ConfigContext'
 import { defaultConfig } from '../../shared/defaultConfig';
+import './index.less'
 
 export const FunConfigProvider: React.FC<ConfigContextProps & { children: any }> = ({ request, antd, children }) => {
   const antConfigProviderMerge = {
