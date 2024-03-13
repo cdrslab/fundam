@@ -16,7 +16,13 @@ export default () => {
   const [formDisplayType, setFormDisplayType] = useState<FormDisplayType>('default')
 
   useEffect(() => {
-
+    setFormDisplayType('text')
+    // start: ['2024-03-07 00:00:00', '2024-03-07 23:59:59']
+    form.setFieldsValue({
+      // startEnd: ['2024-03-07 00:00:00', '2024-03-07 23:59:59'],
+      // start: '2024-03-07 00:00:00',
+      // end: '2024-03-07 23:59:59'
+    })
   }, [])
 
   const onReset = (formIns: FunFormInstance) => {
@@ -42,9 +48,14 @@ export default () => {
         >
           <Title content="基本信息" />
           <FormItemInput name="name" label="活动名" required />
-          <FormItemDatePicker names={['startTime', 'endTime']} label="活动时间" required />
-          <FormItemSelect
+          <FormItemDatePicker
             required
+            // name="startEnd"
+            names={['start', 'end']}
+            initialValue={['2024-03-07 00:00:00', '2024-03-08 23:59:59']}
+            label="活动时间"
+          />
+          <FormItemSelect
             name={['audience', 'type']}
             label="投放"
             initialValue={-1}
@@ -61,6 +72,7 @@ export default () => {
           />
           <Title content="核心信息" />
           <FormItemUploadImage
+            // required
             isString
             label="图片"
             name="images"

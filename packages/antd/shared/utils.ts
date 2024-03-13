@@ -70,3 +70,12 @@ export function getDisplayText(options: Option[], value: Value, separator: strin
     return findLabelByValue(options, value as string | number, true);
   }
 }
+
+// form item 组件公共部分
+export const getFormItemDefaultData = (formItemProps: Record<string, any>, params = {}) => {
+  const currentRules = formItemProps.required ? (formItemProps.rules || [{ required: true, message: `${formItemProps.label}为必填字段` }]) : []
+
+  return {
+    currentRules
+  }
+}

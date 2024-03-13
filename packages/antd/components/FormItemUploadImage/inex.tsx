@@ -9,6 +9,7 @@ import { GetData } from '../../shared/types';
 import useForm from '../../hooks/useForm';
 import useFun from '../../hooks/useFun';
 import './index.less'
+import { getFormItemDefaultData } from '../../shared/utils';
 
 interface FormItemUploadImageProps extends FormItemProps, Omit<UploadProps, 'children' | 'name' | 'fileList'>, Omit<GetData, 'dataFunc'> {
   uploadName?: string // 发送给后台的文件参数名，因为给 Form.Item name冲突，故用uploadName
@@ -68,6 +69,7 @@ const FormItemUploadImage: React.FC<FormItemUploadImageProps> = ({
     displayTextEmpty: formDisplayTextEmpty
   } = useForm()
   const { request } = useFun()
+  const { currentRules } = getFormItemDefaultData(formItemProps)
 
   useEffect(() => {
     if (formItemProps.initialValue) {
@@ -193,7 +195,7 @@ const FormItemUploadImage: React.FC<FormItemUploadImageProps> = ({
   };
 
   return (
-    <Form.Item {...formItemProps}>
+    <Form.Item {...formItemProps} rules={currentRules} style={{ marginBottom: 32 }}>
       {/*@ts-ignore*/}
       <Upload
         {...uploadProps}

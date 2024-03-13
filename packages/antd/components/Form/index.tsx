@@ -52,9 +52,14 @@ export const Form: React.FC<FormProviderProps> = ({
   }
 
   const onFormFinish = (values: any) => {
-    console.log(values)
-    // TODO 待定
-    onFinish && onFinish(values)
+    // 过滤私有属性
+    const newValues: Record<string, any> = {}
+    Object.keys(values).forEach(key => {
+      if (key.startsWith('__')) return
+      newValues[key] = values[key]
+    })
+    console.log(newValues)
+    onFinish && onFinish(newValues)
   }
 
   const onDefaultButtonClick = () => {
