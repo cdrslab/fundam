@@ -4,10 +4,10 @@
 }
 .menus {
     width: 250px;
-    height: 100vh;
     background: #ffffff;
     padding: 24px;
     font-size: 16px;
+    min-height: 100vh;
 }
 .main-content {
     width: 100%;

@@ -148,7 +148,7 @@ export default defineFakeRoute([
         for (let index = 0; index < count; index++) {
           const resType = randomType[numRandom(0, 5)]
           const status = numRandom(1, 4)
-          const statusDesc = ['待发布', '未开始', '进行中', '已结束'][status]
+          const statusDesc = ['待发布', '未开始', '进行中', '已结束'][status - 1]
           res.result.list.push({
             id: numRandom(10000, 99999),
             name: Mock.mock('@cword(0, 2)') + name + Mock.mock('@cword(0, 2)') + '资源位',
@@ -166,7 +166,7 @@ export default defineFakeRoute([
       for (let index = 0; index < pageSize; index++) {
         const resType = randomType[numRandom(0, 5)]
         const status = numRandom(1, 4)
-        const statusDesc = ['待发布', '未开始', '进行中', '已结束'][status]
+        const statusDesc = ['待发布', '未开始', '进行中', '已结束'][status - 1]
 
         res.result.list.push({
           id: numRandom(10000, 99999),

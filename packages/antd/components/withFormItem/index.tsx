@@ -126,7 +126,7 @@ export function withFormItem(WrappedComponent: any) {
     }, [])
 
     const init = async () => {
-      if ((!dataApi && !dataFunc) || options?.length || loading) return
+      if (!dataApi && !dataFunc) return
       try {
         setLoading(true)
         let res = dataApi ? await request[dataApiMethod](dataApi, dataApiReqData) : await dataFunc(dataApiReqData)

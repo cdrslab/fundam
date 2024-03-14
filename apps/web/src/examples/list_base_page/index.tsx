@@ -62,12 +62,12 @@ export default () => {
     {
       title: '资源类型',
       dataIndex: 'typeDesc',
-      width: 220
+      width: 100
     },
     {
       title: '投放时间',
       dataIndex: 'time',
-      width: 150
+      width: 320
     },
     {
       title: '状态',
@@ -135,6 +135,8 @@ export default () => {
       <Card title="资源列表">
         <Table
           columns={columns}
+          dataApi="/api/resource/list"
+          rowKey="id"
         />
       </Card>
     </div>
