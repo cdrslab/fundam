@@ -218,7 +218,7 @@ export const FormItemUploadImage: React.FC<FormItemUploadImageProps> = ({
       {/*@ts-ignore*/}
       <Upload
         {...uploadProps}
-        disabled={uploadProps.disabled || currentDisplayType === 'disabled'}
+        disabled={uploadProps.disabled || currentDisplayType === 'disabled' || currentDisplayType === 'text'}
       >
         {fileList.length >= maxCount ? null : <div><UploadOutlined/> 上传</div>}
       </Upload>

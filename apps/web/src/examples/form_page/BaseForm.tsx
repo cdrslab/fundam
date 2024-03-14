@@ -22,7 +22,7 @@ export default () => {
 
   useEffect(() => {
     // setFormDisplayType('text')
-    setFormDisplayType('disabled')
+    setFormDisplayType('text')
     // start: ['2024-03-07 00:00:00', '2024-03-07 23:59:59']
     // @ts-ignore
     window.$form = form
