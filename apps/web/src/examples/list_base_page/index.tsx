@@ -43,15 +43,6 @@ export default () => {
   const [form] = useAntFormInstance()
   const { resourceTable } = useAlias()
 
-  const onReset = async () => {
-    form.resetFields()
-    await resourceTable.fetchData({ page: 1 })
-  }
-
-  const onSubmit = async (formValues: any) => {
-    await resourceTable.fetchData({ ...formValues, page: 1 })
-  }
-
   const onClickRecordName = (record: any) => {
     console.log(record)
   }
@@ -125,10 +116,10 @@ export default () => {
           direction="horizontal"
           showValidateMessagesRow={false}
           defaultButtonText="重置"
-          defaultButtonClick={onReset}
+          defaultButtonClick={() => { form.resetFields(); resourceTable.fetchData({ page: 1 }) }}
           primaryButtonText="查询"
           primaryButtonClick={() => form.submit()}
-          onFinish={onSubmit}
+          onFinish={(values) => resourceTable.fetchData({ ...values, page: 1 })}
         >
           <FormItemInput
             isNumber
