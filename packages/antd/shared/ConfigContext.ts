@@ -6,6 +6,10 @@ export interface ConfigContextProps {
   antd?: {
     ConfigProviderProps?: ConfigProviderProps // 全局配置 https://ant.design/components/config-provider-cn#api
   }
+  alias?: Record<string, any>
+  setAlias?: (name: string, value: any) => void
+  getAlias?: (name: string) => any
+  getAllAlias?: () => any
 }
 
 const ConfigContext = React.createContext<ConfigContextProps | undefined>(undefined)

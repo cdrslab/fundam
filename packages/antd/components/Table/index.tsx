@@ -7,6 +7,7 @@ import {
 import { GetData } from '../../shared/types';
 import { useFun } from '../../hooks/useFun';
 import { get } from 'lodash';
+import { useAlias } from '../../hooks/useAlias';
 
 export interface RowData {}
 
@@ -15,17 +16,19 @@ export interface ColumnProps<T> extends AntTableColumnProps<T> {
   dataIndex: string // 索引
   title: ((props: any) => React.ReactNode) | React.ReactNode
   tooltip?: string // 提示
+  onClick?: (record: any) => void
   // buttonsConfig?: ButtonConfig[]
 }
 
 interface TableProps extends Omit<AntTableProps, 'columns'>, GetData {
-  column: ColumnProps<RowData>[]
-  initPage: number // 初始化页码
-  initPageSize: number // 初始化页面条数
-  pageKey: string
-  listKey: string
-  pageSizeKey: string
-  totalKey: string
+  columns: ColumnProps<RowData>[]
+  initPage?: number // 初始化页码
+  initPageSize?: number // 初始化页面条数
+  pageKey?: string
+  listKey?: string
+  pageSizeKey?: string
+  totalKey?: string
+  alias?: string // 当前页面唯一的别名
 }
 
 export const Table: React.FC<TableProps> = ({
@@ -42,14 +45,19 @@ export const Table: React.FC<TableProps> = ({
   listKey = 'list',
   pageSizeKey = 'pageSize',
   totalKey = 'total',
+  alias,
+
   rowKey = 'id',
+  columns,
 
   children,
   ...antProps
 }) => {
   const [loading, setLoading] = useState(antProps.loading || false) // 加载中
   const { request } = useFun()
+  const { setAlias } = useAlias()
   const initRef = useRef(false)
+  const [cacheLastRequestParams, setCacheLastRequestParams] = useState<any>({})
   const [data, setData] = useState({
     list: [],
     total: 0,
@@ -59,17 +67,20 @@ export const Table: React.FC<TableProps> = ({
 
   useEffect(() => {
     if (!initRef.current) {
-      init()
+      fetchData()
+      alias && setAlias(alias, { fetchData, refreshData })
       initRef.current = true
     }
   }, [])
 
-  const init = async () => {
+  const fetchData = async (params: any = {}) => {
     if (!dataApi && !dataFunc) return
     try {
       setLoading(true)
+      const requestData = { ...dataApiReqData, ...params }
+      setCacheLastRequestParams(requestData)
       // @ts-ignore
-      let res = dataApi ? await request[dataApiMethod](dataApi, dataApiReqData) : await dataFunc(dataApiReqData)
+      let res = dataApi ? await request[dataApiMethod](dataApi, requestData) : await dataFunc(requestData)
       res = resDataPath ? get(res, resDataPath) : res
       const newData = {
         list: res[listKey],
@@ -85,19 +96,19 @@ export const Table: React.FC<TableProps> = ({
     }
   }
 
-  const handlePagination = async () => {
+  const handlePagination = (page: number, pageSize: number) => fetchData({ ...cacheLastRequestParams, page, pageSize })
 
-  }
-
-  const onSearch = async () => {
-
-  }
+  const refreshData = () => fetchData(cacheLastRequestParams)
 
   // TODO 格式化columns
+  const renderColumns = columns.map(column => {
+    return column
+  })
 
   const renderProps = {
     ...antProps,
     rowKey,
+    columns: renderColumns,
     size: antProps.size || 'small',
     scroll: antProps.scroll || { x: '100%' },
     dataSource: antProps.dataSource || data.list,
@@ -106,7 +117,7 @@ export const Table: React.FC<TableProps> = ({
       pageSize: data.pageSize,
       total: data.total,
       onChange: handlePagination,
-      showSizeChanger: false,
+      showSizeChanger: true,
     } : false)
   }
 

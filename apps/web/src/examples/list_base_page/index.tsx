@@ -15,8 +15,10 @@ import {
   FormDisplayType,
   FunFormInstance,
   FormItemTextArea,
-  Table
+  Table,
+  Badge, useAlias
 } from '@fundam/antd'
+import { DesktopOutlined, MobileOutlined } from '@ant-design/icons';
 
 const resourceStatusOptions = [
   {
@@ -39,13 +41,19 @@ const resourceStatusOptions = [
 
 export default () => {
   const [form] = useAntFormInstance()
+  const { resourceTable } = useAlias()
 
-  const onReset = () => {
+  const onReset = async () => {
     form.resetFields()
+    await resourceTable.fetchData({ page: 1 })
   }
 
-  const onSubmit = () => {
-    form.submit()
+  const onSubmit = async (formValues: any) => {
+    await resourceTable.fetchData({ ...formValues, page: 1 })
+  }
+
+  const onClickRecordName = (record: any) => {
+    console.log(record)
   }
 
   const columns = [
@@ -57,12 +65,24 @@ export default () => {
     {
       title: '名称',
       dataIndex: 'name',
-      width: 150
+      width: 130,
+      onClick: onClickRecordName
     },
     {
       title: '资源类型',
       dataIndex: 'typeDesc',
-      width: 100
+      width: 120,
+      render: (_, record: any) => (
+        <span>
+          {
+            record.type[0] === 'APP' ?
+              <MobileOutlined style={{ color: 'red', marginRight: 4}} />
+              :
+              <DesktopOutlined style={{color: 'red', marginRight: 4}} />
+          }
+          {record.typeDesc}
+        </span>
+      )
     },
     {
       title: '投放时间',
@@ -72,7 +92,8 @@ export default () => {
     {
       title: '状态',
       dataIndex: 'statusDesc',
-      width: 80
+      width: 80,
+      render: (_, record: any) => <Badge status={['warning', 'processing', 'success', 'default'][record.status - 1]} text={record.statusDesc} />
     },
     {
       title: '创建人',
@@ -87,7 +108,12 @@ export default () => {
     {
       title: '操作',
       dataIndex: 'op',
-      width: 150
+      width: 150,
+      render: (_, record) => (
+        <>
+
+        </>
+      )
     },
   ]
 
@@ -101,7 +127,8 @@ export default () => {
           defaultButtonText="重置"
           defaultButtonClick={onReset}
           primaryButtonText="查询"
-          primaryButtonClick={onSubmit}
+          primaryButtonClick={() => form.submit()}
+          onFinish={onSubmit}
         >
           <FormItemInput
             isNumber
@@ -134,6 +161,7 @@ export default () => {
       </Card>
       <Card title="资源列表">
         <Table
+          alias="resourceTable"
           columns={columns}
           dataApi="/api/resource/list"
           rowKey="id"

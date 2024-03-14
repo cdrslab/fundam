@@ -22,5 +22,10 @@ export const createAPI = (options: CreateAxiosDefaults = {}, responseInterceptor
 
   api.interceptors.response.use(responseInterceptorOnFulfilled, responseInterceptorOnRejected)
 
-  return api
+  return {
+    get: (url: string, params: any, config = {}) => api.get(url, { ...config, params }),
+    post: (url: string, data: any, config = {}) => api.post(url, data, config),
+    put: (url: string, data: any, config = {}) => api.put(url, data, config),
+    delete: (url: string, params: any, config = {}) => api.delete(url, { ...config, params }),
+  }
 }

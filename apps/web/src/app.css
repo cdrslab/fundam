@@ -25,3 +25,7 @@
 .content {
     padding: 24px;
 }
+
+.ant-table-cell-row-hover {
+    background: rgba(176, 42, 42, 0.31) !important;
+}
