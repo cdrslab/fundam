@@ -3,7 +3,7 @@ import { Form } from 'antd'
 import { isStringArray } from '@fundam/utils'
 import queryString from 'query-string'
 
-import { evaluateExpression, getData } from '../../shared/utils'
+import { evaluateExpression, extractDependenciesFromString, getData } from '../../shared/utils'
 import { useFun } from '../../hooks/useFun'
 import { useForm } from '../../hooks/useForm';
 import { useLocation } from '@fundam/hooks';
@@ -26,13 +26,17 @@ export const FormItem: React.FC<any> = ({
   const [isVisible, setIsVisible] = useState(true)
   const location = useLocation()
 
+  const curObserve = observe?.length ? observe : extractDependenciesFromString(visibleRule)
+  const watchValues = curObserve?.map((item: string) => Form.useWatch(item, form as any))
+
   useEffect(() => {
     init()
   }, [])
 
+  // 依赖自动收集与联动实现
   useEffect(() => {
     evaluateVisibility()
-  }, [observe.map((item: string) => !item.startsWith('Query.') && Form.useWatch(item, form as any)), location.search])
+  }, [JSON.stringify(watchValues), location.search])
 
   useEffect(() => {
     if (isVisible) return
@@ -59,7 +63,7 @@ export const FormItem: React.FC<any> = ({
   if (isVisible === false) return null
 
   // 默认为联动子项，靠近父级
-  const style = antProps.label === ' ' && observe?.length && visibleRule ? {
+  const style = antProps.label === ' ' && watchValues?.length && visibleRule ? {
     marginTop: '-24px'
   } : {}
 

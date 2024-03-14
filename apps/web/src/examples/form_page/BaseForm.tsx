@@ -106,11 +106,13 @@ export default () => {
             // observe={['zones']}
             // visibleRule="zones[1].userList[0].name === '222'"
             // name={['zones', 1, 'userList', 0, 'status']}
-            noLabel
-            observe={['name', 'audience']}
-            visibleRule="audience.type === 1 || name === '222'"
+            // extra="11"
+            // observe={['name', 'audience']} // 自动收集依赖
             // observe={['audience']}
             // visibleRule="audience.type === 1"
+            // 自动依赖收集
+            noLabel
+            visibleRule="audience.type === 1 || name === '222'"
             name={['audience', 'filterType']}
             initialValue={1}
             options={[

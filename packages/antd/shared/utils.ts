@@ -117,3 +117,21 @@ export const evaluateExpression = (
     return undefined
   }
 }
+
+// 自动收集依赖
+type ExtractDependenciesFromString = (expression: string) => string[];
+export const extractDependenciesFromString: ExtractDependenciesFromString = (expression) => {
+  if (!expression) return []
+
+  const regex = /(?:^|[^.\w])(?!Query\.)[a-zA-Z_$][\w$]*/g
+  let match
+  const dependencies = new Set<string>()
+  while ((match = regex.exec(expression)) !== null) {
+    const dep = match[0].trim()
+    if (!dep.startsWith('.') && !dep.startsWith('[')) {
+      dependencies.add(dep)
+    }
+  }
+  const filteredDeps = Array.from(dependencies).filter(dep => !dep.startsWith('Query.') && !dep.includes('=>'))
+  return filteredDeps.map(dep => dep.replace(/^[^a-zA-Z_$]+/, ''))
+}
