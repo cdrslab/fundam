@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect } from 'react'
-import { DatePicker, Input, Form } from 'antd'
+import { DatePicker, Input, Form, Col } from 'antd'
 import { RangePickerProps as AntDatePickerRangePickerProps } from 'antd/es/date-picker/index'
 
 import { FormItemCommonProps } from '../withFormItem'
@@ -258,22 +258,31 @@ export const FormItemDatePickerRangePicker: React.FC<FormItemDatePickerRangePick
     )
   }
 
+  let formItem = (
+    <FormItem
+      {...formItemProps}
+      className={formItemClass}
+      initialValue={formItemInitialValue}
+      // 为了保持校验，无name的Form.Item，不会对该字段进行校验，使用__开头定义隐藏字段，提交时，过滤__开头的字段
+      name={ignoreFormItemName}
+      rules={currentRules}
+      hidden={formCollapse && collapseNames.includes(name || '') && direction === 'horizontal' || formItemProps.hidden}
+    >
+      <RangePicker
+        {...rangePickerProps}
+      />
+    </FormItem>
+  )
+
+  if (direction === 'horizontal' && !(formCollapse && collapseNames.includes(formItemProps.name as any) || formItemProps.hidden)) {
+    const colSpan = rowCol ? rowCol : (24 / formRowCol)
+    formItem = <Col span={colSpan}>{formItem}</Col>
+  }
+
   return (
     <>
       {buildIgnoreFormItem()}
-      <FormItem
-        {...formItemProps}
-        className={formItemClass}
-        initialValue={formItemInitialValue}
-        // 为了保持校验，无name的Form.Item，不会对该字段进行校验，使用__开头定义隐藏字段，提交时，过滤__开头的字段
-        name={ignoreFormItemName}
-        rules={currentRules}
-        hidden={formCollapse && collapseNames.includes(name || '') && direction === 'horizontal' || formItemProps.hidden}
-      >
-        <RangePicker
-          {...rangePickerProps}
-        />
-      </FormItem>
+      {formItem}
     </>
   )
 }

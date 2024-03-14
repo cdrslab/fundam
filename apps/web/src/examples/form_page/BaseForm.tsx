@@ -22,10 +22,10 @@ export default () => {
 
   useEffect(() => {
     // setFormDisplayType('text')
-    setFormDisplayType('text')
+    // setFormDisplayType('text')
     // start: ['2024-03-07 00:00:00', '2024-03-07 23:59:59']
     // @ts-ignore
-    window.$form = form
+    // window.$form = form
     // form.setFieldsValue({
       // startEnd: ['2024-03-07 00:00:00', '2024-03-07 23:59:59'],
       // start: '2024-03-07 00:00:00',
@@ -72,7 +72,7 @@ export default () => {
   }
 
   return (
-    <div className="fun-page-list">
+    <div className="fun-page">
       <Card style={{ marginBottom: 24 }}>
         <Form
           form={form}

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import List from './examples/list_page/List';
 import BaseForm from './examples/form_page/BaseForm';
+import ListBasePage from './examples/list_base_page';
 
 import './app.css'
 import { FunConfigProvider } from '@fundam/antd/components/FunConfigProvider';
@@ -14,12 +15,13 @@ const getBaseURL = () => {
 }
 
 const RenderComponents = {
+  list_base_page: ListBasePage,
   list: List,
-  baseForm: BaseForm,
+  base_form: BaseForm,
 }
 
 const App = () => {
-  const [renderComponent, setRenderComponent] = useState('baseForm')
+  const [renderComponent, setRenderComponent] = useState('list_base_page')
   const request = useMemo(() => createAPI({
     baseURL: getBaseURL(),
   }, (res: any) => {
@@ -53,7 +55,8 @@ const App = () => {
         <div className="menus">模拟菜单占位</div>
         <div className="main-content">
           <div className="top-bar">
-            <Button onClick={() => setRenderComponent('baseForm')} style={{ marginRight: 4 }}>基础表单</Button>
+            <Button onClick={() => setRenderComponent('list_base_page')} style={{ marginRight: 4 }}>基础列表</Button>
+            <Button onClick={() => setRenderComponent('base_form')} style={{ marginRight: 4 }}>基础表单</Button>
             <Button onClick={() => setRenderComponent('list')}>列表</Button>
           </div>
           <div className="content">

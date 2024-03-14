@@ -3,6 +3,7 @@ export { Card } from './components/Card'
 export { Input } from './components/Input'
 export { Space } from './components/Space'
 export { Title } from './components/Title'
+export { Table } from './components/Table'
 
 export { Form } from './components/Form/index'
 export { FunConfigProvider } from './components/FunConfigProvider'
