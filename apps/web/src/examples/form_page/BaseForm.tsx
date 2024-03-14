@@ -22,6 +22,7 @@ export default () => {
 
   useEffect(() => {
     // setFormDisplayType('text')
+    setFormDisplayType('disabled')
     // start: ['2024-03-07 00:00:00', '2024-03-07 23:59:59']
     // @ts-ignore
     window.$form = form
@@ -40,8 +41,8 @@ export default () => {
         "filterType": 2,
         "audienceTag": {
           "tag": [
-            94663,
-            29342
+            1,
+            2
           ],
           "companyType": 1
         }

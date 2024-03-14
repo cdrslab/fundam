@@ -30,9 +30,9 @@
 #### 基础功能
 
 - [x] 完善表单及表单项，横向、竖向表单组件完善，更多实现，提交时
+- [x] 增加Radio、Checkbox、Select联动子表单项组件
 - [ ] 传入项目配置 or 读取项目配置：baseURL、主题、Form Col span、Table size等
 - [ ] 增加TableForm组件
-- [ ] 增加Radio、Checkbox、Select联动子表单项组件
 - [ ] Table完善：Tooltip、多行内容展开与收起？刷新、列开关、列宽拖动与缓存、SWR、prefetch、columns配置时增加onClick（有onClick自动变为可点击），增加copyable props
 - [ ] 缓存
 - [ ] 数据转换层

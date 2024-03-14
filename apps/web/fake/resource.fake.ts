@@ -20,8 +20,8 @@ export default defineFakeRoute([
       return Mock.mock({
         ok: true,
         result: {
-          "list|2-5": [{
-            id: '@integer(10000, 99999)',
+          "list|2-10": [{
+            "id|+1": 1,
             creator: '@cname',
             name: '@cword(2,5)标签',
           }]

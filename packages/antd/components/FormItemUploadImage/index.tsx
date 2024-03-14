@@ -5,7 +5,7 @@ import { UploadProps, UploadChangeParam } from 'antd/lib/upload';
 import { FormItemProps } from 'antd/lib/form';
 import { get } from 'lodash';
 
-import { GetData } from '../../shared/types';
+import { FormDisplayType, GetData } from '../../shared/types';
 import { useForm } from '../../hooks/useForm';
 import { useFun } from '../../hooks/useFun';
 import './index.less'
@@ -16,9 +16,11 @@ interface FormItemUploadImageProps extends FormItemProps, Omit<UploadProps, 'chi
   isString?: boolean // 上传成功后，form该中该表单项对应的值，数组 or 逗号分隔的字符串
   separator?: string // 配合isString使用
   maxErrorMessage?: string // 上传超限报错文案
+  displayType?: FormDisplayType
 }
 
 export const FormItemUploadImage: React.FC<FormItemUploadImageProps> = ({
+  displayType,
   isString = false,
   separator = ',',
   dataApi,
@@ -72,6 +74,7 @@ export const FormItemUploadImage: React.FC<FormItemUploadImageProps> = ({
   const { currentRules } = getFormItemDefaultData(formItemProps)
   // 兼容 Form.List 场景
   const formItemValue = typeof formItemProps.name === 'string' ? Form.useWatch(formItemProps.name, form as any) : Form.useWatch(formItemProps.name[0], form as any)
+  const currentDisplayType = displayType || formDisplayType
 
   useEffect(() => {
     if (!formItemValue) return
@@ -215,6 +218,7 @@ export const FormItemUploadImage: React.FC<FormItemUploadImageProps> = ({
       {/*@ts-ignore*/}
       <Upload
         {...uploadProps}
+        disabled={uploadProps.disabled || currentDisplayType === 'disabled'}
       >
         {fileList.length >= maxCount ? null : <div><UploadOutlined/> 上传</div>}
       </Upload>
