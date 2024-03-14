@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useState } from 'react'
+import React, { ReactNode, useEffect, useRef, useState } from 'react'
 import { Input as AntInput, Select as AntSelect, Form as AntForm, Col, Input } from 'antd'
 import { isDef } from '@fundam/utils'
 import { FormItemProps as AntFormItemProps } from 'antd/es/form/FormItem'
@@ -35,7 +35,7 @@ export interface FormItemOptionalProps extends FormItemCommonProps {
 const getPlaceholder = (props: any, componentName: string): string => {
   let { placeholder } = props
   if (placeholder) return placeholder
-  if (componentName === 'Input') {
+  if (['Input', 'TextArea'].includes(componentName)) {
     placeholder = '请输入'
   }
   if (['Select', 'Cascader'].includes(componentName)) {
@@ -106,6 +106,8 @@ export function withFormItem(WrappedComponent: any) {
     const [options, setOptions] = useState(wrappedComponentProps.options || []) // 下拉组件等的options
     const { request } = useFun()
 
+    const initRef = useRef(false) // 用于防止父级更新，导致子组件两次 init，发起两次请求
+
     const {
       form,
       direction,
@@ -117,11 +119,14 @@ export function withFormItem(WrappedComponent: any) {
     } = useForm()
 
     useEffect(() => {
-      init()
-    }, []);
+      if (!initRef.current) {
+        init()
+        initRef.current = true
+      }
+    }, [])
 
     const init = async () => {
-      if (!dataApi && !dataFunc) return
+      if ((!dataApi && !dataFunc) || options?.length || loading) return
       try {
         setLoading(true)
         let res = dataApi ? await request[dataApiMethod](dataApi, dataApiReqData) : await dataFunc(dataApiReqData)
@@ -151,7 +156,7 @@ export function withFormItem(WrappedComponent: any) {
     }
 
     const defaultNormalize = (value: any, prevValue: any, prevValues: any) => {
-      if (!isNumber || WrappedComponent !== AntInput) return value
+      if (!isNumber || componentName !== 'Input') return value
       if (value === '') return null
       // 兼容Input输入数字
       if (/^[1-9][0-9]*$/.test(value)) {

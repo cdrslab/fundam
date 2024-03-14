@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Form } from 'antd'
 import { isStringArray } from '@fundam/utils'
 import queryString from 'query-string'
@@ -25,12 +25,16 @@ export const FormItem: React.FC<any> = ({
   const { form } = useForm()
   const [isVisible, setIsVisible] = useState(true)
   const location = useLocation()
+  const initRef = useRef(false)
 
   const curObserve = observe?.length ? observe : extractDependenciesFromString(visibleRule)
   const watchValues = curObserve?.map((item: string) => Form.useWatch(item, form as any))
 
   useEffect(() => {
-    init()
+    if (!initRef.current) {
+      init()
+      initRef.current = true
+    }
   }, [])
 
   // 依赖自动收集与联动实现
@@ -60,7 +64,7 @@ export const FormItem: React.FC<any> = ({
     setCurExtra(isStringArray(extraRes) ? extraRes.join('\n') : extraRes)
   }
 
-  if (isVisible === false) return null
+  if (visibleRule && !isVisible) return null
 
   // 默认为联动子项，靠近父级
   const style = antProps.label === ' ' && watchValues?.length && visibleRule ? {

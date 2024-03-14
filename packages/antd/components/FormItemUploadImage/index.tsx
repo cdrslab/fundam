@@ -70,6 +70,22 @@ export const FormItemUploadImage: React.FC<FormItemUploadImageProps> = ({
   } = useForm()
   const { request } = useFun()
   const { currentRules } = getFormItemDefaultData(formItemProps)
+  // 兼容 Form.List 场景
+  const formItemValue = typeof formItemProps.name === 'string' ? Form.useWatch(formItemProps.name, form as any) : Form.useWatch(formItemProps.name[0], form as any)
+
+  useEffect(() => {
+    if (!formItemValue) return
+    if (typeof formItemValue === 'string') {
+      // 单个
+      setFileList(formItemValue.split(separator).map(url => ({
+        uid: url,
+        status: 'done',
+        url
+      })))
+    } else {
+      // TODO List、Object兼容
+    }
+  }, [formItemValue])
 
   useEffect(() => {
     if (formItemProps.initialValue) {
@@ -217,5 +233,5 @@ export const FormItemUploadImage: React.FC<FormItemUploadImageProps> = ({
         </Image.PreviewGroup>
       </div>
     </Form.Item>
-);
-};
+  )
+}

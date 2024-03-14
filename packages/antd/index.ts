@@ -14,6 +14,7 @@ export { FormItemDatePickerRangePicker } from './components/FormItemDatePickerRa
 export { FormItemRadio } from './components/FormItemRadio'
 export { FormItemSelect } from './components/FormItemSelect'
 export { FormItemUploadImage } from './components/FormItemUploadImage'
+export { FormItemTextArea } from './components/FormItemTextArea'
 
 // hooks
 export { useAntFormInstance } from './hooks/useAntFormInstance'

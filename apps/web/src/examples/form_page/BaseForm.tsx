@@ -13,7 +13,7 @@ import {
   FormItemCheckbox,
   FormItemCascade,
   FormDisplayType,
-  FunFormInstance
+  FunFormInstance, FormItemTextArea
 } from '@fundam/antd'
 
 export default () => {
@@ -25,10 +25,40 @@ export default () => {
     // start: ['2024-03-07 00:00:00', '2024-03-07 23:59:59']
     // @ts-ignore
     window.$form = form
-    form.setFieldsValue({
+    // form.setFieldsValue({
       // startEnd: ['2024-03-07 00:00:00', '2024-03-07 23:59:59'],
       // start: '2024-03-07 00:00:00',
       // end: '2024-03-07 23:59:59'
+    // })
+    // 模拟后端返回场景
+    const res = {
+      "name": "22",
+      "start": "2024-03-07 00:00:00",
+      "end": "2024-03-08 23:59:59",
+      "audience": {
+        "type": 1,
+        "filterType": 2,
+        "audienceTag": {
+          "tag": [
+            94663,
+            29342
+          ],
+          "companyType": 1
+        }
+      },
+      "images": "http://dummyimage.com/745x211/f279c6/79e9f2&text=Eric"
+    }
+    // 转换隐藏属性（不需要提交给后端 -- submit时过滤）
+    const __tagType = []
+    if (res.audience?.audienceTag?.tag?.length) {
+      __tagType.push('TAG')
+    }
+    if (res.audience?.audienceTag?.companyType) {
+      __tagType.push('COMPANY')
+    }
+    form.setFieldsValue({
+      ...res,
+      __tagType
     })
   }, [])
 
@@ -124,6 +154,60 @@ export default () => {
                 label: '按标签',
                 value: 2
               }
+            ]}
+          />
+          <FormItemTextArea
+            noLabel
+            required
+            visibleRule="audience.filterType === 1"
+            name={['audience', 'ids']}
+            style={{ height: 120 }}
+          />
+          <FormItemCheckbox
+            noLabel
+            required
+            visibleRule="audience.filterType === 2"
+            name="__tagType"
+            options={[
+              {
+                label: '标签',
+                value: 'TAG'
+              },
+              {
+                label: '公司',
+                value: 'COMPANY'
+              },
+            ]}
+          />
+          <FormItemSelect
+            noLabel
+            required
+            showSearch
+            filterOption={(input, option: any) => option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+            mode="multiple"
+            placeholder="请选择标签"
+            visibleRule="__tagType && __tagType.includes('TAG')"
+            name={['audience', 'audienceTag', 'tag']}
+            labelKey="name"
+            valueKey="id"
+            dataApi="/api/resource/tags"
+            resDataPath="list"
+          />
+          <FormItemSelect
+            noLabel
+            required
+            placeholder="请选择公司类型"
+            visibleRule="__tagType && __tagType.includes('COMPANY')"
+            name={['audience', 'audienceTag', 'companyType']}
+            options={[
+              {
+                label: '独立',
+                value: 1
+              },
+              {
+                label: '连锁',
+                value: 2
+              },
             ]}
           />
           <Title content="核心信息" />
