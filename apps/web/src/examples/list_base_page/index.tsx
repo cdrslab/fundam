@@ -57,6 +57,7 @@ export default () => {
       title: '名称',
       dataIndex: 'name',
       width: 130,
+      tooltip: 'Test',
       onClick: onClickRecordName
     },
     {
@@ -100,6 +101,7 @@ export default () => {
       title: '操作',
       dataIndex: 'op',
       width: 150,
+      fixed: 'right',
       render: (_: any, record: any) => (
         <>
           <TableRowButton onClick={() => console.log(record)}>查看</TableRowButton>
@@ -159,6 +161,7 @@ export default () => {
       </Card>
       <Card title="资源列表">
         <Table
+          cacheKey="resourceTable"
           alias="resourceTable"
           columns={columns}
           dataApi="/api/resource/list"

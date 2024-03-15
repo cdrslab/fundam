@@ -4,6 +4,7 @@
 }
 .menus {
     width: 250px;
+    min-width: 250px;
     background: #ffffff;
     padding: 24px;
     font-size: 16px;
@@ -24,6 +25,7 @@
 }
 .content {
     padding: 24px;
+    width: calc(100vw - 250px);
 }
 
 .ant-table-cell-row-hover {
