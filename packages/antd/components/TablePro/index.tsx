@@ -4,7 +4,7 @@ import {
   TableColumnProps as AntTableColumnProps,
   Table as AntTable,
   Button,
-  ButtonProps as AntButtonProps, Tooltip
+  ButtonProps as AntButtonProps, Tooltip, Card
 } from 'antd'
 
 import './index.less'
@@ -17,6 +17,7 @@ import { isDef } from '@fundam/utils';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { useLocalStorage } from '@fundam/hooks/useLocalStorage';
 import { TableResizableTitle } from '../TableResizableTitle';
+import { TableProps, TableRowButton } from '../Table';
 
 // 处理table按钮渲染（换行对齐）
 const throttledAdjustButtonMargins = throttle(adjustButtonMargins, 50)
@@ -32,37 +33,17 @@ export interface ColumnProps<T> extends AntTableColumnProps<T> {
   // buttonsConfig?: ButtonConfig[]
 }
 
-export interface TableProps extends Omit<AntTableProps, 'columns'>, GetData {
-  columns: ColumnProps<RowData>[]
-  initPage?: number // 初始化页码
-  initPageSize?: number // 初始化页面条数
-  pageKey?: string
-  listKey?: string
-  pageSizeKey?: string
-  totalKey?: string
-  alias?: string // 当前页面唯一的别名
-  indexType?: 'pagination' | 'nonPagination'; // 序号类型：如每页10条数据，分页（第二页第一条数据序号为11）；不分页（第二页第一条数据序号为1）
-  emptyValue?: string; // 空值展示
-  cacheKey?: string; // 缓存表格数据 & 请求参数 & 各列宽度等，需要项目纬度唯一
+interface TableProProps extends TableProps {
+  tableTitle?: string // 标题
+  extra?: ((props: any) => React.ReactNode) | React.ReactNode
 }
 
 interface CacheData {
   columnsWidthMap?: Record<string, number> // 缓存column.dataIndex => width，用于拖拽更改表格列宽度
 }
 
-export const TableRowButton: React.FC<AntButtonProps> = ({ children, ...antProps }) => {
-  return (
-    <Button
-      {...antProps}
-      type="link"
-      className="fun-table-row-button"
-    >
-      {children}
-    </Button>
-  )
-}
-
-export const Table: React.FC<TableProps> = ({
+// TODO 使用Fun Table 替换 antd Table
+export const TablePro: React.FC<TableProProps> = ({
   // fun新加props
   // 请求接口相关
   dataFunc,
@@ -80,6 +61,8 @@ export const Table: React.FC<TableProps> = ({
   indexType,
   emptyValue = '-',
   cacheKey,
+  tableTitle,
+  extra,
 
   rowKey = 'id',
   columns,
@@ -152,6 +135,10 @@ export const Table: React.FC<TableProps> = ({
       setTableCache({ ...tableCache, columnsWidthMap: newTableCacheColumnsWidth })
       throttledAdjustButtonMargins()
     }
+  }
+
+  const buildExtra = () => {
+    return null
   }
 
   // 格式化columns
@@ -233,10 +220,12 @@ export const Table: React.FC<TableProps> = ({
   }
 
   return (
-    <AntTable
-      {...renderProps as any}
-    >
-      {children}
-    </AntTable>
+    <Card title={tableTitle} extra={buildExtra()} bordered={false}>
+      <AntTable
+        {...renderProps as any}
+      >
+        {children}
+      </AntTable>
+    </Card>
   )
 }
