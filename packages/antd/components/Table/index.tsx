@@ -3,18 +3,26 @@ import {
   TableProps as AntTableProps,
   TableColumnProps as AntTableColumnProps,
   Table as AntTable,
+  Button,
+  ButtonProps as AntButtonProps
 } from 'antd'
+
+import './index.less'
 import { GetData } from '../../shared/types';
 import { useFun } from '../../hooks/useFun';
-import { get } from 'lodash';
+import { get, throttle } from 'lodash';
 import { useAlias } from '../../hooks/useAlias';
+import { adjustButtonMargins } from '../../shared/utils';
+
+// 处理table按钮渲染（换行对齐）
+const throttledAdjustButtonMargins = throttle(adjustButtonMargins, 50)
 
 export interface RowData {}
 
 export interface ColumnProps<T> extends AntTableColumnProps<T> {
-  key: string
   dataIndex: string // 索引
   title: ((props: any) => React.ReactNode) | React.ReactNode
+  key?: string
   tooltip?: string // 提示
   onClick?: (record: any) => void
   // buttonsConfig?: ButtonConfig[]
@@ -29,6 +37,18 @@ interface TableProps extends Omit<AntTableProps, 'columns'>, GetData {
   pageSizeKey?: string
   totalKey?: string
   alias?: string // 当前页面唯一的别名
+}
+
+export const TableRowButton: React.FC<AntButtonProps> = ({ children, ...antProps }) => {
+  return (
+    <Button
+      {...antProps}
+      type="link"
+      className="fun-table-row-button"
+    >
+      {children}
+    </Button>
+  )
 }
 
 export const Table: React.FC<TableProps> = ({
@@ -66,10 +86,20 @@ export const Table: React.FC<TableProps> = ({
   })
 
   useEffect(() => {
+    // 换行按钮对齐
+    throttledAdjustButtonMargins()
+  }, [data])
+
+  useEffect(() => {
     if (!initRef.current) {
       fetchData()
       alias && setAlias(alias, { fetchData, refreshData })
       initRef.current = true
+    }
+    // 处理按钮换行样式
+    window.addEventListener('resize', throttledAdjustButtonMargins)
+    return () => {
+      window.removeEventListener('resize', throttledAdjustButtonMargins)
     }
   }, [])
 
@@ -92,7 +122,7 @@ export const Table: React.FC<TableProps> = ({
     } catch (e) {
       console.error(e)
     } finally {
-      setLoading(true)
+      setLoading(false)
     }
   }
 
@@ -102,15 +132,23 @@ export const Table: React.FC<TableProps> = ({
 
   // TODO 格式化columns
   const renderColumns = columns.map(column => {
+    if (column.onClick) {
+      return {
+        ...column,
+        key: column.key || column.dataIndex,
+        render: (_: any, record: any) => <TableRowButton onClick={record.onClick}>{record[column.dataIndex]}</TableRowButton>
+      }
+    }
     return column
   })
 
   const renderProps = {
     ...antProps,
     rowKey,
+    loading,
     columns: renderColumns,
     size: antProps.size || 'small',
-    scroll: antProps.scroll || { x: '100%' },
+    scroll: antProps.scroll || { x: 'max-content' },
     dataSource: antProps.dataSource || data.list,
     pagination: antProps.pagination || (data.total > data.pageSize ? {
       current: data.page,

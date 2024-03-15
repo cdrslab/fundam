@@ -1,6 +1,19 @@
 ## Fundam
 一套可以搭建并生成jsx代码的低代码系统
 
+## 调试 & 测试使用（目前还未上线）
+
+1. Nodejs20+
+2. 执行
+
+```bash
+$ yarn dev
+```
+
+3. 访问
+
+[http://localhost:5174](http://localhost:5174)
+
 ### keywords
 
 1. 通过搭建器可以生成可编辑JSX代码

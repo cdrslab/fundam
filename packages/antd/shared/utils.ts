@@ -135,3 +135,18 @@ export const extractDependenciesFromString: ExtractDependenciesFromString = (exp
   const filteredDeps = Array.from(dependencies).filter(dep => !dep.startsWith('Query.') && !dep.includes('=>'))
   return filteredDeps.map(dep => dep.replace(/^[^a-zA-Z_$]+/, ''))
 }
+
+// 处理Table中换行后的第一个按钮
+export const adjustButtonMargins = () => {
+  const buttons = document.querySelectorAll('.fun-table-row-button')
+  let lastTop = 0
+  buttons.forEach((button, index) => {
+    const currentTop = button.getBoundingClientRect().top
+    if (index === 0 || currentTop !== lastTop) {
+      button.classList.add('fun-table-row-button-first')
+    } else {
+      button.classList.remove('fun-table-row-button-first')
+    }
+    lastTop = currentTop
+  })
+}

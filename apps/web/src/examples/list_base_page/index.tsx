@@ -16,7 +16,7 @@ import {
   FunFormInstance,
   FormItemTextArea,
   Table,
-  Badge, useAlias
+  Badge, useAlias, TableRowButton
 } from '@fundam/antd'
 import { DesktopOutlined, MobileOutlined } from '@ant-design/icons';
 
@@ -63,7 +63,7 @@ export default () => {
       title: '资源类型',
       dataIndex: 'typeDesc',
       width: 120,
-      render: (_, record: any) => (
+      render: (_: any, record: any) => (
         <span>
           {
             record.type[0] === 'APP' ?
@@ -84,7 +84,7 @@ export default () => {
       title: '状态',
       dataIndex: 'statusDesc',
       width: 80,
-      render: (_, record: any) => <Badge status={['warning', 'processing', 'success', 'default'][record.status - 1]} text={record.statusDesc} />
+      render: (_: any, record: any) => <Badge status={['warning', 'processing', 'success', 'default'][record.status - 1] as any} text={record.statusDesc} />
     },
     {
       title: '创建人',
@@ -100,9 +100,16 @@ export default () => {
       title: '操作',
       dataIndex: 'op',
       width: 150,
-      render: (_, record) => (
+      render: (_: any, record: any) => (
         <>
-
+          <TableRowButton onClick={() => console.log(record)}>查看</TableRowButton>
+          <TableRowButton onClick={() => console.log(record)}>复制</TableRowButton>
+          {
+            record.status < 4 ? <TableRowButton onClick={() => console.log(record)}>编辑</TableRowButton> : null
+          }
+          {
+            record.status === 3 ? <TableRowButton onClick={() => console.log(record)} danger>下线</TableRowButton> : null
+          }
         </>
       )
     },

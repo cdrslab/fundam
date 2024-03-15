@@ -3,7 +3,7 @@ export { Card } from './components/Card'
 export { Input } from './components/Input'
 export { Space } from './components/Space'
 export { Title } from './components/Title'
-export { Table } from './components/Table'
+export { Table, TableRowButton } from './components/Table'
 export { Badge } from './components/Badge'
 
 export { Form } from './components/Form/index'
