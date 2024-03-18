@@ -12,14 +12,11 @@ import { GetData } from '../../shared/types';
 import { useFun } from '../../hooks/useFun';
 import { get, throttle } from 'lodash';
 import { useAlias } from '../../hooks/useAlias';
-import { adjustButtonMargins } from '../../shared/utils';
+import { adjustButtonMargins, throttledAdjustButtonMargins } from '../../shared/utils';
 import { isDef } from '@fundam/utils';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { useLocalStorage } from '@fundam/hooks/useLocalStorage';
 import { TableResizableTitle } from '../TableResizableTitle';
-
-// 处理table按钮渲染（换行对齐）
-const throttledAdjustButtonMargins = throttle(adjustButtonMargins, 50)
 
 export interface RowData {}
 
@@ -30,15 +27,15 @@ export interface TableAlias {
 
 export interface ColumnProps<T> extends AntTableColumnProps<T> {
   dataIndex: string // 索引
-  title: ((props: any) => React.ReactNode) | React.ReactNode
+  title: ((props: any) => React.ReactNode) | React.ReactNode | string
   key?: string
   tooltip?: string // 提示
   onClick?: (record: any) => void
-  // buttonsConfig?: ButtonConfig[]
+  disabled?: boolean // 不可进行列开启关闭
 }
 
 export interface TableProps extends Omit<AntTableProps, 'columns'>, GetData {
-  columns: ColumnProps<RowData>[]
+  columns: Array<Record<string, any>>
   initPage?: number // 初始化页码
   initPageSize?: number // 初始化页面条数
   pageKey?: string
@@ -51,7 +48,7 @@ export interface TableProps extends Omit<AntTableProps, 'columns'>, GetData {
   cacheKey?: string; // 缓存表格数据 & 请求参数 & 各列宽度等，需要项目纬度唯一
 }
 
-interface CacheData {
+export interface CacheTableData {
   columnsWidthMap?: Record<string, number> // 缓存column.dataIndex => width，用于拖拽更改表格列宽度
 }
 
@@ -96,14 +93,14 @@ export const Table: React.FC<TableProps> = ({
   const { request } = useFun()
   const { setAlias } = useAlias()
   const initRef = useRef(false)
-  const [cacheLastRequestParams, setCacheLastRequestParams] = useState<any>({})
+  const cacheLastRequestParamsRef = useRef<any>({})
   const [data, setData] = useState({
     list: [],
     total: 0,
     page: 1,
     pageSize: 20
   })
-  const [tableCache, setTableCache] = useLocalStorage<CacheData>(cacheKey, null)
+  const [tableCache, setTableCache] = useLocalStorage<CacheTableData>(cacheKey, null)
 
   useEffect(() => {
     // 换行按钮对齐
@@ -128,7 +125,7 @@ export const Table: React.FC<TableProps> = ({
     try {
       setLoading(true)
       const requestData = { ...dataApiReqData, ...params }
-      setCacheLastRequestParams(requestData)
+      cacheLastRequestParamsRef.current = requestData
       // @ts-ignore
       let res = dataApi ? await request[dataApiMethod](dataApi, requestData) : await dataFunc(requestData)
       res = resDataPath ? get(res, resDataPath) : res
@@ -146,9 +143,9 @@ export const Table: React.FC<TableProps> = ({
     }
   }
 
-  const handlePagination = (page: number, pageSize: number) => fetchData({ ...cacheLastRequestParams, page, pageSize })
+  const handlePagination = (page: number, pageSize: number) => fetchData({ ...cacheLastRequestParamsRef.current, page, pageSize })
 
-  const refreshData = () => fetchData(cacheLastRequestParams)
+  const refreshData = () => fetchData(cacheLastRequestParamsRef.current)
 
   const handleResize = (column: any) => {
     return (e: any, { size }: any) => {

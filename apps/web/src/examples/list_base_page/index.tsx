@@ -16,7 +16,7 @@ import {
   FunFormInstance,
   FormItemTextArea,
   Table,
-  Badge, useAlias, TableRowButton
+  Badge, useAlias, TableRowButton, TablePro
 } from '@fundam/antd'
 import { DesktopOutlined, MobileOutlined } from '@ant-design/icons';
 import { Tag } from 'antd';
@@ -166,15 +166,23 @@ export default () => {
           />
         </Form>
       </Card>
-      <Card title="资源列表">
-        <Table
-          cacheKey="resourceTable"
-          alias="resourceTable"
-          columns={columns}
-          dataApi="/api/resource/list"
-          rowKey="id"
-        />
-      </Card>
+      {/*<Card title="资源列表">*/}
+      {/*  <Table*/}
+      {/*    cacheKey="resourceTable"*/}
+      {/*    alias="resourceTable"*/}
+      {/*    columns={columns}*/}
+      {/*    dataApi="/api/resource/list"*/}
+      {/*    rowKey="id"*/}
+      {/*  />*/}
+      {/*</Card>*/}
+      <TablePro
+        tableTitle="资源列表"
+        cacheKey="resourceTable"
+        alias="resourceTable"
+        columns={columns}
+        dataApi="/api/resource/list"
+        rowKey="id"
+      />
     </div>
   )
 }

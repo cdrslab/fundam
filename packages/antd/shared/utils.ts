@@ -1,4 +1,4 @@
-import { get } from 'lodash'
+import { get, throttle } from 'lodash'
 
 import { VALID_ROW_COLS } from './constants'
 import { FormInstance } from 'antd/es/form';
@@ -150,3 +150,6 @@ export const adjustButtonMargins = () => {
     lastTop = currentTop
   })
 }
+
+// 处理table按钮渲染（换行对齐）
+export const throttledAdjustButtonMargins = throttle(adjustButtonMargins, 50)

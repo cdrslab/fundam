@@ -4,6 +4,7 @@ export { Input } from './components/Input'
 export { Space } from './components/Space'
 export { Title } from './components/Title'
 export { Table, TableRowButton } from './components/Table'
+export { TablePro } from './components/TablePro'
 export { Badge } from './components/Badge'
 
 export { Form } from './components/Form/index'

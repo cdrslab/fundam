@@ -2,8 +2,8 @@ import { useCallback } from 'react'
 import { useFun } from './useFun'
 
 export interface AliasBaseFunc {
-  set: (name: string, value: any) => void
-  get: (name: string) => any
+  setAlias: (name: string, value: any) => void
+  getAlias: (name: string) => any
 }
 
 export function useAlias<T>() {

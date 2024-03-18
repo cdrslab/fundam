@@ -32,6 +32,7 @@ $ yarn dev
 - [x] Upload实现
 - [x] 表单联动实现
 - [x] 表单联动 - 自动收集依赖
+- [ ] Table - 支持请求后记录参数（与原有参数进行merge）
 - [ ] 按钮联动实现
 - [ ] url支持 _displayType=text disabled default 设置页面的展示样式
 - [ ] 各项组件增加 copyable props，在Form displayType为text或者disabled时，末尾追加复制按钮，点击即可复制
