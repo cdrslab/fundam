@@ -19,6 +19,8 @@ import {
   Badge, useAlias, TableRowButton
 } from '@fundam/antd'
 import { DesktopOutlined, MobileOutlined } from '@ant-design/icons';
+import { Tag } from 'antd';
+import { TableAlias } from '@fundam/antd/components/Table';
 
 const resourceStatusOptions = [
   {
@@ -39,9 +41,13 @@ const resourceStatusOptions = [
   },
 ]
 
+interface ListPageAlias {
+  resourceTable: TableAlias
+}
+
 export default () => {
   const [form] = useAntFormInstance()
-  const { resourceTable } = useAlias()
+  const { resourceTable } = useAlias<ListPageAlias>()
 
   const onClickRecordName = (record: any) => {
     console.log(record)
@@ -90,7 +96,8 @@ export default () => {
     {
       title: '创建人',
       dataIndex: 'createUser',
-      width: 80
+      width: 80,
+      render: (_: any, record: any) => <Tag color={record.createUser.length > 2 ? 'geekblue' : 'volcano'} key={record.createUser}>{record.createUser}</Tag>
     },
     {
       title: '创建时间',

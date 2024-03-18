@@ -23,6 +23,11 @@ const throttledAdjustButtonMargins = throttle(adjustButtonMargins, 50)
 
 export interface RowData {}
 
+export interface TableAlias {
+  fetchData: (params?: Record<string, any>) => void
+  refreshData: () => void
+}
+
 export interface ColumnProps<T> extends AntTableColumnProps<T> {
   dataIndex: string // 索引
   title: ((props: any) => React.ReactNode) | React.ReactNode
