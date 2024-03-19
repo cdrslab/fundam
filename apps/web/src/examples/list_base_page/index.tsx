@@ -87,6 +87,7 @@ export default () => {
       title: '投放时间',
       dataIndex: 'time',
       width: 380,
+      maxLine: 3,
       onCopy: (record: any) => record.time
     },
     {
@@ -179,6 +180,7 @@ export default () => {
       {/*  />*/}
       {/*</Card>*/}
       <TablePro
+        updateQuery
         tableTitle="资源列表"
         cacheKey="resourceTable"
         alias="resourceTable"

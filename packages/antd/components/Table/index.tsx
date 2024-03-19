@@ -6,17 +6,18 @@ import {
   Button,
   ButtonProps as AntButtonProps, Tooltip, message
 } from 'antd'
+import { get } from 'lodash'
+import { isDef } from '@fundam/utils'
+import { CopyOutlined, QuestionCircleOutlined } from '@ant-design/icons'
+import { useLocalStorage } from '@fundam/hooks/useLocalStorage'
 
 import './index.less'
-import { GetData } from '../../shared/types';
-import { useFun } from '../../hooks/useFun';
-import { get, throttle } from 'lodash';
-import { useAlias } from '../../hooks/useAlias';
-import { adjustButtonMargins, copyToClipboard, throttledAdjustButtonMargins } from '../../shared/utils';
-import { isDef } from '@fundam/utils';
-import { CopyOutlined, QuestionCircleOutlined } from '@ant-design/icons';
-import { useLocalStorage } from '@fundam/hooks/useLocalStorage';
-import { TableResizableTitle } from '../TableResizableTitle';
+import { GetData } from '../../shared/types'
+import { useFun } from '../../hooks/useFun'
+import { useAlias } from '../../hooks/useAlias'
+import { copyToClipboard, throttledAdjustButtonMargins, updateURLWithRequestData } from '../../shared/utils'
+import { TableResizableTitle } from '../TableResizableTitle'
+import { TextWithTooltip } from '../TextWithTooltip';
 
 export interface RowData {}
 
@@ -32,7 +33,8 @@ export interface ColumnProps<T> extends AntTableColumnProps<T> {
   tooltip?: string // 提示
   onClick?: (record: T) => void
   disabled?: boolean // 不可进行列开启关闭
-  onCopy?: (record: T) => string | undefined
+  onCopy?: (record: T) => string | undefined // 复制
+  maxLine?: number // 最大行数，超过...
 }
 
 export interface TableProps extends Omit<AntTableProps, 'columns'>, GetData {
@@ -46,7 +48,8 @@ export interface TableProps extends Omit<AntTableProps, 'columns'>, GetData {
   alias?: string // 当前页面唯一的别名
   indexType?: 'pagination' | 'nonPagination'; // 序号类型：如每页10条数据，分页（第二页第一条数据序号为11）；不分页（第二页第一条数据序号为1）
   emptyValue?: string; // 空值展示
-  cacheKey?: string; // 缓存表格数据 & 请求参数 & 各列宽度等，需要项目纬度唯一
+  cacheKey?: string // 缓存表格数据 & 请求参数 & 各列宽度等，需要项目纬度唯一
+  updateQuery?: boolean // 请求后更新地址栏参数
 }
 
 export interface CacheTableData {
@@ -83,6 +86,7 @@ export const Table: React.FC<TableProps> = ({
   indexType,
   emptyValue = '-',
   cacheKey,
+  updateQuery,
 
   rowKey = 'id',
   columns,
@@ -127,6 +131,7 @@ export const Table: React.FC<TableProps> = ({
       setLoading(true)
       const requestData = { ...dataApiReqData, ...params }
       cacheLastRequestParamsRef.current = requestData
+      updateQuery && updateURLWithRequestData(requestData)
       // @ts-ignore
       let res = dataApi ? await request[dataApiMethod](dataApi, requestData) : await dataFunc(requestData)
       res = resDataPath ? get(res, resDataPath) : res
@@ -185,13 +190,13 @@ export const Table: React.FC<TableProps> = ({
       if (column.onClick) {
         tableColumns.push({
           ...column,
-          render: (_: any, record: any) => <TableRowButton onClick={record.onClick}>{record[column.dataIndex]}</TableRowButton>,
+          render: (text: any, record: any) => isDef(text) && text !== '' ? <TableRowButton onClick={record.onClick}>{column.maxLine ? <TextWithTooltip text={text} maxLine={column.maxLine}/> : text}</TableRowButton> : <span>{emptyValue}</span>,
           key: column.dataIndex
         })
       } else {
         tableColumns.push({
           ...column,
-          render: (value: any) => <span>{isDef(value) && value !== '' ? value : emptyValue}</span>,
+          render: (text: any) => isDef(text) && text !== '' ? <span>{column.maxLine ? <TextWithTooltip text={text} maxLine={column.maxLine}/> : text}</span> : <span>{emptyValue}</span>,
           key: column.dataIndex
         })
       }
@@ -211,14 +216,14 @@ export const Table: React.FC<TableProps> = ({
     render: (text: any, record: any, index: number) => {
       const originalRender = item.render ? item.render(text, record, index) : text
       return (
-        <>
+        <span style={{ display: 'flex', alignItems: 'center' }}>
           {originalRender}
           {
             item.onCopy ?
               <Button
                 type="link"
                 icon={<CopyOutlined />}
-                style={{ padding: 0 }}
+                style={{ padding: '0 0 0 2px', width: 'auto' }}
                 onClick={() => {
                   const copyText = item.onCopy?.(record);
                   if (copyText) {
@@ -230,7 +235,7 @@ export const Table: React.FC<TableProps> = ({
               />
               : null
           }
-        </>
+        </span>
       )
     }
   }))

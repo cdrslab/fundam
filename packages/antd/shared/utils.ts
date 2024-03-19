@@ -1,8 +1,9 @@
+import React, { ReactNode } from 'react'
 import { get, throttle } from 'lodash'
 
 import { VALID_ROW_COLS } from './constants'
 import { FormInstance } from 'antd/es/form';
-import { message } from 'antd';
+import { message, Tooltip } from 'antd';
 
 export const validateRowCol = (rowCol: number) => {
   if (!VALID_ROW_COLS.includes(rowCol)) {
@@ -164,5 +165,17 @@ export const copyToClipboard = (text: string) => {
   navigator.clipboard.writeText(text).then(
     () => message.success('复制成功'),
     () => message.error('复制失败')
-  );
+  )
+}
+
+// 更新地址栏参数
+export const updateURLWithRequestData = (requestData: Record<string, any> = {}) => {
+  if (!Object.keys(requestData)?.length) return
+  const currentUrl = new URL(window.location.href);
+  const searchParams = new URLSearchParams(currentUrl.search);
+  Object.keys(requestData).forEach(key => {
+    searchParams.set(key, requestData[key]);
+  });
+  const newUrl = `${currentUrl.pathname}?${searchParams.toString()}`;
+  window.history.pushState({}, '', newUrl);
 }

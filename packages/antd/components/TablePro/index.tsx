@@ -1,22 +1,23 @@
 import React, { useEffect, useRef, useState } from 'react'
-
-import { TableProps, CacheTableData, TableRowButton } from '../Table';
-import { Button, Card, Checkbox, Dropdown, message, Popover, Table as AntTable, Tooltip } from 'antd';
-import { CheckboxValueType } from 'antd/es/checkbox/Group';
-import { useLocalStorage } from '@fundam/hooks/useLocalStorage';
+import { Button, Card, Checkbox, Dropdown, message, Popover, Table as AntTable, Tooltip } from 'antd'
+import { CheckboxValueType } from 'antd/es/checkbox/Group'
+import { useLocalStorage } from '@fundam/hooks/useLocalStorage'
 import {
   ColumnHeightOutlined,
   CopyOutlined,
   QuestionCircleOutlined,
   ReloadOutlined,
   SettingOutlined
-} from '@ant-design/icons';
-import { useFun } from '../../hooks/useFun';
-import { useAlias } from '../../hooks/useAlias';
-import { copyToClipboard, throttledAdjustButtonMargins } from '../../shared/utils';
-import { get } from 'lodash';
-import { isDef } from '@fundam/utils';
-import { TableResizableTitle } from '../TableResizableTitle';
+} from '@ant-design/icons'
+import { get } from 'lodash'
+import { isDef } from '@fundam/utils'
+
+import { TableProps, CacheTableData, TableRowButton } from '../Table'
+import { useFun } from '../../hooks/useFun'
+import { useAlias } from '../../hooks/useAlias'
+import { copyToClipboard, throttledAdjustButtonMargins, updateURLWithRequestData } from '../../shared/utils'
+import { TableResizableTitle } from '../TableResizableTitle'
+import { TextWithTooltip } from '../TextWithTooltip'
 
 interface TableProProps extends TableProps {
   tableTitle?: string // 标题
@@ -47,6 +48,7 @@ export const TablePro: React.FC<TableProProps> = ({
   indexType,
   emptyValue = '-',
   cacheKey,
+  updateQuery,
 
   rowKey = 'id',
   columns,
@@ -99,6 +101,7 @@ export const TablePro: React.FC<TableProProps> = ({
       setLoading(true)
       const requestData = { ...dataApiReqData, ...params }
       cacheLastRequestParamsRef.current = requestData
+      updateQuery && updateURLWithRequestData(requestData)
       // @ts-ignore
       let res = dataApi ? await request[dataApiMethod](dataApi, requestData) : await dataFunc(requestData)
       res = resDataPath ? get(res, resDataPath) : res
@@ -186,13 +189,13 @@ export const TablePro: React.FC<TableProProps> = ({
       if (column.onClick) {
         tableColumns.push({
           ...column,
-          render: (_: any, record: any) => <TableRowButton onClick={record.onClick}>{record[column.dataIndex]}</TableRowButton>,
+          render: (text: any, record: any) => isDef(text) && text !== '' ? <TableRowButton onClick={record.onClick}>{column.maxLine ? <TextWithTooltip text={text} maxLine={column.maxLine}/> : text}</TableRowButton> : <span>{emptyValue}</span>,
           key: column.dataIndex
         })
       } else {
         tableColumns.push({
           ...column,
-          render: (value: any) => <span>{isDef(value) && value !== '' ? value : emptyValue}</span>,
+          render: (text: any) => isDef(text) && text !== '' ? <span>{column.maxLine ? <TextWithTooltip text={text} maxLine={column.maxLine}/> : text}</span> : <span>{emptyValue}</span>,
           key: column.dataIndex
         })
       }
@@ -212,14 +215,14 @@ export const TablePro: React.FC<TableProProps> = ({
     render: (text: any, record: any, index: number) => {
       const originalRender = item.render ? item.render(text, record, index) : text
       return (
-        <span>
+        <span style={{ display: 'flex', alignItems: 'center' }}>
           {originalRender}
           {
             item.onCopy ?
               <Button
                 type="link"
                 icon={<CopyOutlined />}
-                style={{ padding: 0 }}
+                style={{ padding: '0 0 0 2px', width: 'auto' }}
                 onClick={() => {
                   const copyText = item.onCopy?.(record);
                   if (copyText) {
