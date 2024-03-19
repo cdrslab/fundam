@@ -138,6 +138,7 @@ export default defineFakeRoute([
           status: 1,
           statusDesc: '进行中',
           createUser: Mock.mock('@cname'),
+          createUserId: numRandom(10000, 99999),
           createTime: Mock.mock('2024-0@integer(2, 3)-@integer(10, 29) @time("HH:mm:ss")'),
         })
         return res
@@ -158,6 +159,7 @@ export default defineFakeRoute([
             status,
             statusDesc,
             createUser: Mock.mock('@cname'),
+            createUserId: numRandom(10000, 99999),
             createTime: Mock.mock('2024-0@integer(2, 3)-@integer(10, 29) @time("HH:mm:ss")'),
           })
         }
@@ -178,6 +180,7 @@ export default defineFakeRoute([
           status,
           statusDesc,
           createUser: Mock.mock('@cname'),
+          createUserId: numRandom(10000, 99999),
           createTime: Mock.mock('2024-0@integer(2, 3)-@integer(10, 29) @time("HH:mm:ss")'),
         })
       }

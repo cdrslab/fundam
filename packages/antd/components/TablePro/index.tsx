@@ -1,13 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react'
 
 import { TableProps, CacheTableData, TableRowButton } from '../Table';
-import { Card, Checkbox, Dropdown, Popover, Table as AntTable, Tooltip } from 'antd';
+import { Button, Card, Checkbox, Dropdown, message, Popover, Table as AntTable, Tooltip } from 'antd';
 import { CheckboxValueType } from 'antd/es/checkbox/Group';
 import { useLocalStorage } from '@fundam/hooks/useLocalStorage';
-import { ColumnHeightOutlined, QuestionCircleOutlined, ReloadOutlined, SettingOutlined } from '@ant-design/icons';
+import {
+  ColumnHeightOutlined,
+  CopyOutlined,
+  QuestionCircleOutlined,
+  ReloadOutlined,
+  SettingOutlined
+} from '@ant-design/icons';
 import { useFun } from '../../hooks/useFun';
 import { useAlias } from '../../hooks/useAlias';
-import { throttledAdjustButtonMargins } from '../../shared/utils';
+import { copyToClipboard, throttledAdjustButtonMargins } from '../../shared/utils';
 import { get } from 'lodash';
 import { isDef } from '@fundam/utils';
 import { TableResizableTitle } from '../TableResizableTitle';
@@ -22,6 +28,7 @@ interface CacheTableProData extends CacheTableData {
   size?: 'large' | 'middle' | 'small' // 表格大小
 }
 
+// TODO 0.2 优化：与 Table TableForm等抽出共性
 export const TablePro: React.FC<TableProProps> = ({
   tableTitle,
   extra,
@@ -194,7 +201,7 @@ export const TablePro: React.FC<TableProProps> = ({
     }
   })
 
-  // 使用缓存的宽度
+  // 使用缓存的宽度 & onCopy处理
   tableColumns = tableColumns.map((item, index) => ({
     ...item,
     width: tableCache?.columnsWidthMap?.[item.dataIndex] || item.width,
@@ -202,6 +209,31 @@ export const TablePro: React.FC<TableProProps> = ({
       width: column.width,
       onResize: handleResize(item),
     }),
+    render: (text: any, record: any, index: number) => {
+      const originalRender = item.render ? item.render(text, record, index) : text
+      return (
+        <span>
+          {originalRender}
+          {
+            item.onCopy ?
+              <Button
+                type="link"
+                icon={<CopyOutlined />}
+                style={{ padding: 0 }}
+                onClick={() => {
+                  const copyText = item.onCopy?.(record);
+                  if (copyText) {
+                    copyToClipboard(copyText);
+                  } else {
+                    message.error('复制失败');
+                  }
+                }}
+              />
+              : null
+          }
+        </span>
+      )
+    }
   }))
 
   // 格式化数据

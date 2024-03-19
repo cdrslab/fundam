@@ -85,7 +85,8 @@ export default () => {
     {
       title: '投放时间',
       dataIndex: 'time',
-      width: 320
+      width: 320,
+      onCopy: (record: any) => record.time
     },
     {
       title: '状态',
@@ -97,7 +98,8 @@ export default () => {
       title: '创建人',
       dataIndex: 'createUser',
       width: 80,
-      render: (_: any, record: any) => <Tag color={record.createUser.length > 2 ? 'geekblue' : 'volcano'} key={record.createUser}>{record.createUser}</Tag>
+      render: (_: any, record: any) => <Tag color={record.createUser.length > 2 ? 'geekblue' : 'volcano'} key={record.createUser}>{record.createUser}</Tag>,
+      onCopy: (record: any) => record.createUserId
     },
     {
       title: '创建时间',

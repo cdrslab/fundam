@@ -4,7 +4,7 @@ import {
   TableColumnProps as AntTableColumnProps,
   Table as AntTable,
   Button,
-  ButtonProps as AntButtonProps, Tooltip
+  ButtonProps as AntButtonProps, Tooltip, message
 } from 'antd'
 
 import './index.less'
@@ -12,9 +12,9 @@ import { GetData } from '../../shared/types';
 import { useFun } from '../../hooks/useFun';
 import { get, throttle } from 'lodash';
 import { useAlias } from '../../hooks/useAlias';
-import { adjustButtonMargins, throttledAdjustButtonMargins } from '../../shared/utils';
+import { adjustButtonMargins, copyToClipboard, throttledAdjustButtonMargins } from '../../shared/utils';
 import { isDef } from '@fundam/utils';
-import { QuestionCircleOutlined } from '@ant-design/icons';
+import { CopyOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { useLocalStorage } from '@fundam/hooks/useLocalStorage';
 import { TableResizableTitle } from '../TableResizableTitle';
 
@@ -30,8 +30,9 @@ export interface ColumnProps<T> extends AntTableColumnProps<T> {
   title: ((props: any) => React.ReactNode) | React.ReactNode | string
   key?: string
   tooltip?: string // 提示
-  onClick?: (record: any) => void
+  onClick?: (record: T) => void
   disabled?: boolean // 不可进行列开启关闭
+  onCopy?: (record: T) => string | undefined
 }
 
 export interface TableProps extends Omit<AntTableProps, 'columns'>, GetData {
@@ -199,7 +200,7 @@ export const Table: React.FC<TableProps> = ({
     }
   })
 
-  // 使用缓存的宽度
+  // 使用缓存的宽度 & onCopy处理
   tableColumns = tableColumns.map((item, index) => ({
     ...item,
     width: tableCache?.columnsWidthMap?.[item.dataIndex] || item.width,
@@ -207,6 +208,31 @@ export const Table: React.FC<TableProps> = ({
       width: column.width,
       onResize: handleResize(item),
     }),
+    render: (text: any, record: any, index: number) => {
+      const originalRender = item.render ? item.render(text, record, index) : text
+      return (
+        <>
+          {originalRender}
+          {
+            item.onCopy ?
+              <Button
+                type="link"
+                icon={<CopyOutlined />}
+                style={{ padding: 0 }}
+                onClick={() => {
+                  const copyText = item.onCopy?.(record);
+                  if (copyText) {
+                    copyToClipboard(copyText);
+                  } else {
+                    message.error('复制失败');
+                  }
+                }}
+              />
+              : null
+          }
+        </>
+      )
+    }
   }))
 
   // 格式化数据

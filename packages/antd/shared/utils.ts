@@ -2,6 +2,7 @@ import { get, throttle } from 'lodash'
 
 import { VALID_ROW_COLS } from './constants'
 import { FormInstance } from 'antd/es/form';
+import { message } from 'antd';
 
 export const validateRowCol = (rowCol: number) => {
   if (!VALID_ROW_COLS.includes(rowCol)) {
@@ -153,3 +154,15 @@ export const adjustButtonMargins = () => {
 
 // 处理table按钮渲染（换行对齐）
 export const throttledAdjustButtonMargins = throttle(adjustButtonMargins, 50)
+
+// 复制
+export const copyToClipboard = (text: string) => {
+  if (!text) {
+    message.error('复制失败')
+    return
+  }
+  navigator.clipboard.writeText(text).then(
+    () => message.success('复制成功'),
+    () => message.error('复制失败')
+  );
+}
