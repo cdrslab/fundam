@@ -19,7 +19,7 @@ import {
   Badge, useAlias, TableRowButton, TablePro
 } from '@fundam/antd'
 import { DesktopOutlined, MobileOutlined } from '@ant-design/icons';
-import { Tag } from 'antd';
+import { Button, message, Tag } from 'antd';
 import { TableAlias } from '@fundam/antd/components/Table';
 
 const resourceStatusOptions = [
@@ -57,7 +57,8 @@ export default () => {
     {
       title: 'ID',
       dataIndex: 'id',
-      width: 60,
+      width: 120,
+      onCopy: (record: any) => record.id
     },
     {
       title: '名称',
@@ -69,7 +70,7 @@ export default () => {
     {
       title: '资源类型',
       dataIndex: 'typeDesc',
-      width: 120,
+      width: 140,
       render: (_: any, record: any) => (
         <span>
           {
@@ -85,26 +86,26 @@ export default () => {
     {
       title: '投放时间',
       dataIndex: 'time',
-      width: 320,
+      width: 380,
       onCopy: (record: any) => record.time
     },
     {
       title: '状态',
       dataIndex: 'statusDesc',
-      width: 80,
+      width: 100,
       render: (_: any, record: any) => <Badge status={['warning', 'processing', 'success', 'default'][record.status - 1] as any} text={record.statusDesc} />
     },
     {
       title: '创建人',
       dataIndex: 'createUser',
-      width: 80,
+      width: 140,
       render: (_: any, record: any) => <Tag color={record.createUser.length > 2 ? 'geekblue' : 'volcano'} key={record.createUser}>{record.createUser}</Tag>,
       onCopy: (record: any) => record.createUserId
     },
     {
       title: '创建时间',
       dataIndex: 'createTime',
-      width: 160
+      width: 220
     },
     {
       title: '操作',
@@ -184,6 +185,7 @@ export default () => {
         columns={columns}
         dataApi="/api/resource/list"
         rowKey="id"
+        extra={<><Button onClick={() => { console.log('导出'); message.success('Test...') }} type="primary">导出</Button></>}
       />
     </div>
   )

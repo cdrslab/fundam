@@ -321,7 +321,7 @@ export const TablePro: React.FC<TableProProps> = ({
     >
       <AntTable
         {...renderProps as any}
-        size={tableCache?.size}
+        size={tableCache?.size || 'small'}
       >
         {children}
       </AntTable>
