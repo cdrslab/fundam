@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import {
   Card,
   Title,
-  Space,
   Form,
   FormItemUploadImage,
   FormItemDatePickerRangePicker,
@@ -11,7 +10,6 @@ import {
   FormItemRadio,
   useAntFormInstance,
   FormItemCheckbox,
-  FormItemCascade,
   FormDisplayType,
   FunFormInstance, FormItemTextArea
 } from '@fundam/antd'
@@ -21,7 +19,7 @@ export default () => {
   const [formDisplayType, setFormDisplayType] = useState<FormDisplayType>('default')
 
   useEffect(() => {
-    // setFormDisplayType('text')
+    setFormDisplayType('text')
     // setFormDisplayType('text')
     // start: ['2024-03-07 00:00:00', '2024-03-07 23:59:59']
     // @ts-ignore

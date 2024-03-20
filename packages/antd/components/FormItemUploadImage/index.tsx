@@ -63,12 +63,7 @@ export const FormItemUploadImage: React.FC<FormItemUploadImageProps> = ({
   const [fileList, setFileList] = useState<any[]>([])
   const {
     form,
-    direction,
-    collapseNames,
-    formCollapse,
-    rowCol: formRowCol,
     displayType: formDisplayType,
-    displayTextEmpty: formDisplayTextEmpty
   } = useForm()
   const { request } = useFun()
   const { currentRules } = getFormItemDefaultData(formItemProps)

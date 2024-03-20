@@ -159,7 +159,7 @@ export const TablePro: React.FC<TableProProps> = ({
   const refreshData = () => fetchData(cacheLastRequestParamsRef.current)
 
   const handleResize = (column: any) => {
-    return (e: any, { size }: any) => {
+    return (_e: any, { size }: any) => {
       const newTableCacheColumnsWidth = { ...tableCache?.columnsWidthMap }
       newTableCacheColumnsWidth[column.dataIndex] = Math.max(50, Math.min(400, size.width)); // 限制宽度区间
       setTableCache({ ...tableCache, columnsWidthMap: newTableCacheColumnsWidth })
@@ -288,7 +288,7 @@ export const TablePro: React.FC<TableProProps> = ({
   })
 
   // 使用缓存的宽度 & onCopy处理
-  tableColumns = tableColumns.map((item, index) => ({
+  tableColumns = tableColumns.map((item) => ({
     ...item,
     width: tableCache?.columnsWidthMap?.[item.dataIndex] || item.width,
     onHeaderCell: (column: any) => ({

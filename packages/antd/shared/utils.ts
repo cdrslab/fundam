@@ -1,9 +1,8 @@
-import React, { ReactNode } from 'react'
 import { get, throttle } from 'lodash'
 
 import { VALID_ROW_COLS } from './constants'
 import { FormInstance } from 'antd/es/form';
-import { message, Tooltip } from 'antd';
+import { message } from 'antd';
 import { NavigateFunction } from 'react-router/dist/lib/hooks';
 
 export const validateRowCol = (rowCol: number) => {
@@ -78,7 +77,7 @@ export function getDisplayText(options: Option[], value: Value, separator: strin
 }
 
 // form item 组件公共部分
-export const getFormItemDefaultData = (formItemProps: Record<string, any>, params = {}) => {
+export const getFormItemDefaultData = (formItemProps: Record<string, any>, _params = {}) => {
   const currentRules = formItemProps.required ? (formItemProps.rules || [{ required: true, message: `${formItemProps.label || '该字段'}为必填字段` }]) : []
 
   return {
@@ -105,7 +104,7 @@ export const evaluateExpression = (
   expression: string,
   form: FormInstance,
   query: QueryParams = {},
-  names: string[] // TODO 多层name，Form.List中用到的？--暂不需要
+  _names: string[] // TODO 多层name，Form.List中用到的？--暂不需要
 ): any => {
   const formValues = form.getFieldsValue()
   const context = { ...query, ...formValues }

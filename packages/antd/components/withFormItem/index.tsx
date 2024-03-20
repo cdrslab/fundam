@@ -1,5 +1,6 @@
+// @ts-ignore
 import React, { ReactNode, useEffect, useRef, useState } from 'react'
-import { Input as AntInput, Select as AntSelect, Form as AntForm, Col, Input } from 'antd'
+import { Col } from 'antd'
 import { isDef } from '@fundam/utils'
 import { FormItemProps as AntFormItemProps } from 'antd/es/form/FormItem'
 import { get } from 'lodash'
@@ -155,7 +156,7 @@ export function withFormItem(WrappedComponent: any) {
       return formItemValue
     }
 
-    const defaultNormalize = (value: any, prevValue: any, prevValues: any) => {
+    const defaultNormalize = (value: any, prevValue: any) => {
       if (!isNumber || componentName !== 'Input') return value
       if (value === '') return null
       // 兼容Input输入数字
@@ -177,7 +178,9 @@ export function withFormItem(WrappedComponent: any) {
       }
       if (['Select', 'Cascader', 'Checkbox']) {
         // 多选数组，自动处理逗号分隔的值
-        curValue[name] = curValue[name].includes(',') ? curValue[name].split(',') : curValue[name]
+        if (curValue[name] && typeof curValue[name] === 'string') {
+          curValue[name] = curValue[name].includes(',') ? curValue[name].split(',') : curValue[name]
+        }
       }
       return true
     }

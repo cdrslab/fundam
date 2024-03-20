@@ -1,10 +1,7 @@
 import { useEffect, useState } from 'react'
 import {
   Card,
-  Title,
-  Space,
   Form,
-  FormItemUploadImage,
   FormItemDatePickerRangePicker,
   FormItemInput,
   FormItemSelect,
@@ -18,6 +15,7 @@ import {
 
 export default () => {
   const [form] = useAntFormInstance()
+  // @ts-ignore
   const [formDisplayType, setFormDisplayType] = useState<FormDisplayType>('default')
 
   useEffect(() => {

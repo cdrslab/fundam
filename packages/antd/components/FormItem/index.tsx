@@ -18,7 +18,7 @@ export const FormItem: React.FC<any> = ({
   visibleRule,
   ...antProps
 }) => {
-  const { name, initialValue } = antProps
+  const { name } = antProps
   const [curTooltip, setCurTooltip] = useState(null)
   const [curExtra, setCurExtra] = useState(null)
   const { request } = useFun()

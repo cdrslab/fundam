@@ -9,9 +9,6 @@
     "preview": "vite preview",
     "lint": "eslint \"src/**/*.ts\""
   },
-  "dependencies": {
-    "@fundam/web-ui": "*"
-  },
   "devDependencies": {
     "eslint": "^7.32.0",
     "@fundam/eslint-config-custom": "*",

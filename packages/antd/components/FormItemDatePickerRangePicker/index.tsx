@@ -6,7 +6,6 @@ import { FormItemCommonProps } from '../withFormItem'
 import dayjs, { Dayjs } from 'dayjs';
 import { getFormItemDefaultData } from '../../shared/utils';
 import { useForm } from '../../hooks/useForm';
-import { useFun } from '../../hooks/useFun';
 import { FormItem } from '../FormItem';
 import { GetData } from '../../shared/types';
 
@@ -95,7 +94,6 @@ export const FormItemDatePickerRangePicker: React.FC<FormItemDatePickerRangePick
     displayType: formDisplayType,
     displayTextEmpty: formDisplayTextEmpty
   } = useForm()
-  const { request } = useFun()
 
   const currentDisplayType = displayType || formDisplayType
   const currentDisplayTextEmpty = displayTextEmpty || formDisplayTextEmpty

@@ -15,11 +15,11 @@ import './index.less'
 import { GetData } from '../../shared/types'
 import { useFun } from '../../hooks/useFun'
 import { useAlias } from '../../hooks/useAlias'
-import { copyToClipboard, throttledAdjustButtonMargins, updateURLWithRequestData } from '../../shared/utils'
+import { copyToClipboard, throttledAdjustButtonMargins } from '../../shared/utils'
 import { TableResizableTitle } from '../TableResizableTitle'
 import { TextWithTooltip } from '../TextWithTooltip';
 
-export interface RowData {}
+// export interface RowData {}
 
 export interface TableAlias {
   fetchData: (params?: Record<string, any>) => void
@@ -151,7 +151,7 @@ export const Table: React.FC<TableProps> = ({
   const refreshData = () => fetchData(cacheLastRequestParamsRef.current)
 
   const handleResize = (column: any) => {
-    return (e: any, { size }: any) => {
+    return (_e: any, { size }: any) => {
       const newTableCacheColumnsWidth = { ...tableCache?.columnsWidthMap }
       newTableCacheColumnsWidth[column.dataIndex] = Math.max(50, Math.min(400, size.width)); // 限制宽度区间
       setTableCache({ ...tableCache, columnsWidthMap: newTableCacheColumnsWidth })
@@ -203,7 +203,7 @@ export const Table: React.FC<TableProps> = ({
   })
 
   // 使用缓存的宽度 & onCopy处理
-  tableColumns = tableColumns.map((item, index) => ({
+  tableColumns = tableColumns.map((item) => ({
     ...item,
     width: tableCache?.columnsWidthMap?.[item.dataIndex] || item.width,
     onHeaderCell: (column: any) => ({

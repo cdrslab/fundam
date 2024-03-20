@@ -4,6 +4,7 @@ import { message } from 'antd'
 import { createAPI } from '@fundam/utils/request'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
+import '@fundam/antd/dist/style.css'
 import './app.css'
 // import Routes from './Routes';
 import BaseHeader from './examples/components/BaseHeader'
