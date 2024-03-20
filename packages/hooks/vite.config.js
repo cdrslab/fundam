@@ -8,18 +8,11 @@ export default defineConfig({
     react(),
     dts(),
   ],
-  css: {
-    preprocessorOptions: {
-      less: {
-        javascriptEnabled: true, // 允许在.less文件中使用JavaScript
-      }
-    }
-  },
   build: {
     lib: {
       entry: resolve(__dirname, 'index.ts'),
-      name: 'FundamAntd',
-      fileName: (format) => `fundam-antd.${format}.js`
+      name: 'FundamHooks',
+      fileName: (format) => `fundam-hooks.${format}.js`
     },
     rollupOptions: {
       external: ['react', 'react-dom', 'react-router', 'react-router-dom'],
