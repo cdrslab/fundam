@@ -4,6 +4,7 @@ import { get, throttle } from 'lodash'
 import { VALID_ROW_COLS } from './constants'
 import { FormInstance } from 'antd/es/form';
 import { message, Tooltip } from 'antd';
+import { NavigateFunction } from 'react-router/dist/lib/hooks';
 
 export const validateRowCol = (rowCol: number) => {
   if (!VALID_ROW_COLS.includes(rowCol)) {
@@ -169,13 +170,14 @@ export const copyToClipboard = (text: string) => {
 }
 
 // 更新地址栏参数
-export const updateURLWithRequestData = (requestData: Record<string, any> = {}) => {
+export const updateURLWithRequestData = (navigate: NavigateFunction, requestData: Record<string, any> = {}, replace = false) => {
   if (!Object.keys(requestData)?.length) return
-  const currentUrl = new URL(window.location.href);
-  const searchParams = new URLSearchParams(currentUrl.search);
+  const currentUrl = new URL(window.location.href)
+  const searchParams = replace ? new URLSearchParams() : new URLSearchParams(currentUrl.search)
   Object.keys(requestData).forEach(key => {
-    searchParams.set(key, requestData[key]);
-  });
-  const newUrl = `${currentUrl.pathname}?${searchParams.toString()}`;
-  window.history.pushState({}, '', newUrl);
+    if (!key || !requestData[key]) return
+    searchParams.set(key, requestData[key])
+  })
+  const newUrl = `${currentUrl.pathname}?${searchParams.toString()}`
+  navigate(newUrl)
 }

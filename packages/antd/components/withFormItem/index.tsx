@@ -175,6 +175,10 @@ export function withFormItem(WrappedComponent: any) {
           curValue[name] = parseInt(currentFormItemValue)
         }
       }
+      if (['Select', 'Cascader', 'Checkbox']) {
+        // 多选数组，自动处理逗号分隔的值
+        curValue[name] = curValue[name].includes(',') ? curValue[name].split(',') : curValue[name]
+      }
       return true
     }
 

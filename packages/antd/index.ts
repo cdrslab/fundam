@@ -6,6 +6,7 @@ export { Title } from './components/Title'
 export { Table, TableRowButton } from './components/Table'
 export { TablePro } from './components/TablePro'
 export { Badge } from './components/Badge'
+export { ListFilter } from './components/ListFilter'
 
 export { Form } from './components/Form/index'
 export { FunConfigProvider } from './components/FunConfigProvider'

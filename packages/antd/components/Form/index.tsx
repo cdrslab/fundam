@@ -58,7 +58,6 @@ export const Form: React.FC<FormProviderProps> = ({
       if (key.startsWith('__')) return
       newValues[key] = values[key]
     })
-    console.log(newValues)
     onFinish && onFinish(newValues)
   }
 

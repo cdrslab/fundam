@@ -22,6 +22,7 @@ import { TextWithTooltip } from '../TextWithTooltip'
 interface TableProProps extends TableProps {
   tableTitle?: string // 标题
   extra?: ((props: any) => React.ReactNode) | React.ReactNode
+  onPaginationChange?: (page: number, pageSize: number) => Promise<void>
 }
 
 interface CacheTableProData extends CacheTableData {
@@ -48,7 +49,7 @@ export const TablePro: React.FC<TableProProps> = ({
   indexType,
   emptyValue = '-',
   cacheKey,
-  updateQuery,
+  onPaginationChange,
 
   rowKey = 'id',
   columns,
@@ -68,10 +69,9 @@ export const TablePro: React.FC<TableProProps> = ({
   const [data, setData] = useState({
     list: [],
     total: 0,
-    page: 1,
-    pageSize: 20
+    page: initPage,
+    pageSize: initPageSize
   })
-  // const [tableCache, setTableCache] = useLocalStorage<CacheTableData>(cacheKey, null)
 
   useEffect(() => {
     // 换行按钮对齐
@@ -95,13 +95,17 @@ export const TablePro: React.FC<TableProProps> = ({
     initFilterColumns()
   }, []);
 
-  const fetchData = async (params: any = {}) => {
+  const fetchData = async (params: any = {}, replace = false) => {
     if (!dataApi && !dataFunc) return
     try {
       setLoading(true)
-      const requestData = { ...dataApiReqData, ...params }
+      const requestData = replace ? params : {
+        ...dataApiReqData,
+        [pageKey]: initPage,
+        [pageSizeKey]: initPageSize,
+        ...params
+      }
       cacheLastRequestParamsRef.current = requestData
-      updateQuery && updateURLWithRequestData(requestData)
       // @ts-ignore
       let res = dataApi ? await request[dataApiMethod](dataApi, requestData) : await dataFunc(requestData)
       res = resDataPath ? get(res, resDataPath) : res
@@ -119,7 +123,13 @@ export const TablePro: React.FC<TableProProps> = ({
     }
   }
 
-  const handlePagination = (page: number, pageSize: number) => fetchData({ ...cacheLastRequestParamsRef.current, page, pageSize })
+  const handlePagination = async (page: number, pageSize: number) => {
+    if (onPaginationChange) {
+      await onPaginationChange(page, pageSize)
+    } else {
+      await fetchData({ ...cacheLastRequestParamsRef.current, page, pageSize })
+    }
+  }
 
   const refreshData = () => fetchData(cacheLastRequestParamsRef.current)
 

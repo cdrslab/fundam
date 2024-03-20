@@ -1,26 +1,14 @@
-import { useEffect, useState } from 'react'
 import {
-  Card,
-  Title,
-  Space,
-  Form,
-  FormItemUploadImage,
   FormItemDatePickerRangePicker,
   FormItemInput,
   FormItemSelect,
-  FormItemRadio,
-  useAntFormInstance,
-  FormItemCheckbox,
   FormItemCascade,
-  FormDisplayType,
-  FunFormInstance,
-  FormItemTextArea,
-  Table,
-  Badge, useAlias, TableRowButton, TablePro
+  Badge,
+  TableRowButton,
+  ListFilter
 } from '@fundam/antd'
 import { DesktopOutlined, MobileOutlined } from '@ant-design/icons';
 import { Button, message, Tag } from 'antd';
-import { TableAlias } from '@fundam/antd/components/Table';
 
 const resourceStatusOptions = [
   {
@@ -41,14 +29,7 @@ const resourceStatusOptions = [
   },
 ]
 
-interface ListPageAlias {
-  resourceTable: TableAlias
-}
-
 export default () => {
-  const [form] = useAntFormInstance()
-  const { resourceTable } = useAlias<ListPageAlias>()
-
   const onClickRecordName = (record: any) => {
     console.log(record)
   }
@@ -128,66 +109,46 @@ export default () => {
     },
   ]
 
-  return (
-    <div className="fun-page">
-      <Card style={{ marginBottom: 24 }}>
-        <Form
-          form={form}
-          direction="horizontal"
-          showValidateMessagesRow={false}
-          defaultButtonText="重置"
-          defaultButtonClick={() => { form.resetFields(); resourceTable.fetchData({ page: 1 }) }}
-          primaryButtonText="查询"
-          primaryButtonClick={() => form.submit()}
-          onFinish={(values) => resourceTable.fetchData({ ...values, page: 1 })}
-        >
-          <FormItemInput
-            isNumber
-            name="id"
-            label="投放ID"
-          />
-          <FormItemInput
-            name="name"
-            label="活动名称"
-          />
-          <FormItemCascade
-            name="type"
-            label="资源类型"
-            labelKey="title"
-            valueKey="code"
-            childrenKey="sub"
-            dataApi="/api/resource/type"
-          />
-          <FormItemSelect
-            name="status"
-            label="状态"
-            options={resourceStatusOptions}
-          />
-          <FormItemDatePickerRangePicker
-            rowCol={12}
-            names={['start', 'end']}
-            label="活动时间"
-          />
-        </Form>
-      </Card>
-      {/*<Card title="资源列表">*/}
-      {/*  <Table*/}
-      {/*    cacheKey="resourceTable"*/}
-      {/*    alias="resourceTable"*/}
-      {/*    columns={columns}*/}
-      {/*    dataApi="/api/resource/list"*/}
-      {/*    rowKey="id"*/}
-      {/*  />*/}
-      {/*</Card>*/}
-      <TablePro
-        tableTitle="资源列表"
-        cacheKey="resourceTable"
-        alias="resourceTable"
-        columns={columns}
-        dataApi="/api/resource/list"
-        rowKey="id"
-        extra={<><Button onClick={() => { console.log('导出'); message.success('Test...') }} type="primary">导出</Button></>}
+  const formItem = (
+    <>
+      <FormItemInput
+        isNumber
+        name="id"
+        label="投放ID"
       />
-    </div>
+      <FormItemInput
+        name="name"
+        label="活动名称"
+      />
+      <FormItemCascade
+        name="type"
+        label="资源类型"
+        labelKey="title"
+        valueKey="code"
+        childrenKey="sub"
+        dataApi="/api/resource/type"
+      />
+      <FormItemSelect
+        name="status"
+        label="状态"
+        options={resourceStatusOptions}
+      />
+      <FormItemDatePickerRangePicker
+        rowCol={12}
+        names={['start', 'end']}
+        label="活动时间"
+      />
+    </>
+  )
+
+  return (
+    <ListFilter
+      formItems={formItem}
+      tableCacheKey="resourceTablePro"
+      tableColumns={columns}
+      tableDataApi="/api/resource/list"
+      tableTitle="资源列表"
+      tableExtra={<><Button onClick={() => { console.log('导出'); message.success('Test...') }} type="primary">导出</Button></>}
+    />
   )
 }

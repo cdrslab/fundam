@@ -1,12 +1,16 @@
-import { useMemo, useState } from 'react'
-import List from './examples/list_page/List';
-import BaseForm from './examples/form_page/BaseForm';
-import ListBasePage from './examples/list_base_page';
+import { useMemo } from 'react'
+import { FunConfigProvider } from '@fundam/antd'
+import { message } from 'antd'
+import { createAPI } from '@fundam/utils/request'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 import './app.css'
-import { FunConfigProvider } from '@fundam/antd/components/FunConfigProvider';
-import { Button, message } from 'antd';
-import { createAPI } from '@fundam/utils/request';
+// import Routes from './Routes';
+import BaseHeader from './examples/components/BaseHeader'
+import ListPro from './examples/list_pro'
+import BaseForm from './examples/form_page/BaseForm'
+import ListBasePage from './examples/list_base_page'
+import List from './examples/list_page/List'
 
 // 模拟不同环境不同baseURL
 const getBaseURL = () => {
@@ -14,14 +18,7 @@ const getBaseURL = () => {
   return '//localhost:5174'
 }
 
-const RenderComponents = {
-  list_base_page: ListBasePage,
-  list: List,
-  base_form: BaseForm,
-}
-
 const App = () => {
-  const [renderComponent, setRenderComponent] = useState('list_base_page')
   const request = useMemo(() => createAPI({
     baseURL: getBaseURL(),
   }, (res: any) => {
@@ -45,26 +42,28 @@ const App = () => {
     throw error
   }), [])
 
-  // @ts-ignore
-  const CurrentComponent = RenderComponents[renderComponent]
+
   return (
-    <FunConfigProvider
-      request={request}
-    >
-      <div className="app-container">
-        <div className="menus">模拟菜单占位</div>
-        <div className="main-content">
-          <div className="top-bar">
-            <Button onClick={() => setRenderComponent('list_base_page')} style={{ marginRight: 4 }}>基础列表</Button>
-            <Button onClick={() => setRenderComponent('base_form')} style={{ marginRight: 4 }}>基础表单</Button>
-            <Button onClick={() => setRenderComponent('list')}>列表</Button>
-          </div>
-          <div className="content">
-            <CurrentComponent />
+    <BrowserRouter>
+      <FunConfigProvider
+        request={request}
+      >
+        <div className="app-container">
+          <div className="menus">模拟菜单占位</div>
+          <div className="main-content">
+            <BaseHeader />
+            <div className="content">
+              <Routes>
+                <Route path="/list_pro" element={<ListPro />}></Route>
+                <Route path="/list" element={<List />}></Route>
+                <Route path="/base_form" element={<BaseForm />}></Route>
+                <Route path="/list_base_page" element={<ListBasePage />}></Route>
+              </Routes>
+            </div>
           </div>
         </div>
-      </div>
-    </FunConfigProvider>
+      </FunConfigProvider>
+    </BrowserRouter>
   )
 }
 

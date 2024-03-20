@@ -49,7 +49,6 @@ export interface TableProps extends Omit<AntTableProps, 'columns'>, GetData {
   indexType?: 'pagination' | 'nonPagination'; // 序号类型：如每页10条数据，分页（第二页第一条数据序号为11）；不分页（第二页第一条数据序号为1）
   emptyValue?: string; // 空值展示
   cacheKey?: string // 缓存表格数据 & 请求参数 & 各列宽度等，需要项目纬度唯一
-  updateQuery?: boolean // 请求后更新地址栏参数
 }
 
 export interface CacheTableData {
@@ -86,7 +85,6 @@ export const Table: React.FC<TableProps> = ({
   indexType,
   emptyValue = '-',
   cacheKey,
-  updateQuery,
 
   rowKey = 'id',
   columns,
@@ -131,7 +129,6 @@ export const Table: React.FC<TableProps> = ({
       setLoading(true)
       const requestData = { ...dataApiReqData, ...params }
       cacheLastRequestParamsRef.current = requestData
-      updateQuery && updateURLWithRequestData(requestData)
       // @ts-ignore
       let res = dataApi ? await request[dataApiMethod](dataApi, requestData) : await dataFunc(requestData)
       res = resDataPath ? get(res, resDataPath) : res
