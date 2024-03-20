@@ -16,6 +16,8 @@ interface ListFilterProps {
   updateQuery?: Boolean // 更新地址栏参数
   tableRowKey?: string
   formItems: React.ReactNode
+
+  // 抽出常用的props
   tableCacheKey: string, // 唯一key（localstorage缓存使用）
   tableColumns: Array<any>
   tableDataApi: string
@@ -27,6 +29,12 @@ interface ListFilterProps {
   tableListKey?: string
   tablePageSizeKey?: string
   tableTotalKey?: string
+  // 选择行相关
+  tableInitSelectedRowKeys?: Array<any>
+  tableSelectedMaxRow?: number
+  tableSelectedMaxRowErrorMessage?: string
+  tableOnSelectedRowKeysChange?: (selectedRowKeys: Array<any>) => void
+  tableOnSelectedRowRecordsChange?: (selectedRowRecords: Array<any>) => void
 }
 
 export const ListFilter: React.FC<ListFilterProps> = ({
@@ -46,7 +54,12 @@ export const ListFilter: React.FC<ListFilterProps> = ({
   tablePageKey = 'page',
   tableListKey = 'list',
   tablePageSizeKey = 'pageSize',
-  tableTotalKey = 'total'
+  tableTotalKey = 'total',
+  tableInitSelectedRowKeys,
+  tableSelectedMaxRow,
+  tableSelectedMaxRowErrorMessage,
+  tableOnSelectedRowKeysChange,
+  tableOnSelectedRowRecordsChange
 }) => {
   const [form] = useAntFormInstance()
   const tableAlias = useAlias<any>()
@@ -118,6 +131,11 @@ export const ListFilter: React.FC<ListFilterProps> = ({
         listKey={tableListKey}
         totalKey={tableTotalKey}
         onPaginationChange={onPaginationChange}
+        initSelectedRowKeys={tableInitSelectedRowKeys}
+        selectedMaxRow={tableSelectedMaxRow}
+        selectedMaxRowErrorMessage={tableSelectedMaxRowErrorMessage}
+        onSelectedRowKeysChange={tableOnSelectedRowKeysChange}
+        onSelectedRowRecordsChange={tableOnSelectedRowRecordsChange}
       />
     </div>
   )

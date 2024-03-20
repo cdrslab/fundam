@@ -9,13 +9,17 @@ import {
   ReloadOutlined,
   SettingOutlined
 } from '@ant-design/icons'
-import { get } from 'lodash'
+import { get, union } from 'lodash'
 import { isDef } from '@fundam/utils'
 
 import { TableProps, CacheTableData, TableRowButton } from '../Table'
 import { useFun } from '../../hooks/useFun'
 import { useAlias } from '../../hooks/useAlias'
-import { copyToClipboard, throttledAdjustButtonMargins, updateURLWithRequestData } from '../../shared/utils'
+import {
+  arrayRemoveByValues,
+  copyToClipboard, objArrayRemoveByValuesKey, objArrayUnionByValuesKey,
+  throttledAdjustButtonMargins
+} from '../../shared/utils'
 import { TableResizableTitle } from '../TableResizableTitle'
 import { TextWithTooltip } from '../TextWithTooltip'
 
@@ -23,6 +27,11 @@ interface TableProProps extends TableProps {
   tableTitle?: string // 标题
   extra?: ((props: any) => React.ReactNode) | React.ReactNode
   onPaginationChange?: (page: number, pageSize: number) => Promise<void>
+  initSelectedRowKeys?: Array<any>
+  selectedMaxRow?: number // 最多选择行数
+  selectedMaxRowErrorMessage?: string // 超出选择行数限制
+  onSelectedRowKeysChange?: (selectedRowKeys: Array<any>) => void
+  onSelectedRowRecordsChange?: (selectedRowRecords: Array<any>) => void
 }
 
 interface CacheTableProData extends CacheTableData {
@@ -50,6 +59,11 @@ export const TablePro: React.FC<TableProProps> = ({
   emptyValue = '-',
   cacheKey,
   onPaginationChange,
+  initSelectedRowKeys = [],
+  selectedMaxRow,
+  selectedMaxRowErrorMessage = '超出限制',
+  onSelectedRowKeysChange,
+  onSelectedRowRecordsChange,
 
   rowKey = 'id',
   columns,
@@ -72,6 +86,9 @@ export const TablePro: React.FC<TableProProps> = ({
     page: initPage,
     pageSize: initPageSize
   })
+  // Table选择相关
+  const [selectedRowKeys, setSelectedRowKeys] = useState<Array<any>>(initSelectedRowKeys) // 选择的行key
+  const [selectedRowRecords, setSelectedRowRecords] = useState<Array<any>>([]) // 临时存储
 
   useEffect(() => {
     // 换行按钮对齐
@@ -93,7 +110,15 @@ export const TablePro: React.FC<TableProProps> = ({
 
   useEffect(() => {
     initFilterColumns()
-  }, []);
+  }, [])
+
+  // 选择行变化
+  useEffect(() => {
+    onSelectedRowKeysChange && onSelectedRowKeysChange(selectedRowKeys)
+  }, [selectedRowKeys])
+  useEffect(() => {
+    onSelectedRowRecordsChange && onSelectedRowRecordsChange(selectedRowRecords)
+  }, [selectedRowRecords])
 
   const fetchData = async (params: any = {}, replace = false) => {
     if (!dataApi && !dataFunc) return
@@ -170,6 +195,54 @@ export const TablePro: React.FC<TableProProps> = ({
     setCurrentColumns(curColumns)
     onTableCacheChange('columnKeys', stringValues)
   }
+
+  // 选中&取消选中（支持跨页多选）
+  const selectLengthCheck = (selectData: Array<any>) => {
+    if (!selectedMaxRow) return true
+    return selectData && selectData.length <= selectedMaxRow
+  }
+  const onTableSelect = (record: any, selected: boolean) => {
+    const newSelectedRowKeys: Array<any> = [...selectedRowKeys]
+    const newSelectedRowRecords: Array<any> = [...selectedRowRecords]
+
+    if (selected) {
+      // 选中
+      newSelectedRowKeys.push(record[rowKey as string])
+      newSelectedRowRecords.push(record)
+
+      if (!selectLengthCheck(newSelectedRowKeys)) {
+        message.error(selectedMaxRowErrorMessage)
+        return
+      }
+
+      setSelectedRowKeys(newSelectedRowKeys)
+      setSelectedRowRecords(newSelectedRowRecords)
+    } else {
+      setSelectedRowKeys(arrayRemoveByValues(newSelectedRowKeys, [record[rowKey as string]]))
+      setSelectedRowRecords(objArrayRemoveByValuesKey(newSelectedRowRecords, [record], rowKey as string))
+    }
+  }
+
+  const onTableSelectAll = (selected: boolean) => {
+    const currentPageRowKeys = data.list.map(i => i[rowKey as string])
+    const newSelectedRowKeys = [...selectedRowKeys]
+    const newSelectedRowRecords = [...selectedRowRecords]
+
+    if (selected) {
+      // 选中
+      const unionNewSelectedRowKeys = union(newSelectedRowKeys, currentPageRowKeys)
+      if (!selectLengthCheck(unionNewSelectedRowKeys)) {
+        message.error(selectedMaxRowErrorMessage)
+        return
+      }
+      setSelectedRowKeys(unionNewSelectedRowKeys)
+      setSelectedRowRecords(objArrayUnionByValuesKey(newSelectedRowRecords, data.list, rowKey as string))
+    } else {
+      setSelectedRowKeys(arrayRemoveByValues(newSelectedRowKeys, currentPageRowKeys))
+      setSelectedRowRecords(objArrayRemoveByValuesKey(newSelectedRowRecords, data.list, rowKey as string))
+    }
+  }
+
 
   // 格式化columns
   let tableColumns: any[] = []
@@ -272,6 +345,15 @@ export const TablePro: React.FC<TableProProps> = ({
       onChange: handlePagination,
       showSizeChanger: true,
     } : false)
+  }
+
+  if ((onSelectedRowKeysChange || onSelectedRowRecordsChange) && !renderProps.rowSelection) {
+    // 需要行可选
+    renderProps.rowSelection = {
+      selectedRowKeys: selectedRowKeys,
+      onSelect: onTableSelect,
+      onSelectAll: onTableSelectAll,
+    }
   }
 
   const buildExtra = () => {

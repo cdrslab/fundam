@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   FormItemDatePickerRangePicker,
   FormItemInput,
@@ -7,8 +8,8 @@ import {
   TableRowButton,
   ListFilter
 } from '@fundam/antd'
-import { DesktopOutlined, MobileOutlined } from '@ant-design/icons';
-import { Button, message, Tag } from 'antd';
+import { DesktopOutlined, MobileOutlined } from '@ant-design/icons'
+import { Button, message, Tag } from 'antd'
 
 const resourceStatusOptions = [
   {
@@ -30,8 +31,26 @@ const resourceStatusOptions = [
 ]
 
 export default () => {
+  const [selectedData, setSelectedData] = useState<any>([])
   const onClickRecordName = (record: any) => {
     console.log(record)
+  }
+
+  // 选中rowKeys（跨页多选） - 可以重写rowSelection props替换掉TablePro原逻辑
+  // const tableOnSelectedRowKeysChange = (selectKeys: Array<any>) => {
+  //   console.log(selectKeys)
+  //   setSelectedData(selectKeys)
+  // }
+
+  // 选中rowRecords（跨页多选）
+  const tableOnSelectedRowRecordsChange = (selectRecords: Array<any>) => {
+    console.log(selectRecords)
+    setSelectedData(selectRecords)
+  }
+
+  const exportSelectedData = () => {
+    console.log(selectedData)
+    message.success('Test....')
   }
 
   const columns = [
@@ -148,7 +167,11 @@ export default () => {
       tableColumns={columns}
       tableDataApi="/api/resource/list"
       tableTitle="资源列表"
-      tableExtra={<><Button onClick={() => { console.log('导出'); message.success('Test...') }} type="primary">导出</Button></>}
+      tableExtra={<><Button onClick={exportSelectedData} type="primary">导出</Button></>}
+      // tableOnSelectedRowKeysChange={tableOnSelectedRowKeysChange}
+      tableOnSelectedRowRecordsChange={tableOnSelectedRowRecordsChange}
+      tableSelectedMaxRow={22}
+      tableSelectedMaxRowErrorMessage="不能选择超过22个资源位"
     />
   )
 }

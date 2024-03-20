@@ -181,3 +181,21 @@ export const updateURLWithRequestData = (navigate: NavigateFunction, requestData
   const newUrl = `${currentUrl.pathname}?${searchParams.toString()}`
   navigate(newUrl)
 }
+
+// 基础类型数组批量删除元素，Table select row使用
+export const arrayRemoveByValues = (array: Array<any>, values: Array<any>) => array.filter(i => !values.includes(i))
+
+// 对象数组批量删除元素
+export const objArrayRemoveByValuesKey = (objArray: Array<Record<string, any>>, values: Array<Record<string, any>>, key: string) => {
+  const valueKeys = values.map(i => i[key])
+  return objArray.filter(item => !valueKeys.includes(item[key]))
+}
+// 去重
+export const objArrayUnionByValuesKey = (objArray: Array<Record<string, any>>, values: Array<Record<string, any>>, key: string) => {
+  const objArrayKeys = objArray.map(i => i[key])
+  values.forEach(item => {
+    if (objArrayKeys.includes(item[key])) return
+    objArray.push(item)
+  })
+  return objArray
+}
