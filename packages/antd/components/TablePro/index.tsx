@@ -3,6 +3,7 @@ import { Button, Card, Checkbox, Dropdown, message, Popover, Table as AntTable, 
 import { CheckboxValueType } from 'antd/es/checkbox/Group'
 import { useLocalStorage } from '@fundam/hooks'
 import {
+  CoffeeOutlined,
   ColumnHeightOutlined,
   CopyOutlined,
   QuestionCircleOutlined,
@@ -397,6 +398,14 @@ export const TablePro: React.FC<TableProProps> = ({
     return (
       <>
         {extra}
+        {/*筛选自动填入*/}
+        {/*<Dropdown*/}
+        {/*  menu={{ items: sizeItems }}*/}
+        {/*  placement="bottom"*/}
+        {/*  overlayStyle={{ maxWidth: '70vw' }}*/}
+        {/*>*/}
+        {/*  <CoffeeOutlined style={{ marginLeft: 12, fontSize: 16 }} onClick={refreshData} />*/}
+        {/*</Dropdown>*/}
         <ReloadOutlined style={{ marginLeft: 12 }} onClick={refreshData} />
         <Dropdown menu={{ items: sizeItems }}>
           <ColumnHeightOutlined style={{ marginLeft: 12, fontSize: 16, color: 'rgba(0, 0, 0, 0.75)' }} />

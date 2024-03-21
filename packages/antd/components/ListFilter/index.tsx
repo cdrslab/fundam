@@ -16,7 +16,6 @@ interface ListFilterProps {
   updateQuery?: Boolean // 更新地址栏参数
   tableRowKey?: string
   formItems: React.ReactNode
-
   // 抽出常用的props
   tableCacheKey: string, // 唯一key（localstorage缓存使用）
   tableColumns: Array<any>
