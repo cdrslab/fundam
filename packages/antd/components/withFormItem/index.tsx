@@ -2,6 +2,7 @@
 import React, { ReactNode, useEffect, useRef, useState } from 'react'
 import { Col } from 'antd'
 import { isDef } from '@fundam/utils'
+import { useLocalStorage } from '@fundam/hooks'
 import { FormItemProps as AntFormItemProps } from 'antd/es/form/FormItem'
 import { get } from 'lodash'
 
@@ -62,6 +63,8 @@ export function withFormItem(WrappedComponent: any) {
       dataApi,
       dataApiReqData = {},
       dataApiMethod = 'get',
+      cacheKey,
+      cacheExpirationSec = 120, // 默认缓存120秒
       resDataPath,
       // 可选组件相关
       labelKey = 'label',
@@ -106,6 +109,7 @@ export function withFormItem(WrappedComponent: any) {
     const [loading, setLoading] = useState(wrappedComponentProps.loading || false) // 加载中
     const [options, setOptions] = useState(wrappedComponentProps.options || []) // 下拉组件等的options
     const { request } = useFun()
+    const [optionsCache, setOptionsCache] = useLocalStorage(cacheKey, null, cacheExpirationSec)
 
     const initRef = useRef(false) // 用于防止父级更新，导致子组件两次 init，发起两次请求
 
@@ -130,9 +134,14 @@ export function withFormItem(WrappedComponent: any) {
       if (!dataApi && !dataFunc) return
       try {
         setLoading(true)
+        if (optionsCache) {
+          setOptions(optionsCache)
+          return
+        }
         let res = dataApi ? await request[dataApiMethod](dataApi, dataApiReqData) : await dataFunc(dataApiReqData)
         res = resDataPath ? get(res, resDataPath) : res
         res = formatDataToOptions(res, labelKey, valueKey, childrenKey)
+        cacheKey && setOptionsCache(res)
         setOptions(res)
       } catch (e) {
         console.error(e)
