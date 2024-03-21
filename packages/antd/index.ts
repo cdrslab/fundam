@@ -26,4 +26,5 @@ export { useForm } from './hooks/useForm'
 export { useFun } from './hooks/useFun'
 export { useAlias } from './hooks/useAlias'
 
+export type { TableAlias } from './components/Table'
 export type { FormDisplayType, FunFormInstance } from './shared/types'

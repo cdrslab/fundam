@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Button, Card, Checkbox, Dropdown, message, Popover, Table as AntTable, Tooltip } from 'antd'
 import { CheckboxValueType } from 'antd/es/checkbox/Group'
-import { useLocalStorage } from '@fundam/hooks/useLocalStorage'
+import { useLocalStorage } from '@fundam/hooks'
 import {
   ColumnHeightOutlined,
   CopyOutlined,

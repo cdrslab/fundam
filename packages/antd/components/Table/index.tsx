@@ -9,7 +9,7 @@ import {
 import { get } from 'lodash'
 import { isDef } from '@fundam/utils'
 import { CopyOutlined, QuestionCircleOutlined } from '@ant-design/icons'
-import { useLocalStorage } from '@fundam/hooks/useLocalStorage'
+import { useLocalStorage } from '@fundam/hooks'
 
 import './index.less'
 import { GetData } from '../../shared/types'

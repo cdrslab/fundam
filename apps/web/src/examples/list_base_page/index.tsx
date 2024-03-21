@@ -5,11 +5,11 @@ import {
   FormItemInput,
   FormItemSelect,
   useAntFormInstance,
-  Badge, useAlias, TableRowButton, TablePro, FormItemCascade
+  Badge, useAlias, TableRowButton, TablePro, FormItemCascade,
+  TableAlias
 } from '@fundam/antd'
 import { DesktopOutlined, MobileOutlined } from '@ant-design/icons';
 import { Button, message, Tag } from 'antd';
-import { TableAlias } from '@fundam/antd/components/Table';
 
 const resourceStatusOptions = [
   {
