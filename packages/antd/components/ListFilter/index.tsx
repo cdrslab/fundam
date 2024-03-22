@@ -69,6 +69,8 @@ export const ListFilter: React.FC<ListFilterProps> = ({
   const { [tablePageKey]: initPage, [tablePageSizeKey]: initPageSize } = query
 
   useEffect(() => {
+    // @ts-ignore
+    window.$form = form
     // 非首次进入 或 不使用地址栏参数
     if (params || !updateQuery) return
     form.setFieldsValue(query)
@@ -76,20 +78,20 @@ export const ListFilter: React.FC<ListFilterProps> = ({
   }, [query])
 
   const onFormFinish = async (values: Record<string, any> | null) => {
-    const newQuery = { ...values, page: 1 }
+    const newQuery = { ...tableApiReqData, ...values, [tablePageKey]: 1 }
     updateQuery && updateURLWithRequestData(navigate, newQuery)
     await table.fetchData(newQuery)
   }
 
   const onPaginationChange = async (page: number, pageSize: number) => {
-    const newQuery = { ...query, page, pageSize }
+    const newQuery = { ...tableApiReqData, ...query, [tablePageKey]: page, [tablePageSizeKey]: pageSize }
     updateQuery && updateURLWithRequestData(navigate, newQuery)
     await table.fetchData(newQuery)
   }
 
   const onFormReset = async () => {
-    form.resetFields();
-    const newQuery = { page: 1 }
+    form.resetFields()
+    const newQuery = { ...tableApiReqData, [tablePageKey]: 1 }
     updateQuery && updateURLWithRequestData(navigate, newQuery, true)
     await table.fetchData(newQuery, true)
   }
@@ -113,6 +115,8 @@ export const ListFilter: React.FC<ListFilterProps> = ({
       </Card>
       <TablePro
         {...tableProps}
+        updateQuery={updateQuery}
+        query={query}
         initPage={parseInt(initPage || 1)}
         initPageSize={parseInt(initPageSize || 20)}
         tableTitle={tableTitle}
@@ -120,7 +124,6 @@ export const ListFilter: React.FC<ListFilterProps> = ({
         alias={tableCacheKey}
         columns={tableColumns}
         dataApi={tableDataApi}
-        dataApiReqData={{ ...tableApiReqData, ...query }}
         dataApiMethod={tableDataApiMethod}
         resDataPath={tableResDataPath}
         rowKey={tableRowKey}

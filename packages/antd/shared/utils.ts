@@ -1,9 +1,10 @@
 import { get, throttle } from 'lodash'
+import queryString from 'query-string'
+import { message } from 'antd'
+import { NavigateFunction } from 'react-router/dist/lib/hooks'
+import { FormInstance } from 'antd/es/form'
 
 import { VALID_ROW_COLS } from './constants'
-import { FormInstance } from 'antd/es/form';
-import { message } from 'antd';
-import { NavigateFunction } from 'react-router/dist/lib/hooks';
 
 export const validateRowCol = (rowCol: number) => {
   if (!VALID_ROW_COLS.includes(rowCol)) {
@@ -171,14 +172,9 @@ export const copyToClipboard = (text: string) => {
 // 更新地址栏参数
 export const updateURLWithRequestData = (navigate: NavigateFunction, requestData: Record<string, any> = {}, replace = false) => {
   if (!Object.keys(requestData)?.length) return
-  const currentUrl = new URL(window.location.href)
-  const searchParams = replace ? new URLSearchParams() : new URLSearchParams(currentUrl.search)
-  Object.keys(requestData).forEach(key => {
-    if (!key || !requestData[key]) return
-    searchParams.set(key, requestData[key])
-  })
-  const newUrl = `${currentUrl.pathname}?${searchParams.toString()}`
-  navigate(newUrl)
+  const queryParams: any = queryString.parse(window.location.search)
+  const qs = queryString.stringify(replace ? { ...requestData } : { ...queryParams, ...requestData })
+  navigate(window.location.pathname + window.location.hash + '?' + qs)
 }
 
 // 基础类型数组批量删除元素，Table select row使用

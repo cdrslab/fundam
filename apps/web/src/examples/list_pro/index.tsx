@@ -140,7 +140,9 @@ export default () => {
         label="活动名称"
       />
       <FormItemCascade
-        name="type"
+        changeOnSelect
+        // name="type"
+        names={['deviceTyoe', 'type']}
         label="资源类型"
         labelKey="title"
         valueKey="code"

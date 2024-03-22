@@ -37,6 +37,7 @@ $ yarn dev
 - [x] Table - 跨页多选：onSelectedRowKeysChange & onSelectedRowRecordsChange 支持
 - [ ] Cascade、Select 无限极选择 - 兼容解构取值，如：\[province, city, district\]，多选兼容
 - [ ] Cascade、Select - 远程搜索兼容，updateQuery兼容
+- [ ] GetData 数据转换
 - [ ] Input、Select、Cascade、RangePicker带入快捷输入（Cache & 计数）
 - [ ] Cascade、Select - 开启常用选项（个数），dropdownRender
 - [ ] Upload - 拖拽上传
@@ -52,6 +53,7 @@ $ yarn dev
 - [ ] 封装[antd form item trigger（组合组件）](https://ant.design/components/form-cn#components-form-demo-customized-form-controls)
 - [ ] Table - 右键功能：刷新、表格大小、筛选列、复制
 - [ ] 常用筛选统计&带入
+- [ ] Command/Control + Shift + F => 站内搜索：菜单？
 
 #### 基础功能
 

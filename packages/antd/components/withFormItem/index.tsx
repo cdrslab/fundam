@@ -1,6 +1,6 @@
 // @ts-ignore
 import React, { ReactNode, useEffect, useRef, useState } from 'react'
-import { Col } from 'antd'
+import { Col, Form } from 'antd'
 import { isDef } from '@fundam/utils'
 import { useLocalStorage } from '@fundam/hooks'
 import { FormItemProps as AntFormItemProps } from 'antd/es/form/FormItem'
@@ -19,6 +19,7 @@ export interface FunFormItemProps {
   noLabel?: boolean // 不展示label（关联设置colon）
   visibleRule?: (() => boolean) | string
   observe?: Array<string>
+  // names?: Array<string>
 }
 
 export interface FormItemCommonProps extends Omit<AntFormItemProps, 'tooltip' | 'extra'>, FunFormItemProps {
@@ -52,6 +53,7 @@ export function withFormItem(WrappedComponent: any) {
       // formItem新增props
       visibleRule, // 表达式 & Func 计算是否展示组件
       observe, // 监听 变化 => 触发 visibleRule 重新计算
+      // names, // 针对Cascade等多级进行解构
 
       rowCol,
       displayType,

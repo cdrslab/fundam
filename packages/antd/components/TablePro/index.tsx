@@ -33,6 +33,8 @@ interface TableProProps extends TableProps {
   selectedMaxRowErrorMessage?: string // 超出选择行数限制
   onSelectedRowKeysChange?: (selectedRowKeys: Array<any>) => void
   onSelectedRowRecordsChange?: (selectedRowRecords: Array<any>) => void
+  updateQuery?: Boolean // 更新地址栏参数
+  query?: Record<string, any>
 }
 
 interface CacheTableProData extends CacheTableData {
@@ -42,6 +44,8 @@ interface CacheTableProData extends CacheTableData {
 
 // TODO 0.2 优化：与 Table TableForm等抽出共性
 export const TablePro: React.FC<TableProProps> = ({
+  updateQuery, // 当值为数组时，与地址栏保持一致
+  query = {},
   tableTitle,
   extra,
   dataFunc,
@@ -98,7 +102,11 @@ export const TablePro: React.FC<TableProProps> = ({
 
   useEffect(() => {
     if (!initRef.current) {
-      fetchData()
+      if (updateQuery) {
+        fetchData(query)
+      } else {
+        fetchData()
+      }
       alias && setAlias(alias, { fetchData, refreshData })
       initRef.current = true
     }
@@ -125,13 +133,20 @@ export const TablePro: React.FC<TableProProps> = ({
     if (!dataApi && !dataFunc) return
     try {
       setLoading(true)
-      const requestData = replace ? params : {
+      let requestData = replace ? { ...params } : {
         ...dataApiReqData,
         [pageKey]: initPage,
         [pageSizeKey]: initPageSize,
         ...params
       }
-      cacheLastRequestParamsRef.current = requestData
+      if (dataApiMethod === 'get' && dataApi && updateQuery) {
+        Object.keys(requestData).forEach((key: string) => {
+          if (Array.isArray(requestData[key])) {
+            requestData[key] = requestData[key].join(',')
+          }
+        })
+      }
+      cacheLastRequestParamsRef.current = { ...requestData }
       // @ts-ignore
       let res = dataApi ? await request[dataApiMethod](dataApi, requestData) : await dataFunc(requestData)
       res = resDataPath ? get(res, resDataPath) : res
