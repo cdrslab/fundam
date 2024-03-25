@@ -86,12 +86,27 @@ export const getFormItemDefaultData = (formItemProps: Record<string, any>, _para
   }
 }
 
+export const filterIgnoreFunValues = (values: Record<string, any>, filterRemoteSearchText: boolean = false) => {
+  const newValues: Record<string, any> = {}
+  Object.keys(values).forEach(key => {
+    // 移除Fundam隐藏字段（__开头）
+    if (key.startsWith('__')) {
+      // 过滤远程搜索文案
+      if (filterRemoteSearchText) return
+      // 远程搜索的文案-不过滤，如__idText，以__开头+Text结尾
+      if (!filterRemoteSearchText && !key.endsWith('Text')) return
+    }
+    newValues[key] = values[key]
+  })
+  return newValues
+}
+
 // 组件自适应请求
 export const getData = async (data: any, request: any) => {
   if (!data || !request) return data
   const { dataApi, dataFunc, dataApiReqData = {}, dataApiMethod = 'get', resDataPath = '' } = data as any
   if (!dataApi && !dataFunc) return data
-  let res = dataApi ? await request[dataApiMethod](dataApi, dataApiReqData) : await dataFunc(dataApiReqData)
+  let res = dataApi ? await request[dataApiMethod](dataApi, filterIgnoreFunValues(dataApiReqData, true)) : await dataFunc(dataApiReqData)
   res = resDataPath ? get(res, resDataPath) : res
   return res
 }
@@ -173,7 +188,7 @@ export const copyToClipboard = (text: string) => {
 export const updateURLWithRequestData = (navigate: NavigateFunction, requestData: Record<string, any> = {}, replace = false) => {
   if (!Object.keys(requestData)?.length) return
   const queryParams: any = queryString.parse(window.location.search)
-  const qs = queryString.stringify(replace ? { ...requestData } : { ...queryParams, ...requestData })
+  const qs = queryString.stringify(replace ? { ...requestData } : { ...queryParams, ...requestData }, { arrayFormat: 'comma' })
   navigate(window.location.pathname + window.location.hash + '?' + qs)
 }
 

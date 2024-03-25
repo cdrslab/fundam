@@ -7,6 +7,7 @@ import { DownOutlined, UpOutlined } from '@ant-design/icons'
 import './index.less'
 import FormContext, { FormContextProps } from '../../shared/FormContext'
 import { FunFormInstance } from '../../shared/types'
+import { filterIgnoreFunValues } from '../../shared/utils'
 
 interface FormProviderProps extends Partial<Omit<FormContextProps, 'form'>>, Omit<AntFormProps, 'form'> {
   form: FunFormInstance // 原因见 useAntFormInstance
@@ -52,13 +53,7 @@ export const Form: React.FC<FormProviderProps> = ({
   }
 
   const onFormFinish = (values: any) => {
-    // 过滤私有属性
-    const newValues: Record<string, any> = {}
-    Object.keys(values).forEach(key => {
-      if (key.startsWith('__')) return
-      newValues[key] = values[key]
-    })
-    onFinish && onFinish(newValues)
+    onFinish && onFinish(filterIgnoreFunValues(values))
   }
 
   const onDefaultButtonClick = () => {

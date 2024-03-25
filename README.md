@@ -35,8 +35,9 @@ $ yarn dev
 - [x] 新增Table， column 增加 onClick、onCopy props，有onClick时，变为可点击的link，最多行数限制...，增加enum控制dataIndex数据展示
 - [x] Table - 支持请求后记录参数（与原有参数进行merge）
 - [x] Table - 跨页多选：onSelectedRowKeysChange & onSelectedRowRecordsChange 支持
-- [ ] Cascade、Select 无限极选择 - 兼容解构取值，如：\[province, city, district\]，多选兼容
-- [ ] Cascade、Select - 远程搜索兼容，updateQuery兼容
+- [x] Cascade 无限极选择 - 兼容解构取值，如：\[province, city, district\]，多选兼容
+- [x] Cascade、Select - 远程搜索兼容，支持多选，updateQuery兼容
+- [ ] Cascade loadData优化实现，updateQuery兼容
 - [ ] GetData 数据转换
 - [ ] Input、Select、Cascade、RangePicker带入快捷输入（Cache & 计数）
 - [ ] Cascade、Select - 开启常用选项（个数），dropdownRender

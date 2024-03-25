@@ -18,7 +18,7 @@ import { useFun } from '../../hooks/useFun'
 import { useAlias } from '../../hooks/useAlias'
 import {
   arrayRemoveByValues,
-  copyToClipboard, objArrayRemoveByValuesKey, objArrayUnionByValuesKey,
+  copyToClipboard, getData, objArrayRemoveByValuesKey, objArrayUnionByValuesKey,
   throttledAdjustButtonMargins
 } from '../../shared/utils'
 import { TableResizableTitle } from '../TableResizableTitle'
@@ -147,9 +147,13 @@ export const TablePro: React.FC<TableProProps> = ({
         })
       }
       cacheLastRequestParamsRef.current = { ...requestData }
-      // @ts-ignore
-      let res = dataApi ? await request[dataApiMethod](dataApi, requestData) : await dataFunc(requestData)
-      res = resDataPath ? get(res, resDataPath) : res
+      const res = await getData({
+        dataApi,
+        dataFunc,
+        dataApiMethod,
+        resDataPath,
+        dataApiReqData: requestData,
+      }, request)
       const newData = {
         list: res[listKey],
         total: res[totalKey],

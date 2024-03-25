@@ -1,10 +1,10 @@
 // @ts-ignore
 import React, { ReactNode, useEffect, useRef, useState } from 'react'
-import { Col, Form } from 'antd'
+import { Col, Form, Input } from 'antd'
 import { isDef } from '@fundam/utils'
 import { useLocalStorage } from '@fundam/hooks'
 import { FormItemProps as AntFormItemProps } from 'antd/es/form/FormItem'
-import { get } from 'lodash'
+import { debounce, get } from 'lodash'
 
 import { useForm } from '../../hooks/useForm';
 import { useFun } from '../../hooks/useFun'
@@ -26,6 +26,7 @@ export interface FormItemCommonProps extends Omit<AntFormItemProps, 'tooltip' | 
   tooltip?: string | GetData | ReactNode
   extra?: string | GetData | ReactNode
   options?: Array<any>
+  searchKey?: string // 远程搜索key
 }
 
 // 可选择的组件，如：Select、Radio、Checkbox等
@@ -53,7 +54,7 @@ export function withFormItem(WrappedComponent: any) {
       // formItem新增props
       visibleRule, // 表达式 & Func 计算是否展示组件
       observe, // 监听 变化 => 触发 visibleRule 重新计算
-      // names, // 针对Cascade等多级进行解构
+      searchKey, // 远程搜索key
 
       rowCol,
       displayType,
@@ -102,6 +103,7 @@ export function withFormItem(WrappedComponent: any) {
       validateTrigger,
       valuePropName,
       wrapperCol,
+      onChange,
       // Form.Item子组件：Input、Select等的props
       ...wrappedComponentProps
     } = props
@@ -132,6 +134,7 @@ export function withFormItem(WrappedComponent: any) {
       }
     }, [])
 
+    // 设置Select、Radio等options
     const init = async () => {
       if (!dataApi && !dataFunc) return
       try {
@@ -140,16 +143,23 @@ export function withFormItem(WrappedComponent: any) {
           setOptions(optionsCache)
           return
         }
-        let res = dataApi ? await request[dataApiMethod](dataApi, dataApiReqData) : await dataFunc(dataApiReqData)
-        res = resDataPath ? get(res, resDataPath) : res
-        res = formatDataToOptions(res, labelKey, valueKey, childrenKey)
-        cacheKey && setOptionsCache(res)
-        setOptions(res)
+        const res = await fetchData()
+        if (!searchKey) {
+          cacheKey && setOptionsCache(res)
+        }
       } catch (e) {
         console.error(e)
       } finally {
         setLoading(false)
       }
+    }
+
+    const fetchData = async (params: Record<string, any> = {}) => {
+      let res = dataApi ? await request[dataApiMethod](dataApi, { ...dataApiReqData, ...params }) : await dataFunc({ ...dataApiReqData, ...params })
+      res = resDataPath ? get(res, resDataPath) : res
+      res = formatDataToOptions(res, labelKey, valueKey, childrenKey)
+      setOptions(res)
+      return res
     }
 
     const currentRules = required ? (rules || [{ required: true, message: `${label || '该字段'}为必填字段` }]) : []
@@ -190,13 +200,44 @@ export function withFormItem(WrappedComponent: any) {
       if (['Select', 'Cascader', 'Checkbox']) {
         // 多选数组，自动处理逗号分隔的值
         if (curValue[name] && typeof curValue[name] === 'string') {
-          curValue[name] = curValue[name].includes(',') ? curValue[name].split(',') : curValue[name]
+          curValue[name] = wrappedComponentProps.mode ? curValue[name].split(',') : curValue[name]
+        }
+        // 远程搜索，回显
+        if (searchKey && curValue['__' + name + 'Text'] && curValue[name] && !options?.length) {
+          const currentValueText = curValue['__' + name + 'Text']
+          if (wrappedComponentProps.mode) {
+            setOptions(currentValueText.split(',').map((item: string, index: number) => ({ label: item, value: curValue[name][index] })))
+          } else {
+            setOptions([{ label: currentValueText, value: curValue[name] }])
+          }
         }
       }
       return true
     }
 
+    // Select等远程搜索
+    const onSearch = debounce((val = '') => fetchData({ [searchKey]: val }), 300)
+
     const buildComponent = () => {
+      if (searchKey) {
+        // 需要远程搜索- 兼容配置
+        wrappedComponentProps.onSearch = onSearch
+        wrappedComponentProps.showSearch = true
+        wrappedComponentProps.filterOption = false
+        wrappedComponentProps.onFocus = () => onSearch()
+        wrappedComponentProps.onChange = (val: any, kv: any) => {
+          if (Array.isArray(kv)) {
+            form.setFieldsValue({
+              ['__' + name + 'Text']: kv.map(item => item.label).join(',')
+            })
+          } else {
+            form.setFieldsValue({
+              ['__' + name + 'Text']: kv.label
+            })
+          }
+          onChange && onChange(val, kv)
+        }
+      }
       if (['Select', 'Cascader'].includes(componentName)) {
         return (
           <WrappedComponent
@@ -261,19 +302,33 @@ export function withFormItem(WrappedComponent: any) {
       }
       if (currentDisplayType === 'default' || currentDisplayType === 'disabled') {
         return (
-          <FormItem
-            {...commonAntFormItemProps}
-            visibleRule={visibleRule}
-            observe={observe}
-            rules={currentRules}
-            hidden={formCollapse && collapseNames.includes(name) && direction === 'horizontal' || hidden}
-            normalize={normalize || defaultNormalize}
-            shouldUpdate={shouldUpdate || defaultShouldUpdate}
-            label={noLabel ? ' ' : label}
-            colon={!noLabel}
-          >
-            {buildComponent()}
-          </FormItem>
+          <>
+            {
+              searchKey ?
+                <FormItem
+                  hidden
+                  name={'__' + name + 'Text'}
+                  shouldUpdate={defaultShouldUpdate}
+                >
+                  <Input/>
+                </FormItem>
+                :
+                null
+            }
+            <FormItem
+              {...commonAntFormItemProps}
+              visibleRule={visibleRule}
+              observe={observe}
+              rules={currentRules}
+              hidden={formCollapse && collapseNames.includes(name) && direction === 'horizontal' || hidden}
+              normalize={normalize || defaultNormalize}
+              shouldUpdate={shouldUpdate || defaultShouldUpdate}
+              label={noLabel ? ' ' : label}
+              colon={!noLabel}
+            >
+              {buildComponent()}
+            </FormItem>
+          </>
         )
       }
       // 文字展示

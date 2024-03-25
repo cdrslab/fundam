@@ -130,11 +130,26 @@ export default () => {
 
   const formItem = (
     <>
-      <FormItemInput
-        isNumber
+      <FormItemSelect
+        // mode="multiple"
         name="id"
-        label="投放ID"
+        label="远程搜索"
+        dataApi="/api/resource/list"
+        resDataPath="list"
+        labelKey="name"
+        valueKey="id"
+        searchKey="name"
+        // maxTagCount="responsive"
+        dataApiReqData={{
+          page: 1,
+          pageSize: 200
+        }}
       />
+      {/*<FormItemInput*/}
+      {/*  isNumber*/}
+      {/*  name="id"*/}
+      {/*  label="投放ID"*/}
+      {/*/>*/}
       <FormItemInput
         name="name"
         label="活动名称"
