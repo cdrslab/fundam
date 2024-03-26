@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { CSSProperties, useEffect, useState } from 'react'
 import { useQuery } from '@fundam/hooks'
 import { convertObjectToNumbers } from '@fundam/utils'
 
@@ -13,8 +13,10 @@ import { useNavigate } from 'react-router'
 
 interface ListFilterProps {
   formProps?: Record<string, any> // 筛选表单Form的props
+  useFormItemBorder?: boolean // 使用FormItem边框样式
   tableProps?: Record<string, any> // 表格 Table 的props
-  tableTitle?: string,
+  tableTitle?: string
+  tableCardStyle?: CSSProperties
   updateQuery?: Boolean // 更新地址栏参数
   queryToNumber?: Array<string> // 需要转换为number的query数组
   tableRowKey?: string
@@ -42,8 +44,10 @@ interface ListFilterProps {
 
 export const ListFilter: React.FC<ListFilterProps> = ({
   formProps = {},
+  useFormItemBorder = false,
   tableProps = {},
   tableTitle = '',
+  tableCardStyle = {},
   updateQuery = true,
   queryToNumber = [],
   tableRowKey = 'id',
@@ -107,6 +111,7 @@ export const ListFilter: React.FC<ListFilterProps> = ({
       return (
         <Form
           {...formProps}
+          useFormItemBorder={useFormItemBorder}
           form={form}
           direction="horizontal"
           showValidateMessagesRow={false}
@@ -130,6 +135,7 @@ export const ListFilter: React.FC<ListFilterProps> = ({
           <Card style={{ marginBottom: 24 }}>
             <Form
               {...formProps}
+              useFormItemBorder={useFormItemBorder}
               form={form}
               direction="horizontal"
               showValidateMessagesRow={false}
@@ -150,6 +156,7 @@ export const ListFilter: React.FC<ListFilterProps> = ({
         initPage={parseInt(initPage || 1)}
         initPageSize={parseInt(initPageSize || 20)}
         tableTitle={buildTableTitle()}
+        cardStyle={tableCardStyle}
         cacheKey={tableCacheKey}
         alias={tableCacheKey}
         columns={tableColumns}

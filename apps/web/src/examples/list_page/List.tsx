@@ -52,6 +52,7 @@ export default () => {
     <div className="fun-page-list">
       <Card style={{ marginBottom: 24 }}>
         <Form
+          useFormItemBorder
           form={form}
           direction="horizontal"
           showValidateMessagesRow={false}

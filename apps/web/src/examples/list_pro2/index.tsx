@@ -10,7 +10,7 @@ import {
 } from '@fundam/antd'
 import { DesktopOutlined, MobileOutlined } from '@ant-design/icons'
 import { Button, Tag } from 'antd'
-// import './index.less'
+import './index.less'
 
 // const resourceStatusOptions = [
 //   {
@@ -191,6 +191,10 @@ export default () => {
       children: (
         <ListFilter
           formInCardTitle
+          useFormItemBorder
+          tableCardStyle={{
+            borderRadius: 0
+          }}
           formItems={formItem}
           queryToNumber={['province', 'city', 'district', 'page', 'pageSize', 'status', 'id']}
           tableCacheKey="resourceTablePro"
@@ -206,6 +210,9 @@ export default () => {
       children: (
         <ListFilter
           formInCardTitle
+          tableCardStyle={{
+            borderRadius: 0
+          }}
           formItems={formItem}
           queryToNumber={['province', 'city', 'district', 'page', 'pageSize', 'status', 'id']}
           tableCacheKey="resourceTablePro"

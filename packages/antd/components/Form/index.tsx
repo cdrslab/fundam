@@ -17,6 +17,7 @@ interface FormProviderProps extends Partial<Omit<FormContextProps, 'form'>>, Omi
   primaryButtonText?: string // 蓝色按钮文案，默认：提交
   primaryButtonClick?: (form: FunFormInstance) => void
   collapseNames?: Array<string> // 收起的表单项（name区分）
+  useFormItemBorder?: boolean // 使用FormItem边框样式
 }
 
 export const Form: React.FC<FormProviderProps> = ({
@@ -27,6 +28,7 @@ export const Form: React.FC<FormProviderProps> = ({
   collapseNames = [],
   primaryButtonText = '提交',
   primaryButtonClick,
+  useFormItemBorder = false,
   // 注释说明见FormContextProps
   direction = 'horizontal',
   rowCol = 4,
@@ -68,6 +70,18 @@ export const Form: React.FC<FormProviderProps> = ({
   const currentLabelCol = direction === 'vertical' ? labelCol || { span: 6 } : labelCol
   const currentWrapperCol = direction === 'vertical' ? wrapperCol || { span: 12 } : wrapperCol
 
+  const formCls = []
+  if (!showValidateMessagesRow) {
+    formCls.push('fun-form-validate-messages-row-hidden')
+  }
+  if (useFormItemBorder) {
+    formCls.push('fun-form-item-border')
+    antProps.variant = 'borderless'
+  }
+
+  console.log('-----formCls')
+  console.log(formCls)
+
   return (
     <FormContext.Provider value={providerValue}>
       <AntForm
@@ -76,7 +90,7 @@ export const Form: React.FC<FormProviderProps> = ({
         labelCol={currentLabelCol}
         wrapperCol={currentWrapperCol}
         {...antProps}
-        className={showValidateMessagesRow ? '' : 'fun-form-validate-messages-row-hidden'}
+        className={formCls}
       >
         {
           direction === 'horizontal' ?

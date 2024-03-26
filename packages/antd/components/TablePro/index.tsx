@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useRef, useState } from 'react'
+import React, { CSSProperties, ReactNode, useEffect, useRef, useState } from 'react'
 import { Button, Card, Checkbox, Dropdown, message, Popover, Table as AntTable, Tooltip } from 'antd'
 import { CheckboxValueType } from 'antd/es/checkbox/Group'
 import { useLocalStorage } from '@fundam/hooks'
@@ -35,6 +35,7 @@ interface TableProProps extends TableProps {
   onSelectedRowRecordsChange?: (selectedRowRecords: Array<any>) => void
   updateQuery?: Boolean // 更新地址栏参数
   query?: Record<string, any>
+  cardStyle?: CSSProperties
 }
 
 interface CacheTableProData extends CacheTableData {
@@ -46,6 +47,7 @@ interface CacheTableProData extends CacheTableData {
 export const TablePro: React.FC<TableProProps> = ({
   updateQuery, // 当值为数组时，与地址栏保持一致
   query = {},
+  cardStyle = {},
   tableTitle,
   extra,
   dataFunc,
@@ -441,7 +443,7 @@ export const TablePro: React.FC<TableProProps> = ({
       title={tableTitle as any}
       extra={buildExtra()}
       bordered={false}
-      style={{ borderRadius: 0 }}
+      style={cardStyle}
     >
       <AntTable
         {...renderProps as any}
