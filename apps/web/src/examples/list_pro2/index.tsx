@@ -139,6 +139,7 @@ export default () => {
         labelKey="name"
         valueKey="id"
         searchKey="name"
+        rowCol={8}
         // maxTagCount="responsive"
         dataApiReqData={{
           page: 1,
@@ -147,6 +148,7 @@ export default () => {
       />
       <FormItemInput
         name="name"
+        rowCol={8}
         label="活动名称"
       />
       {/*<FormItemCascade*/}

@@ -79,9 +79,6 @@ export const Form: React.FC<FormProviderProps> = ({
     antProps.variant = 'borderless'
   }
 
-  console.log('-----formCls')
-  console.log(formCls)
-
   return (
     <FormContext.Provider value={providerValue}>
       <AntForm
@@ -90,7 +87,7 @@ export const Form: React.FC<FormProviderProps> = ({
         labelCol={currentLabelCol}
         wrapperCol={currentWrapperCol}
         {...antProps}
-        className={formCls}
+        className={formCls as any}
       >
         {
           direction === 'horizontal' ?
