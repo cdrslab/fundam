@@ -9,6 +9,7 @@ import './app.css'
 // import Routes from './Routes';
 import BaseHeader from './examples/components/BaseHeader'
 import ListPro from './examples/list_pro'
+import ListProTwo from './examples/list_pro2'
 import BaseForm from './examples/form_page/BaseForm'
 import ListBasePage from './examples/list_base_page'
 import List from './examples/list_page/List'
@@ -55,6 +56,7 @@ const App = () => {
             <BaseHeader />
             <div className="content">
               <Routes>
+                <Route path="/list_pro_2" element={<ListProTwo />}></Route>
                 <Route path="/list_pro" element={<ListPro />}></Route>
                 <Route path="/list" element={<List />}></Route>
                 <Route path="/base_form" element={<BaseForm />}></Route>

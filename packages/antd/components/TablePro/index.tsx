@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { ReactNode, useEffect, useRef, useState } from 'react'
 import { Button, Card, Checkbox, Dropdown, message, Popover, Table as AntTable, Tooltip } from 'antd'
 import { CheckboxValueType } from 'antd/es/checkbox/Group'
 import { useLocalStorage } from '@fundam/hooks'
 import {
-  CoffeeOutlined,
+  // CoffeeOutlined,
   ColumnHeightOutlined,
   CopyOutlined,
   QuestionCircleOutlined,
@@ -25,8 +25,8 @@ import { TableResizableTitle } from '../TableResizableTitle'
 import { TextWithTooltip } from '../TextWithTooltip'
 
 interface TableProProps extends TableProps {
-  tableTitle?: string // 标题
-  extra?: ((props: any) => React.ReactNode) | React.ReactNode
+  tableTitle?: string | Element | ReactNode // 标题
+  extra?: ((props: any) => ReactNode) | ReactNode
   onPaginationChange?: (page: number, pageSize: number) => Promise<void>
   initSelectedRowKeys?: Array<any>
   selectedMaxRow?: number // 最多选择行数
@@ -438,9 +438,10 @@ export const TablePro: React.FC<TableProProps> = ({
 
   return (
     <Card
-      title={tableTitle}
+      title={tableTitle as any}
       extra={buildExtra()}
       bordered={false}
+      style={{ borderRadius: 0 }}
     >
       <AntTable
         {...renderProps as any}

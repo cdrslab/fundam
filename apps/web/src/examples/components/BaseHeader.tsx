@@ -6,6 +6,7 @@ export default () => {
 
   return (
     <div className="top-bar">
+      <Button onClick={() => navigate('/list_pro_2')} style={{marginRight: 4}}>简化列表2</Button>
       <Button onClick={() => navigate('/list_pro')} style={{marginRight: 4}}>简化列表</Button>
       <Button onClick={() => navigate('/list_base_page')} style={{marginRight: 4}}>基础列表</Button>
       <Button onClick={() => navigate('/base_form')} style={{marginRight: 4}}>基础表单</Button>

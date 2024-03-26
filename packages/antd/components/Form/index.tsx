@@ -83,17 +83,17 @@ export const Form: React.FC<FormProviderProps> = ({
             <Row gutter={[24, 12]}>
               {children}
               <Col span={6}>
+                <Button type="primary" style={{ marginRight: 8 }} onClick={onPrimaryButtonClick}>
+                  {primaryButtonText}
+                </Button>
                 {
                   defaultButtonText ?
-                    <Button type="default" style={{ marginRight: 8 }} onClick={onDefaultButtonClick}>
+                    <Button type="default" onClick={onDefaultButtonClick}>
                       {defaultButtonText}
                     </Button>
                     :
                     null
                 }
-                <Button type="primary" onClick={onPrimaryButtonClick}>
-                  {primaryButtonText}
-                </Button>
                 {
                   collapseNames?.length && displayType === 'default' ?
                     <Button type="link" style={{ paddingLeft: 8 }} onClick={() => setFormCollapse(!formCollapse)}>

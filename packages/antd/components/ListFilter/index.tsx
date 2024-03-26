@@ -18,6 +18,7 @@ interface ListFilterProps {
   updateQuery?: Boolean // 更新地址栏参数
   queryToNumber?: Array<string> // 需要转换为number的query数组
   tableRowKey?: string
+  formInCardTitle?: boolean // 将表单植入Card组件的title中
   formItems: React.ReactNode
   // 抽出常用的props
   tableCacheKey: string, // 唯一key（localstorage缓存使用）
@@ -46,6 +47,7 @@ export const ListFilter: React.FC<ListFilterProps> = ({
   updateQuery = true,
   queryToNumber = [],
   tableRowKey = 'id',
+  formInCardTitle = false,
   formItems,
   tableCacheKey,
   tableColumns,
@@ -100,9 +102,9 @@ export const ListFilter: React.FC<ListFilterProps> = ({
     await table.fetchData(newQuery, true)
   }
 
-  return (
-    <div className="fun-list-filter">
-      <Card style={{ marginBottom: 24 }}>
+  const buildTableTitle = () => {
+    if (formInCardTitle) {
+      return (
         <Form
           {...formProps}
           form={form}
@@ -116,14 +118,38 @@ export const ListFilter: React.FC<ListFilterProps> = ({
         >
           {formItems}
         </Form>
-      </Card>
+      )
+    }
+    return tableTitle
+  }
+
+  return (
+    <div className="fun-list-filter">
+      {
+        !formInCardTitle ?
+          <Card style={{ marginBottom: 24 }}>
+            <Form
+              {...formProps}
+              form={form}
+              direction="horizontal"
+              showValidateMessagesRow={false}
+              defaultButtonText="重置"
+              defaultButtonClick={onFormReset}
+              primaryButtonText="查询"
+              primaryButtonClick={() => form.submit()}
+              onFinish={onFormFinish}
+            >
+              {formItems}
+            </Form>
+          </Card> : null
+      }
       <TablePro
         {...tableProps}
         updateQuery={updateQuery}
         query={convertObjectToNumbers(query, queryToNumber)}
         initPage={parseInt(initPage || 1)}
         initPageSize={parseInt(initPageSize || 20)}
-        tableTitle={tableTitle}
+        tableTitle={buildTableTitle()}
         cacheKey={tableCacheKey}
         alias={tableCacheKey}
         columns={tableColumns}

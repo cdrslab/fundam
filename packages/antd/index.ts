@@ -7,6 +7,8 @@ export { Table, TableRowButton } from './components/Table'
 export { TablePro } from './components/TablePro'
 export { Badge } from './components/Badge'
 export { ListFilter } from './components/ListFilter'
+export { Tabs } from './components/Tabs'
+export { CardTabs } from './components/CardTabs'
 
 export { Form } from './components/Form/index'
 export { FunConfigProvider } from './components/FunConfigProvider'
