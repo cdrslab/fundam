@@ -23,6 +23,8 @@ import {
 } from '../../shared/utils'
 import { TableResizableTitle } from '../TableResizableTitle'
 import { TextWithTooltip } from '../TextWithTooltip'
+import { ButtonProps as AntButtonProps } from 'antd/es/button/button';
+import { ColumnsType, ColumnType } from 'antd/es/table';
 
 interface TableProProps extends TableProps {
   tableTitle?: string | Element | ReactNode // 标题
@@ -41,6 +43,59 @@ interface TableProProps extends TableProps {
 interface CacheTableProData extends CacheTableData {
   columnKeys?: Array<string> // 开启的列（未在columnKeys中的列会隐藏）
   size?: 'large' | 'middle' | 'small' // 表格大小
+}
+
+function cloneElementWithExtraFunc(
+  element: ReactNode,
+  refreshData: () => void,
+  fetchData: () => void,
+): ReactNode {
+  // 如果是TableRowButton，我们需要重写onClick方法
+  if (
+    React.isValidElement<AntButtonProps>(element) &&
+    element.type === TableRowButton
+  ) {
+    return React.cloneElement(element, {
+      ...element.props,
+      onClick: (e: React.MouseEvent<HTMLElement>) => {
+        if (element.props.onClick) {
+          // @ts-ignore
+          element.props.onClick(e, { refreshData, fetchData });
+        }
+      },
+    });
+  }
+
+  // 如果是其它React元素，且有children属性，我们递归处理children
+  if (React.isValidElement(element) && element.props.children) {
+    return React.cloneElement(element, {
+      ...element.props,
+      children: React.Children.map(element.props.children, (child) => cloneElementWithExtraFunc(child, refreshData, fetchData)),
+    });
+  }
+
+  return element;
+}
+
+// 注入 fetchData refreshData
+function modifyColumnsWithExtra<T>(
+  columns: ColumnsType<T>,
+  refreshData: () => void,
+  fetchData: () => void,
+): ColumnsType<T> {
+  return columns.map((column): ColumnType<T> => {
+    const customRender = column.render;
+    if (customRender) {
+      return {
+        ...column,
+        render: (...params) => {
+          const renderedElement = customRender(...params);
+          return cloneElementWithExtraFunc(renderedElement as ReactNode, refreshData, fetchData);
+        },
+      };
+    }
+    return column;
+  })
 }
 
 // TODO 0.2 优化：与 Table TableForm等抽出共性
@@ -285,7 +340,7 @@ export const TablePro: React.FC<TableProProps> = ({
         ),
         key: column.dataIndex
       }
-      if (column.onClick) currentColumn.render = (_: any, record: any) => <TableRowButton onClick={record.onClick}>{record[column.dataIndex]}</TableRowButton>
+      if (column.onClick) currentColumn.render = (_: any, record: any) => <TableRowButton onClick={(e) => record.onClick(e, { fetchData, refreshData })}>{record[column.dataIndex]}</TableRowButton>
       tableColumns.push(currentColumn)
       return
     }
@@ -294,7 +349,7 @@ export const TablePro: React.FC<TableProProps> = ({
       if (column.onClick) {
         tableColumns.push({
           ...column,
-          render: (text: any, record: any) => isDef(text) && text !== '' ? <TableRowButton onClick={record.onClick}>{column.maxLine ? <TextWithTooltip text={text} maxLine={column.maxLine}/> : text}</TableRowButton> : <span>{emptyValue}</span>,
+          render: (text: any, record: any) => isDef(text) && text !== '' ? <TableRowButton onClick={(e) => record.onClick(e, { fetchData, refreshData })}>{column.maxLine ? <TextWithTooltip text={text} maxLine={column.maxLine}/> : text}</TableRowButton> : <span>{emptyValue}</span>,
           key: column.dataIndex
         })
       } else {
@@ -344,6 +399,15 @@ export const TablePro: React.FC<TableProProps> = ({
     }
   }))
 
+  if (indexType) {
+    tableColumns.unshift({
+      fixed: 'left',
+      title: '序号',
+      dataIndex: '_index',
+      width: '80px'
+    })
+  }
+
   // 格式化数据
   let listData = funProps.dataSource || data.list || []
   listData = listData.map((item: any, index: number) => ({
@@ -355,7 +419,7 @@ export const TablePro: React.FC<TableProProps> = ({
     ...funProps,
     rowKey,
     loading,
-    columns: tableColumns,
+    columns: modifyColumnsWithExtra(tableColumns, refreshData, fetchData),
     size: funProps.size || 'small',
     scroll: funProps.scroll || { x: 'max-content' },
     dataSource: listData,

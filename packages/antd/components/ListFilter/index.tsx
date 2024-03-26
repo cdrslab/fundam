@@ -23,6 +23,7 @@ interface ListFilterProps {
   formInCardTitle?: boolean // 将表单植入Card组件的title中
   formItems: React.ReactNode
   // 抽出常用的props
+  tableIndexType: 'pagination' | 'nonPagination'
   tableCacheKey: string, // 唯一key（localstorage缓存使用）
   tableColumns: Array<any>
   tableDataApi: string
@@ -53,6 +54,7 @@ export const ListFilter: React.FC<ListFilterProps> = ({
   tableRowKey = 'id',
   formInCardTitle = false,
   formItems,
+  tableIndexType,
   tableCacheKey,
   tableColumns,
   tableDataApi,
@@ -152,6 +154,7 @@ export const ListFilter: React.FC<ListFilterProps> = ({
       <TablePro
         {...tableProps}
         updateQuery={updateQuery}
+        indexType={tableIndexType}
         query={convertObjectToNumbers(query, queryToNumber)}
         initPage={parseInt(initPage || 1)}
         initPageSize={parseInt(initPageSize || 20)}
@@ -161,6 +164,7 @@ export const ListFilter: React.FC<ListFilterProps> = ({
         alias={tableCacheKey}
         columns={tableColumns}
         dataApi={tableDataApi}
+        dataApiReqData={tableApiReqData}
         dataApiMethod={tableDataApiMethod}
         resDataPath={tableResDataPath}
         rowKey={tableRowKey}

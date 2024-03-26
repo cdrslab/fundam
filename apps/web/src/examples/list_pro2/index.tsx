@@ -115,7 +115,7 @@ export default () => {
       fixed: 'right',
       render: (_: any, record: any) => (
         <>
-          <TableRowButton onClick={() => console.log(record)}>查看</TableRowButton>
+          {/*<TableRowButton onClick={(e, { refreshData, fetchData }) => refreshData()}>刷新</TableRowButton>*/}
           <TableRowButton onClick={() => console.log(record)}>复制</TableRowButton>
           {
             record.status < 4 ? <TableRowButton onClick={() => console.log(record)}>编辑</TableRowButton> : null
@@ -194,6 +194,7 @@ export default () => {
         <ListFilter
           formInCardTitle
           useFormItemBorder
+          // tableIndexType="pagination"
           tableCardStyle={{
             borderRadius: 0
           }}

@@ -46,7 +46,7 @@ export interface TableProps extends Omit<AntTableProps, 'columns'>, GetData {
   pageSizeKey?: string
   totalKey?: string
   alias?: string // 当前页面唯一的别名
-  indexType?: 'pagination' | 'nonPagination'; // 序号类型：如每页10条数据，分页（第二页第一条数据序号为11）；不分页（第二页第一条数据序号为1）
+  indexType?: 'pagination' | 'nonPagination' // 序号类型：如每页10条数据，分页（第二页第一条数据序号为11）；不分页（第二页第一条数据序号为1）
   emptyValue?: string; // 空值展示
   cacheKey?: string // 缓存表格数据 & 请求参数 & 各列宽度等，需要项目纬度唯一
 }
@@ -55,7 +55,7 @@ export interface CacheTableData {
   columnsWidthMap?: Record<string, number> // 缓存column.dataIndex => width，用于拖拽更改表格列宽度
 }
 
-export const TableRowButton: React.FC<AntButtonProps> = ({ children, ...antProps }) => {
+export const TableRowButton: React.FC<any> = ({ children, ...antProps }) => {
   return (
     <Button
       {...antProps}
