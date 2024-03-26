@@ -55,10 +55,15 @@ export interface CacheTableData {
   columnsWidthMap?: Record<string, number> // 缓存column.dataIndex => width，用于拖拽更改表格列宽度
 }
 
-export const TableRowButton: React.FC<any> = ({ children, ...antProps }) => {
+// Table 方法注入
+export interface TableRowButtonProps extends Omit<AntButtonProps, 'onClick'> {
+  onClick: (e: MouseEvent, extra?: { refreshData?: () => void, fetchData?: (params: any) => void }) => void
+}
+export const TableRowButton: React.FC<TableRowButtonProps> = ({ children, onClick, ...antProps }) => {
   return (
     <Button
       {...antProps}
+      onClick={onClick as any}
       type="link"
       className="fun-table-row-button"
     >

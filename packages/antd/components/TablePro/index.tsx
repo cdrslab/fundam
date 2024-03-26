@@ -50,7 +50,6 @@ function cloneElementWithExtraFunc(
   refreshData: () => void,
   fetchData: () => void,
 ): ReactNode {
-  // 如果是TableRowButton，我们需要重写onClick方法
   if (
     React.isValidElement<AntButtonProps>(element) &&
     element.type === TableRowButton
@@ -63,18 +62,17 @@ function cloneElementWithExtraFunc(
           element.props.onClick(e, { refreshData, fetchData });
         }
       },
-    });
+    })
   }
 
-  // 如果是其它React元素，且有children属性，我们递归处理children
   if (React.isValidElement(element) && element.props.children) {
     return React.cloneElement(element, {
       ...element.props,
       children: React.Children.map(element.props.children, (child) => cloneElementWithExtraFunc(child, refreshData, fetchData)),
-    });
+    })
   }
 
-  return element;
+  return element
 }
 
 // 注入 fetchData refreshData
