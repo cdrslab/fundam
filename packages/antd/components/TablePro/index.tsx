@@ -340,7 +340,7 @@ export const TablePro: React.FC<TableProProps> = ({
         ),
         key: column.dataIndex
       }
-      if (column.onClick) currentColumn.render = (_: any, record: any) => <TableRowButton onClick={(e) => record.onClick(e, { fetchData, refreshData })}>{record[column.dataIndex]}</TableRowButton>
+      if (column.onClick) currentColumn.render = (_: any, record: any) => <TableRowButton onClick={(e: any) => record.onClick(e, { fetchData, refreshData })}>{record[column.dataIndex]}</TableRowButton>
       tableColumns.push(currentColumn)
       return
     }
@@ -349,7 +349,7 @@ export const TablePro: React.FC<TableProProps> = ({
       if (column.onClick) {
         tableColumns.push({
           ...column,
-          render: (text: any, record: any) => isDef(text) && text !== '' ? <TableRowButton onClick={(e) => record.onClick(e, { fetchData, refreshData })}>{column.maxLine ? <TextWithTooltip text={text} maxLine={column.maxLine}/> : text}</TableRowButton> : <span>{emptyValue}</span>,
+          render: (text: any, record: any) => isDef(text) && text !== '' ? <TableRowButton onClick={(e: any) => record.onClick(e, { fetchData, refreshData })}>{column.maxLine ? <TextWithTooltip text={text} maxLine={column.maxLine}/> : text}</TableRowButton> : <span>{emptyValue}</span>,
           key: column.dataIndex
         })
       } else {

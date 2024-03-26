@@ -23,7 +23,7 @@ interface ListFilterProps {
   formInCardTitle?: boolean // 将表单植入Card组件的title中
   formItems: React.ReactNode
   // 抽出常用的props
-  tableIndexType: 'pagination' | 'nonPagination'
+  tableIndexType?: 'pagination' | 'nonPagination'
   tableCacheKey: string, // 唯一key（localstorage缓存使用）
   tableColumns: Array<any>
   tableDataApi: string
