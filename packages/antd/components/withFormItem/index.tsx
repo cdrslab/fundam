@@ -8,7 +8,7 @@ import { debounce, get } from 'lodash'
 
 import { useForm } from '../../hooks/useForm';
 import { useFun } from '../../hooks/useFun'
-import { formatDataToOptions, getDisplayText } from '../../shared/utils'
+import { formatDataToOptions, getData, getDisplayText } from '../../shared/utils'
 import { FormDisplayType, GetData } from '../../shared/types'
 import { FormItem } from '../FormItem'
 
@@ -27,6 +27,8 @@ export interface FormItemCommonProps extends Omit<AntFormItemProps, 'tooltip' | 
   extra?: string | GetData | ReactNode
   options?: Array<any>
   searchKey?: string // 远程搜索key
+  loadDataKey?: string // 动态加载接口key（注意：antd官方 - 不允许loadData 与 search混用，故可以公用 GetData 相关属性）
+  loadDataMaxLayer?: number // 前端控制cascade远程加载的层数
 }
 
 // 可选择的组件，如：Select、Radio、Checkbox等
@@ -34,6 +36,7 @@ export interface FormItemOptionalProps extends FormItemCommonProps {
   labelKey?: string
   valueKey?: string
   childrenKey?: string
+  isLeafKey?: string // 服务端控制cascade远程加载的层数
 }
 
 const getPlaceholder = (props: any, componentName: string): string => {
@@ -55,6 +58,8 @@ export function withFormItem(WrappedComponent: any) {
       visibleRule, // 表达式 & Func 计算是否展示组件
       observe, // 监听 变化 => 触发 visibleRule 重新计算
       searchKey, // 远程搜索key
+      loadDataKey, // 动态加载接口key（Cascade）
+      loadDataMaxLayer,
 
       rowCol,
       displayType,
@@ -73,6 +78,7 @@ export function withFormItem(WrappedComponent: any) {
       labelKey = 'label',
       valueKey = 'value',
       childrenKey = 'children',
+      isLeafKey = 'isLeaf',
       // Form.Item props: https://ant.design/components/form-cn#formitem
       colon,
       dependencies,
@@ -127,12 +133,58 @@ export function withFormItem(WrappedComponent: any) {
       displayTextEmpty: formDisplayTextEmpty
     } = useForm()
 
+    const formItemValue = Form.useWatch(name, form as any)
+
     useEffect(() => {
       if (!initRef.current) {
         init()
         initRef.current = true
       }
     }, [])
+
+    useEffect(() => {
+      // 处理cascade + loadData回显
+      if (!formItemValue || options?.length || componentName !== 'Cascader' || !loadDataKey) return
+      initCascadeText()
+    }, [formItemValue])
+
+    const initCascadeText = async () => {
+      const cascadeInitOptions = await loadCascadeData(formItemValue, [...formItemValue], formItemValue.length)
+      setOptions(cascadeInitOptions)
+    }
+
+    const loadCascadeData = async (formItemValue: Array<any>, currentFormItemValue: Array<any>, depth: number, layer: number = 1) => {
+      if (depth === 0 || !formItemValue) return []
+
+      const currentDataApiReqData = { ...dataApiReqData }
+      if (layer !== 1) {
+        currentDataApiReqData[loadDataKey] = formItemValue[layer - 2]
+      }
+      const currentRes = await getData({
+        dataApi,
+        dataFunc,
+        dataApiMethod,
+        resDataPath,
+        dataApiReqData: currentDataApiReqData,
+      }, request)
+      let formattedRes = formatDataToOptions(currentRes, labelKey, valueKey, childrenKey, isLeafKey)
+
+      if (depth === 1) {
+        if (loadDataMaxLayer) {
+          formattedRes = formattedRes.map((item: any) => ({ ...item, isLeaf: layer === loadDataMaxLayer }))
+        }
+        return formattedRes
+      } else {
+        formattedRes = formattedRes.map((item: any) => ({ ...item, isLeaf: false }))
+        const childData = await loadCascadeData(formItemValue, currentFormItemValue.slice(1), depth - 1, layer + 1)
+        formattedRes.forEach((item: any) => {
+          if (item.value === formItemValue[layer - 1]) {
+            item.children = childData
+          }
+        })
+        return formattedRes
+      }
+    }
 
     // 设置Select、Radio等options
     const init = async () => {
@@ -143,6 +195,8 @@ export function withFormItem(WrappedComponent: any) {
           setOptions(optionsCache)
           return
         }
+        if (componentName === 'Cascader' && loadDataKey) return
+
         const res = await fetchData()
         if (!searchKey) {
           cacheKey && setOptionsCache(res)
@@ -154,10 +208,21 @@ export function withFormItem(WrappedComponent: any) {
       }
     }
 
+    const optionsFormat = (optionValues: any) => {
+      if (componentName !== 'Cascader' || !loadDataKey) return formatDataToOptions(optionValues, labelKey, valueKey, childrenKey)
+      if (loadDataMaxLayer) {
+        // 前端控制层数
+        const formItemValue = form.getFieldValue(name)
+        return formItemValue?.length === loadDataMaxLayer - 1 ? optionValues : optionValues.map((item: any) => ({ ...item, isLeaf: false }))
+      }
+      // 服务端控制层数
+      return formatDataToOptions(optionValues, labelKey, valueKey, childrenKey, isLeafKey)
+    }
+
     const fetchData = async (params: Record<string, any> = {}) => {
       let res = dataApi ? await request[dataApiMethod](dataApi, { ...dataApiReqData, ...params }) : await dataFunc({ ...dataApiReqData, ...params })
       res = resDataPath ? get(res, resDataPath) : res
-      res = formatDataToOptions(res, labelKey, valueKey, childrenKey)
+      res = optionsFormat(res)
       setOptions(res)
       return res
     }
@@ -197,7 +262,7 @@ export function withFormItem(WrappedComponent: any) {
           curValue[name] = parseInt(currentFormItemValue)
         }
       }
-      if (['Select', 'Cascader', 'Checkbox']) {
+      if (['Select', 'Cascader', 'Checkbox'].includes(componentName)) {
         // 多选数组，自动处理逗号分隔的值
         if (curValue[name] && typeof curValue[name] === 'string') {
           curValue[name] = wrappedComponentProps.mode ? curValue[name].split(',') : curValue[name]
@@ -218,9 +283,36 @@ export function withFormItem(WrappedComponent: any) {
     // Select等远程搜索
     const onSearch = debounce((val = '') => fetchData({ [searchKey]: val }), 300)
 
+    // Cascade - loadData兼容
+    const loadData = async (selectedOptions: any[]) => {
+      const targetOption = selectedOptions[selectedOptions.length - 1]
+
+      let res = await getData({
+        dataApi,
+        dataFunc,
+        dataApiMethod,
+        resDataPath,
+        dataApiReqData: { ...dataApiReqData, [loadDataKey]: targetOption.value }
+      }, request)
+
+      if (isLeafKey) {
+        // 服务端控制是否还有下一级
+        res = formatDataToOptions(res, labelKey, valueKey, childrenKey, isLeafKey)
+      }
+
+
+      if (loadDataMaxLayer) {
+        res = optionsFormat(res)
+      }
+
+      targetOption.children = res
+
+      setOptions([...options])
+    }
+
     const buildComponent = () => {
       if (searchKey) {
-        // 需要远程搜索- 兼容配置
+        // 需要远程搜索 - 兼容配置
         wrappedComponentProps.onSearch = onSearch
         wrappedComponentProps.showSearch = true
         wrappedComponentProps.filterOption = false
@@ -237,6 +329,10 @@ export function withFormItem(WrappedComponent: any) {
           }
           onChange && onChange(val, kv)
         }
+      }
+      if (loadDataKey) {
+        // Cascade - loadData兼容
+        wrappedComponentProps.loadData = loadData
       }
       if (['Select', 'Cascader'].includes(componentName)) {
         return (

@@ -103,5 +103,97 @@ export default defineFakeRoute([
         }
       })
     }
+  },
+  {
+    url: '/api/location/listById',
+    method: 'GET',
+    response: ({ query }) => {
+      const mockMap = {
+        '-1': [
+          {
+            label: '四川省',
+            value: 5000
+          },
+          {
+            label: '浙江省',
+            value: 6000
+          },
+          {
+            label: '重庆市',
+            value: 7000
+          }
+        ],
+        '5000': [
+          {
+            label: '成都市',
+            value: 5001
+          },
+          {
+            label: '绵阳市',
+            value: 5002
+          },
+        ],
+        '6000': [
+          {
+            label: '杭州市',
+            value: 6001
+          },
+          {
+            label: '温州市',
+            value: 6002
+          },
+        ],
+        '7000': [
+          {
+            label: '沙坪坝区',
+            value: 7001
+          },
+          {
+            label: '逾中区',
+            value: 7002
+          }
+        ],
+        '5001': [
+          {
+            label: '武侯区',
+            value: 50011,
+          },
+          {
+            label: '成华区',
+            value: 50012,
+          },
+        ],
+        '5002': [
+          {
+            label: '涪城区',
+            value: 50021,
+          }
+        ],
+        '6001': [
+          {
+            label: '上城区',
+            value: 60011,
+          },
+          {
+            label: '滨江区',
+            value: 60012,
+          },
+        ],
+        '6002': [
+          {
+            label: '鹿城区',
+            value: 60021,
+          },
+          {
+            label: '龙湾区',
+            value: 60022,
+          },
+        ]
+      }
+      return {
+        ok: true,
+        result: mockMap[query.id]
+      }
+    }
   }
 ])

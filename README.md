@@ -36,7 +36,7 @@ $ yarn dev
 - [x] Table - 支持请求后记录参数（与原有参数进行merge）
 - [x] Table - 跨页多选：onSelectedRowKeysChange & onSelectedRowRecordsChange 支持
 - [x] Cascade 无限极选择 - 兼容解构取值，如：\[province, city, district\]，多选兼容
-- [x] Cascade、Select - 远程搜索兼容，支持多选，updateQuery兼容
+- [x] Select - 远程搜索兼容，支持多选，updateQuery兼容
 - [ ] Cascade loadData优化实现，updateQuery兼容
 - [ ] GetData 数据转换
 - [ ] Input、Select、Cascade、RangePicker带入快捷输入（Cache & 计数）

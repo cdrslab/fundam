@@ -5,6 +5,8 @@ import { NavigateFunction } from 'react-router/dist/lib/hooks'
 import { FormInstance } from 'antd/es/form'
 
 import { VALID_ROW_COLS } from './constants'
+import { GetData } from './types';
+import { isDef } from '@fundam/utils';
 
 export const validateRowCol = (rowCol: number) => {
   if (!VALID_ROW_COLS.includes(rowCol)) {
@@ -14,25 +16,34 @@ export const validateRowCol = (rowCol: number) => {
 
 // 格式化options
 interface OptionItem {
-  label: string;
-  value: any;
-  children?: OptionItem[];
+  label: string
+  value: any
+  isLeaf?: boolean // false-还下一层，兼容cascade - 远程加载数据
+  children?: OptionItem[]
 }
-export function formatDataToOptions(data: Array<Record<string, any>>, labelKey: string = 'label', valueKey: string = 'value', childrenKey: string = 'children'): OptionItem[] {
+export function formatDataToOptions(data: Array<Record<string, any>>, labelKey: string = 'label', valueKey: string = 'value', childrenKey: string = 'children', isLeafKey: string = 'isLeaf'): OptionItem[] {
   const options: OptionItem[] = [];
 
-  data.forEach(item => {
-    const option: OptionItem = {
-      label: item[labelKey],
-      value: item[valueKey]
-    };
+  try {
+    data.forEach(item => {
+      const option: OptionItem = {
+        label: item[labelKey],
+        value: item[valueKey]
+      };
 
-    if (item[childrenKey] && Array.isArray(item[childrenKey])) {
-      option.children = formatDataToOptions(item[childrenKey], labelKey, valueKey, childrenKey);
-    }
+      if (item[childrenKey] && Array.isArray(item[childrenKey])) {
+        option.children = formatDataToOptions(item[childrenKey], labelKey, valueKey, childrenKey);
+      }
 
-    options.push(option);
-  });
+      if (isDef(item[isLeafKey])) {
+        option.isLeaf = item[isLeafKey]
+      }
+
+      options.push(option);
+    })
+  } catch (e) {
+
+  }
 
   return options;
 }
@@ -102,8 +113,10 @@ export const filterIgnoreFunValues = (values: Record<string, any>, filterRemoteS
 }
 
 // 组件自适应请求
-export const getData = async (data: any, request: any) => {
+export const getData = async (data: GetData, request: any) => {
   if (!data || !request) return data
+  console.log('-----getData')
+  console.log(data)
   const { dataApi, dataFunc, dataApiReqData = {}, dataApiMethod = 'get', resDataPath = '' } = data as any
   if (!dataApi && !dataFunc) return data
   let res = dataApi ? await request[dataApiMethod](dataApi, filterIgnoreFunValues(dataApiReqData, true)) : await dataFunc(dataApiReqData)

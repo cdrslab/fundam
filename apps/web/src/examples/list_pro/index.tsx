@@ -14,19 +14,19 @@ import { Button, message, Tag } from 'antd'
 const resourceStatusOptions = [
   {
     label: '待发布',
-    value: '1',
+    value: 1,
   },
   {
     label: '未开始',
-    value: '2',
+    value: 2,
   },
   {
     label: '进行中',
-    value: '3',
+    value: 3,
   },
   {
     label: '已结束',
-    value: '4',
+    value: 4,
   },
 ]
 
@@ -44,7 +44,6 @@ export default () => {
 
   // 选中rowRecords（跨页多选）
   const tableOnSelectedRowRecordsChange = (selectRecords: Array<any>) => {
-    console.log(selectRecords)
     setSelectedData(selectRecords)
   }
 
@@ -164,6 +163,18 @@ export default () => {
         childrenKey="sub"
         dataApi="/api/resource/type"
       />
+      <FormItemCascade
+        changeOnSelect
+        // name="type"
+        names={['province', 'city', 'district']}
+        label="loadData"
+        loadDataKey="id"
+        loadDataMaxLayer={3}
+        dataApiReqData={{
+          id: '-1'
+        }}
+        dataApi="/api/location/listById"
+      />
       <FormItemSelect
         name="status"
         label="状态"
@@ -180,9 +191,11 @@ export default () => {
   return (
     <ListFilter
       formItems={formItem}
+      queryToNumber={['province', 'city', 'district', 'page', 'pageSize', 'status', 'id']}
       tableCacheKey="resourceTablePro"
       tableColumns={columns}
       tableDataApi="/api/resource/list"
+      // tableDataApiMethod="post"
       tableTitle="资源列表"
       tableExtra={<><Button onClick={exportSelectedData} type="primary">导出</Button></>}
       // tableOnSelectedRowKeysChange={tableOnSelectedRowKeysChange}

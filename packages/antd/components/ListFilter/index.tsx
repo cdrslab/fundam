@@ -8,12 +8,14 @@ import { useAlias } from '../../hooks/useAlias';
 import { TablePro } from '../TablePro';
 import { updateURLWithRequestData } from '../../shared/utils';
 import { useNavigate } from 'react-router';
+import { convertObjectToNumbers } from '@fundam/utils';
 
 interface ListFilterProps {
   formProps?: Record<string, any> // 筛选表单Form的props
   tableProps?: Record<string, any> // 表格 Table 的props
   tableTitle?: string,
   updateQuery?: Boolean // 更新地址栏参数
+  queryToNumber?: Array<string> // 需要转换为number的query数组
   tableRowKey?: string
   formItems: React.ReactNode
   // 抽出常用的props
@@ -41,6 +43,7 @@ export const ListFilter: React.FC<ListFilterProps> = ({
   tableProps = {},
   tableTitle = '',
   updateQuery = true,
+  queryToNumber = [],
   tableRowKey = 'id',
   formItems,
   tableCacheKey,
@@ -73,7 +76,7 @@ export const ListFilter: React.FC<ListFilterProps> = ({
     window.$form = form
     // 非首次进入 或 不使用地址栏参数
     if (params || !updateQuery) return
-    form.setFieldsValue(query)
+    form.setFieldsValue(convertObjectToNumbers(query, queryToNumber))
     setParams(query)
   }, [query])
 
@@ -116,7 +119,7 @@ export const ListFilter: React.FC<ListFilterProps> = ({
       <TablePro
         {...tableProps}
         updateQuery={updateQuery}
-        query={query}
+        query={convertObjectToNumbers(query, queryToNumber)}
         initPage={parseInt(initPage || 1)}
         initPageSize={parseInt(initPageSize || 20)}
         tableTitle={tableTitle}
