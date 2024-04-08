@@ -9,6 +9,7 @@ import { useAlias } from '../../hooks/useAlias';
 import { TablePro } from '../TablePro';
 import { updateURLWithRequestData } from '../../shared/utils'
 import { useQuery } from '../../hooks/useQuery';
+import { FORCE_UPDATE_QUERY_KEY } from '../../shared/constants';
 
 
 interface ListFilterProps {
@@ -82,10 +83,11 @@ export const ListFilter: React.FC<ListFilterProps> = ({
 
   useEffect(() => {
     // 非首次进入 或 不使用地址栏参数
-    if (params || !updateQuery) return
+    if (!updateQuery) return
+    form.resetFields()
     form.setFieldsValue(convertObjectToNumbers(query, queryToNumber))
     setParams(query)
-  }, [query])
+  }, [query && query[FORCE_UPDATE_QUERY_KEY]])
 
   const onFormFinish = async (values: Record<string, any> | null) => {
     const newQuery = { ...tableApiReqData, ...values, [tablePageKey]: 1 }

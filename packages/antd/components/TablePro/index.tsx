@@ -34,7 +34,7 @@ import { useFun } from '../../hooks/useFun'
 import { useAlias } from '../../hooks/useAlias'
 import {
   arrayRemoveByValues,
-  copyToClipboard, getData, objArrayRemoveByValuesKey, objArrayUnionByValuesKey,
+  copyToClipboard, forceUpdateByPath, getData, objArrayRemoveByValuesKey, objArrayUnionByValuesKey,
   throttledAdjustButtonMargins
 } from '../../shared/utils'
 import { TableResizableTitle } from '../TableResizableTitle'
@@ -494,7 +494,7 @@ export const TablePro: React.FC<TableProProps> = ({
 
   const navigateQuickQuery = async (path: string) => {
     try {
-      navigate(path, { replace: true })
+      navigate(forceUpdateByPath(path), { replace: true })
       await fetchData(queryString.parse(path.split('?')[1]), true)
     } catch (e) {
       message.error('快捷查询失败，请手动查询')

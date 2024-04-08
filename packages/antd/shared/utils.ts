@@ -4,7 +4,7 @@ import { message } from 'antd'
 import { NavigateFunction } from 'react-router/dist/lib/hooks'
 import { FormInstance } from 'antd/es/form'
 
-import { VALID_ROW_COLS } from './constants'
+import { FORCE_UPDATE_QUERY_KEY, VALID_ROW_COLS } from './constants'
 import { GetData } from './types';
 import { isDef } from '@fundam/utils';
 
@@ -219,4 +219,14 @@ export const objArrayUnionByValuesKey = (objArray: Array<Record<string, any>>, v
     objArray.push(item)
   })
   return objArray
+}
+
+export const forceUpdateByPath = (path: string) => {
+  const updateTime = new Date().getTime()
+  if (path.includes('?')) {
+    path = path + '&' + FORCE_UPDATE_QUERY_KEY + '=' + updateTime
+  } else {
+    path = path + '?' + FORCE_UPDATE_QUERY_KEY + '=' + updateTime
+  }
+  return path
 }
