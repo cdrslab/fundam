@@ -200,7 +200,7 @@ export const updateURLWithRequestData = (navigate: NavigateFunction, requestData
   if (!Object.keys(requestData)?.length) return
   const queryParams: any = queryString.parse(window.location.search)
   const qs = queryString.stringify(replace ? { ...requestData } : { ...queryParams, ...requestData }, { arrayFormat: 'comma' })
-  navigate(window.location.pathname + window.location.hash + '?' + qs)
+  navigate(window.location.pathname + window.location.hash + '?' + qs, { replace: true })
 }
 
 // 基础类型数组批量删除元素，Table select row使用

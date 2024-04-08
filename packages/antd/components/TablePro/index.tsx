@@ -1,17 +1,33 @@
 import React, { CSSProperties, ReactNode, useEffect, useRef, useState } from 'react'
-import { Button, Card, Checkbox, Dropdown, message, Popover, Table as AntTable, Tooltip } from 'antd'
+import {
+  Button,
+  Card,
+  Checkbox,
+  Divider,
+  Dropdown, Empty,
+  Input,
+  message,
+  Popover,
+  Space,
+  Table as AntTable,
+  Tooltip
+} from 'antd'
 import { CheckboxValueType } from 'antd/es/checkbox/Group'
 import { useLocalStorage } from '@fundam/hooks'
 import {
-  // CoffeeOutlined,
+  CoffeeOutlined,
   ColumnHeightOutlined,
-  CopyOutlined,
+  CopyOutlined, PlusOutlined,
   QuestionCircleOutlined,
   ReloadOutlined,
   SettingOutlined
 } from '@ant-design/icons'
 import { get, union } from 'lodash'
 import { isDef } from '@fundam/utils'
+import { ButtonProps as AntButtonProps } from 'antd/es/button/button';
+import { ColumnsType, ColumnType } from 'antd/es/table';
+import { useNavigate } from 'react-router';
+import queryString from 'query-string';
 
 import { TableProps, CacheTableData, TableRowButton } from '../Table'
 import { useFun } from '../../hooks/useFun'
@@ -23,8 +39,8 @@ import {
 } from '../../shared/utils'
 import { TableResizableTitle } from '../TableResizableTitle'
 import { TextWithTooltip } from '../TextWithTooltip'
-import { ButtonProps as AntButtonProps } from 'antd/es/button/button';
-import { ColumnsType, ColumnType } from 'antd/es/table';
+
+import './index.less'
 
 interface TableProProps extends TableProps {
   tableTitle?: string | Element | ReactNode // 标题
@@ -43,6 +59,7 @@ interface TableProProps extends TableProps {
 interface CacheTableProData extends CacheTableData {
   columnKeys?: Array<string> // 开启的列（未在columnKeys中的列会隐藏）
   size?: 'large' | 'middle' | 'small' // 表格大小
+  quickQuery?: Array<{ key: string, label: any }> // 快捷查询
 }
 
 function cloneElementWithExtraFunc(
@@ -131,11 +148,13 @@ export const TablePro: React.FC<TableProProps> = ({
   children,
   ...funProps
 }) => {
+  const navigate = useNavigate()
   // 外部控制列展示
   const [selectFilterColumns, setSelectFilterColumns] = useState<string[]>([]) // 选中的筛选列
   const [currentColumns, setCurrentColumns] = useState(columns) // 渲染的列
-  const [tableCache, setTableCache] = useLocalStorage<CacheTableProData>(cacheKey, null)
+  const [tableCache, setTableCache] = useLocalStorage<CacheTableProData>(cacheKey, null, 86400 * 30) // 30天过期
   const [loading, setLoading] = useState(funProps.loading || false) // 加载中
+  const [quickQueryName, setQuickQueryName] = useState('') // 快捷查询名称
   const { request } = useFun()
   const { setAlias } = useAlias()
   const initRef = useRef(false)
@@ -440,6 +459,48 @@ export const TablePro: React.FC<TableProProps> = ({
     }
   }
 
+  const addQuickQueryItem = () => {
+    if (!quickQueryName) {
+      message.error('请输入快捷查询名称')
+      return
+    }
+    if (!window.location.search) {
+      message.error('抱歉，当前页面不允许保存快捷查询')
+      return
+    }
+    const existed = tableCache?.quickQuery?.find(item => item.key === window.location.pathname + window.location.search)
+    if (existed) {
+      setQuickQueryName('')
+      message.error('已存在相同快捷查询：' + existed.label)
+      return;
+    }
+    const existedName = tableCache?.quickQuery?.find(item => item.label === quickQueryName)
+    if (existedName) {
+      message.error('已存在相同快捷查询名称：' + existedName.label)
+      return;
+    }
+    setTableCache({
+      ...tableCache,
+      quickQuery: [
+        ...(tableCache?.quickQuery || []),
+        {
+          key: window.location.pathname + window.location.search,
+          label: quickQueryName
+        }
+      ]
+    })
+    setQuickQueryName('')
+  }
+
+  const navigateQuickQuery = async (path: string) => {
+    try {
+      navigate(path, { replace: true })
+      await fetchData(queryString.parse(path.split('?')[1]), true)
+    } catch (e) {
+      message.error('快捷查询失败，请手动查询')
+    }
+  }
+
   const buildExtra = () => {
     const filterColumnOptions: any[] = columns.map(item => ({
       label: item.title,
@@ -482,13 +543,39 @@ export const TablePro: React.FC<TableProProps> = ({
       <>
         {extra}
         {/*筛选自动填入*/}
-        {/*<Dropdown*/}
-        {/*  menu={{ items: sizeItems }}*/}
-        {/*  placement="bottom"*/}
-        {/*  overlayStyle={{ maxWidth: '70vw' }}*/}
-        {/*>*/}
-        {/*  <CoffeeOutlined style={{ marginLeft: 12, fontSize: 16 }} onClick={refreshData} />*/}
-        {/*</Dropdown>*/}
+        <Dropdown
+          menu={{ items: (tableCache?.quickQuery || []).map(item => ({
+              key: item.key,
+              label: <a onClick={() => navigateQuickQuery(item.key)}>{item.label}</a>
+            })) || []
+          }}
+          placement="bottom"
+          overlayStyle={{ maxWidth: '70vw' }}
+          dropdownRender={(menu) => (
+            <div className="quick-query-dropdown">
+              {
+                tableCache?.quickQuery?.length ?
+                  React.cloneElement(menu as React.ReactElement, { style: { boxShadow: 'none' } })
+                  :
+                  <Empty />
+              }
+              <Divider style={{ margin: '8px 0' }} />
+              <Space style={{ padding: '4px 4px 12px 12px' }}>
+                <Input
+                  placeholder="查询名称"
+                  value={quickQueryName}
+                  onChange={(e) => setQuickQueryName(e.target.value)}
+                  onKeyDown={(e) => e.stopPropagation()}
+                />
+                <Button type="text" icon={<PlusOutlined />} onClick={addQuickQueryItem}>
+                  添加快捷查询
+                </Button>
+              </Space>
+            </div>
+          )}
+        >
+          <CoffeeOutlined style={{ marginLeft: 12, fontSize: 16 }} onClick={refreshData} />
+        </Dropdown>
         <ReloadOutlined style={{ marginLeft: 12 }} onClick={refreshData} />
         <Dropdown menu={{ items: sizeItems }}>
           <ColumnHeightOutlined style={{ marginLeft: 12, fontSize: 16, color: 'rgba(0, 0, 0, 0.75)' }} />

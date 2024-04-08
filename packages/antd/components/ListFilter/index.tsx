@@ -81,8 +81,6 @@ export const ListFilter: React.FC<ListFilterProps> = ({
   const { [tablePageKey]: initPage, [tablePageSizeKey]: initPageSize } = query
 
   useEffect(() => {
-    // @ts-ignore
-    window.$form = form
     // 非首次进入 或 不使用地址栏参数
     if (params || !updateQuery) return
     form.setFieldsValue(convertObjectToNumbers(query, queryToNumber))
