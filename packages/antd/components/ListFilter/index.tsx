@@ -1,18 +1,21 @@
-import React, { CSSProperties, useEffect, useState } from 'react'
-import { convertObjectToNumbers } from '@fundam/utils'
-import { useNavigate } from 'react-router'
+import React, { CSSProperties, RefObject, useCallback, useEffect, useRef, useState } from 'react'
+import { convertObjectToNumbers, isDef } from '@fundam/utils'
+import { useSearchParams } from 'react-router-dom'
+import { FormInstance } from 'antd/es/form'
+import { isEqual } from 'lodash'
 
 import { useAntFormInstance } from '../../hooks/useAntFormInstance'
 import { Card } from '../Card'
 import { Form } from '../Form'
 import { useAlias } from '../../hooks/useAlias';
-import { TablePro } from '../TablePro';
-import { updateURLWithRequestData } from '../../shared/utils'
-import { useQuery } from '../../hooks/useQuery';
-import { FORCE_UPDATE_QUERY_KEY } from '../../shared/constants';
-
+import { TableOperate, TablePro } from '../TablePro';
+import { getQueryBySearchParams } from '../../shared/utils'
 
 interface ListFilterProps {
+  formRef: RefObject<FormInstance & {
+    reset: () => Promise<void>
+  }>, // 筛选form ref
+  tableRef?: RefObject<TableOperate>, // 列表Table ref
   formProps?: Record<string, any> // 筛选表单Form的props
   useFormItemBorder?: boolean // 使用FormItem边框样式
   tableProps?: Record<string, any> // 表格 Table 的props
@@ -45,6 +48,8 @@ interface ListFilterProps {
 }
 
 export const ListFilter: React.FC<ListFilterProps> = ({
+  formRef,
+  tableRef,
   formProps = {},
   useFormItemBorder = false,
   tableProps = {},
@@ -71,41 +76,78 @@ export const ListFilter: React.FC<ListFilterProps> = ({
   tableSelectedMaxRow,
   tableSelectedMaxRowErrorMessage,
   tableOnSelectedRowKeysChange,
-  tableOnSelectedRowRecordsChange
+  tableOnSelectedRowRecordsChange,
 }) => {
   const [form] = useAntFormInstance()
-  const tableAlias = useAlias<any>()
-  const table = tableAlias?.[tableCacheKey]
-  const [params, setParams] = useState<any>(null)
-  const query: any = useQuery()
-  const navigate = useNavigate()
-  const { [tablePageKey]: initPage, [tablePageSizeKey]: initPageSize } = query
+  // const tableAlias = useAlias<any>()
+  // const table = tableAlias?.[tableCacheKey]
+  const currentTableRef = tableRef ? tableRef : React.useRef<TableOperate>(null)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const { query, realQuery } = getQueryBySearchParams(searchParams, [tablePageKey, tablePageSizeKey, ...queryToNumber])
+  const [initialized, setInitialized] = useState<Boolean>(false)
+  const lastRequestParams = useRef<any>(null)
 
   useEffect(() => {
-    // 非首次进入 或 不使用地址栏参数
-    if (!updateQuery) return
+    if (!formRef) return
+    // @ts-ignore
+    formRef.current = {
+      ...form,
+      reset: onFormReset
+    }
+  }, [form, formRef])
+
+  useEffect(() => {
+    // 初始化
+    if (!updateQuery || !currentTableRef.current || initialized) return
+    setInitialized(true)
     form.resetFields()
-    form.setFieldsValue(convertObjectToNumbers(query, queryToNumber))
-    setParams(query)
-  }, [query && query[FORCE_UPDATE_QUERY_KEY]])
+    form.setFieldsValue(query)
+    const newRequestParams = { ...tableApiReqData, ...query }
+    currentTableRef.current.fetchData(newRequestParams, true)
+    lastRequestParams.current = { ...newRequestParams }
+  }, [])
+
+  useEffect(() => {
+    if (!lastRequestParams.current) return;
+    // 使用 updateQuery 时，query改变即重新请求，防止重复请求
+    const newRequestParams = { ...tableApiReqData, ...query }
+    if (isEqual(lastRequestParams.current, newRequestParams)) return;
+    lastRequestParams.current = { ...newRequestParams }
+    currentTableRef.current && currentTableRef.current.fetchData(newRequestParams, true)
+  }, [searchParams])
+
+  const updateQueryParams = useCallback((params: any) => {
+    const newParams: any = {}
+    Object.keys(params).forEach((key: string) => {
+      if (params[key] === 'undefined' || params[key] === 'null' || !isDef(params[key])) return
+      newParams[key] = params[key]
+    })
+    setSearchParams(newParams)
+  }, [setSearchParams])
 
   const onFormFinish = async (values: Record<string, any> | null) => {
-    const newQuery = { ...tableApiReqData, ...values, [tablePageKey]: 1 }
-    updateQuery && updateURLWithRequestData(navigate, newQuery)
-    await table.fetchData(newQuery)
+    const newQuery = { ...query, ...values, [tablePageKey]: 1 }
+    updateQuery && updateQueryParams({ ...newQuery })
+    if (!updateQuery && currentTableRef.current) {
+      await currentTableRef.current.fetchData(newQuery)
+    }
   }
 
   const onPaginationChange = async (page: number, pageSize: number) => {
-    const newQuery = { ...tableApiReqData, ...query, [tablePageKey]: page, [tablePageSizeKey]: pageSize }
-    updateQuery && updateURLWithRequestData(navigate, newQuery)
-    await table.fetchData(newQuery)
+    const newQuery = { ...query, [tablePageKey]: page, [tablePageSizeKey]: pageSize }
+    updateQuery && updateQueryParams({ ...newQuery })
+    if (!updateQuery && currentTableRef.current) {
+      await currentTableRef.current.fetchData(newQuery)
+    }
   }
 
   const onFormReset = async () => {
     form.resetFields()
-    const newQuery = { ...tableApiReqData, [tablePageKey]: 1 }
-    updateQuery && updateURLWithRequestData(navigate, newQuery, true)
-    await table.fetchData(newQuery, true)
+    const newQuery = { [tablePageKey]: 1 }
+    updateQuery && updateQueryParams({ ...newQuery })
+    if (!updateQuery && currentTableRef.current) {
+      await currentTableRef.current.fetchData(newQuery, true)
+    }
   }
 
   const buildTableTitle = () => {
@@ -153,11 +195,12 @@ export const ListFilter: React.FC<ListFilterProps> = ({
       }
       <TablePro
         {...tableProps}
-        updateQuery={updateQuery}
+        updateQueryParams={updateQueryParams}
+        tableRef={currentTableRef}
         indexType={tableIndexType}
-        query={convertObjectToNumbers(query, queryToNumber)}
-        initPage={parseInt(initPage || 1)}
-        initPageSize={parseInt(initPageSize || 20)}
+        query={realQuery}
+        initPage={query[tablePageKey]}
+        initPageSize={query[tablePageSizeKey]}
         tableTitle={buildTableTitle()}
         cardStyle={tableCardStyle}
         cacheKey={tableCacheKey}

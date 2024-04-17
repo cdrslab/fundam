@@ -20,5 +20,9 @@ export type GetData = {
   cacheExpirationSec?: string, // 缓存过期时间
 }
 
+export function isURLSearchParams(obj: any): obj is URLSearchParams {
+  return Object.prototype.toString.call(obj) === '[object URLSearchParams]';
+}
+
 // 可以包含options的组件
 // export type IncludesOptionsAntComponent = Select

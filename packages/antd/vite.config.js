@@ -22,13 +22,15 @@ export default defineConfig({
       fileName: (format) => `fundam-antd.${format}.js`
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react-router', 'react-router-dom'],
+      external: ['react', 'react-dom', 'react-router', 'react-router-dom', 'antd', '@ant-design/icons'],
       output: {
         globals: {
           react: 'React',
           'react-dom': 'ReactDOM',
           'react-router': 'ReactRouter',
-          'react-router-dom': 'ReactRouterDOM'
+          'react-router-dom': 'ReactRouterDOM',
+          'antd': 'Antd',
+          '@ant-design/icons': 'AntDesignIcons'
         }
       }
     }

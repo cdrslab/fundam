@@ -5,7 +5,7 @@ import { NavigateFunction } from 'react-router/dist/lib/hooks'
 import { FormInstance } from 'antd/es/form'
 
 import { FORCE_UPDATE_QUERY_KEY, VALID_ROW_COLS } from './constants'
-import { GetData } from './types';
+import { GetData, isURLSearchParams } from './types';
 import { isDef } from '@fundam/utils';
 
 export const validateRowCol = (rowCol: number) => {
@@ -117,7 +117,21 @@ export const getData = async (data: GetData, request: any) => {
   if (!data || !request) return data
   const { dataApi, dataFunc, dataApiReqData = {}, dataApiMethod = 'get', resDataPath = '' } = data as any
   if (!dataApi && !dataFunc) return data
-  let res = dataApi ? await request[dataApiMethod](dataApi, filterIgnoreFunValues(dataApiReqData, true)) : await dataFunc(dataApiReqData)
+
+  if (dataFunc) {
+    const res = await dataFunc(dataApiReqData)
+    return res
+  }
+
+  if (dataApiMethod === 'get' && dataApi && dataApiReqData) {
+    Object.keys(dataApiReqData).forEach((key: string) => {
+      if (Array.isArray(dataApiReqData[key])) {
+        dataApiReqData[key] = dataApiReqData[key].join(',')
+      }
+    })
+  }
+
+  let res = await request[dataApiMethod](dataApi, filterIgnoreFunValues(dataApiReqData, true))
   res = resDataPath ? get(res, resDataPath) : res
   return res
 }
@@ -229,4 +243,27 @@ export const forceUpdateByPath = (path: string) => {
     path = path + '?' + FORCE_UPDATE_QUERY_KEY + '=' + updateTime
   }
   return path
+}
+
+// 通过 useSearchParams 获取query
+export const getQueryBySearchParams = (searchParams: any, parseValueKeys: Array<string> = [], ignoreQueryKeys: Array<string> = []) => {
+  // 存在getAll 为 URLSearchParams 类型
+  const realQuery = searchParams?.getAll ? Object.fromEntries([...searchParams]) : searchParams
+  const query: any = {}
+  Object.keys(realQuery).forEach(key => {
+    if (realQuery[key] === 'undefined' || realQuery[key] === 'null' || !isDef(realQuery[key])) return
+    // 隐藏字段
+    if (key.startsWith('__') || ignoreQueryKeys.includes(key)) return
+    try {
+      realQuery[key] = parseValueKeys.includes(key) ? JSON.parse(realQuery[key]) : realQuery[key]
+    } catch (e) {
+    } finally {
+      query[key] = realQuery[key]
+    }
+  })
+
+  return {
+    realQuery,
+    query
+  }
 }

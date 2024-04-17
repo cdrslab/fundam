@@ -1,4 +1,4 @@
-import React, { CSSProperties, ReactNode, useEffect, useRef, useState } from 'react'
+import React, { CSSProperties, ReactNode, RefObject, useEffect, useRef, useState } from 'react'
 import {
   Button,
   Card,
@@ -42,7 +42,13 @@ import { TextWithTooltip } from '../TextWithTooltip'
 
 import './index.less'
 
+export interface TableOperate {
+  fetchData: (params: any, replace?: Boolean) => Promise<void>;
+  refresh: () => Promise<void>;
+}
+
 interface TableProProps extends TableProps {
+  tableRef?: RefObject<TableOperate>
   tableTitle?: string | Element | ReactNode // 标题
   extra?: ((props: any) => ReactNode) | ReactNode
   onPaginationChange?: (page: number, pageSize: number) => Promise<void>
@@ -51,7 +57,7 @@ interface TableProProps extends TableProps {
   selectedMaxRowErrorMessage?: string // 超出选择行数限制
   onSelectedRowKeysChange?: (selectedRowKeys: Array<any>) => void
   onSelectedRowRecordsChange?: (selectedRowRecords: Array<any>) => void
-  updateQuery?: Boolean // 更新地址栏参数
+  updateQueryParams?: (params: Record<string, any>) => void // 使用地址栏变更获取数据
   query?: Record<string, any>
   cardStyle?: CSSProperties
 }
@@ -115,7 +121,8 @@ function modifyColumnsWithExtra<T>(
 
 // TODO 0.2 优化：与 Table TableForm等抽出共性
 export const TablePro: React.FC<TableProProps> = ({
-  updateQuery, // 当值为数组时，与地址栏保持一致
+  tableRef,
+  updateQueryParams,
   query = {},
   cardStyle = {},
   tableTitle,
@@ -175,11 +182,21 @@ export const TablePro: React.FC<TableProProps> = ({
   }, [data])
 
   useEffect(() => {
+    if (!tableRef) return
+    // @ts-ignore
+    tableRef.current = {
+      fetchData: fetchData,
+      refreshData: refreshData,
+      handlePagination: handlePagination,
+    }
+  }, []);
+
+  useEffect(() => {
     if (!initRef.current) {
-      if (updateQuery) {
-        fetchData(query)
-      } else {
+      if (!updateQueryParams) {
         fetchData()
+      } else {
+        fetchData(query)
       }
       alias && setAlias(alias, { fetchData, refreshData })
       initRef.current = true
@@ -213,7 +230,7 @@ export const TablePro: React.FC<TableProProps> = ({
         [pageSizeKey]: initPageSize,
         ...params
       }
-      if (dataApiMethod === 'get' && dataApi && updateQuery) {
+      if (dataApiMethod === 'get' && dataApi && updateQueryParams) {
         Object.keys(requestData).forEach((key: string) => {
           if (Array.isArray(requestData[key])) {
             requestData[key] = requestData[key].join(',')
@@ -246,11 +263,17 @@ export const TablePro: React.FC<TableProProps> = ({
     if (onPaginationChange) {
       await onPaginationChange(page, pageSize)
     } else {
-      await fetchData({ ...cacheLastRequestParamsRef.current, page, pageSize })
+      if (updateQueryParams) {
+        updateQueryParams({ ...query, page: page, pageSize: pageSize })
+      } else {
+        await fetchData({ ...cacheLastRequestParamsRef.current, page, pageSize })
+      }
     }
   }
 
-  const refreshData = () => fetchData(cacheLastRequestParamsRef.current)
+  const refreshData = async () => {
+    await fetchData(cacheLastRequestParamsRef.current)
+  }
 
   const handleResize = (column: any) => {
     return (_e: any, { size }: any) => {
@@ -494,8 +517,11 @@ export const TablePro: React.FC<TableProProps> = ({
 
   const navigateQuickQuery = async (path: string) => {
     try {
-      navigate(forceUpdateByPath(path), { replace: true })
-      await fetchData(queryString.parse(path.split('?')[1]), true)
+      if (!updateQueryParams) {
+        await fetchData(queryString.parse(path.split('?')[1]), true)
+      } else {
+        navigate(path)
+      }
     } catch (e) {
       message.error('快捷查询失败，请手动查询')
     }

@@ -5,12 +5,14 @@ import {
   // FormItemCascade,
   Badge,
   TableRowButton,
-  ListFilter,
+  PageListQuery,
   CardTabs,
 } from '@fundam/antd'
 import { DesktopOutlined, MobileOutlined } from '@ant-design/icons'
 import { Button, Tag } from 'antd'
 import './index.less'
+import { useRef } from 'react';
+import { useNavigate } from 'react-router';
 
 // const resourceStatusOptions = [
 //   {
@@ -32,6 +34,10 @@ import './index.less'
 // ]
 
 export default () => {
+  const tableRef = useRef(null)
+  const formRef1 = useRef(null)
+  const formRef2 = useRef(null)
+  const navigate = useNavigate()
   // const [selectedData, setSelectedData] = useState<any>([])
   const onClickRecordName = (record: any) => {
     console.log(record)
@@ -116,7 +122,11 @@ export default () => {
       render: (_: any, record: any) => (
         <>
           {/*<TableRowButton onClick={(e, { refreshData, fetchData }) => refreshData()}>刷新</TableRowButton>*/}
-          <TableRowButton onClick={() => console.log(record)}>复制</TableRowButton>
+          <TableRowButton onClick={async () => {
+            // @ts-ignore
+            formRef.current?.reset()
+            // await tableRef.current?.handlePagination(2)
+          }}>复制</TableRowButton>
           {
             record.status < 4 ? <TableRowButton onClick={() => console.log(record)}>编辑</TableRowButton> : null
           }
@@ -191,19 +201,25 @@ export default () => {
       label: 'tab1',
       key: 'tab1',
       children: (
-        <ListFilter
-          formInCardTitle
-          useFormItemBorder
-          // tableIndexType="pagination"
-          tableCardStyle={{
-            borderRadius: 0
-          }}
+        <PageListQuery
+          formRef={formRef1}
+          formInTableCardTitle
           formItems={formItem}
-          queryToNumber={['province', 'city', 'district', 'page', 'pageSize', 'status', 'id']}
-          tableCacheKey="resourceTablePro"
-          tableColumns={columns}
-          tableDataApi="/api/resource/list"
-          tableExtra={<><Button onClick={() => {}} type="primary">导出</Button></>}
+          parseQueryKeys={['province', 'city', 'district', 'page', 'pageSize', 'status', 'id']}
+          tableProps={{
+            rowKey: 'id',
+            columns: columns as any,
+            dataApi: '/api/resource/list',
+            dataApiReqData: {
+              status: 1
+            }
+          }}
+          tableCardProps={{
+            style: {
+              borderTopLeftRadius: 0,
+              borderTopRightRadius: 0,
+            }
+          }}
         />
       )
     },
@@ -211,17 +227,25 @@ export default () => {
       label: 'tab2',
       key: 'tab2',
       children: (
-        <ListFilter
-          formInCardTitle
-          tableCardStyle={{
-            borderRadius: 0
-          }}
+        <PageListQuery
+          formRef={formRef2}
+          formInTableCardTitle
           formItems={formItem}
-          queryToNumber={['province', 'city', 'district', 'page', 'pageSize', 'status', 'id']}
-          tableCacheKey="resourceTablePro"
-          tableColumns={columns}
-          tableDataApi="/api/resource/list"
-          tableExtra={<><Button onClick={() => {}} type="primary">导出</Button></>}
+          parseQueryKeys={['province', 'city', 'district', 'page', 'pageSize', 'status', 'id']}
+          tableProps={{
+            rowKey: 'id',
+            columns: columns as any,
+            dataApi: '/api/resource/list',
+            dataApiReqData: {
+              status: 2
+            }
+          }}
+          tableCardProps={{
+            style: {
+              borderTopLeftRadius: 0,
+              borderTopRightRadius: 0,
+            }
+          }}
         />
       )
     },
@@ -233,6 +257,18 @@ export default () => {
         defaultActiveKey="tab1"
         items={items}
         type="card"
+        onChange={(activeKey) => {
+          if (activeKey === 'tab1') {
+            // @ts-ignore
+            formRef2.current.reset()
+          } else {
+            // @ts-ignore
+            formRef1.current?.reset()
+          }
+          // let path = '/list_pro_2?status='
+          // path = path + (activeKey === 'tab1' ? '1' : '2')
+          // navigate(path, { replace: true })
+        }}
       />
     </div>
   )
