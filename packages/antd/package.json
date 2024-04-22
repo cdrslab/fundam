@@ -1,6 +1,6 @@
 {
   "name": "@fundam/antd",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "main": "dist/fundam-antd.umd.js",
   "module": "dist/fundam-antd.es.js",
   "types": "dist/index.d.ts",
@@ -15,6 +15,7 @@
   "peerDependencies": {
     "@ant-design/icons": "^5.3.6",
     "antd": "^5.16.2",
+    "dayjs": "^1.11.10",
     "react-router": "^6.15.0",
     "react-router-dom": "^6.15.0"
   },
@@ -35,7 +36,6 @@
   "dependencies": {
     "@fundam/hooks": "*",
     "@fundam/utils": "*",
-    "dayjs": "^1.11.10",
     "lodash": "^4.17.21",
     "query-string": "^9.0.0",
     "react": "^18.2.0",

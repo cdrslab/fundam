@@ -22,7 +22,7 @@ export default defineConfig({
       fileName: (format) => `fundam-antd.${format}.js`
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react-router', 'react-router-dom', 'antd', '@ant-design/icons'],
+      external: ['react', 'react-dom', 'react-router', 'react-router-dom', 'antd', '@ant-design/icons', 'dayjs'],
       output: {
         globals: {
           react: 'React',
@@ -30,7 +30,8 @@ export default defineConfig({
           'react-router': 'ReactRouter',
           'react-router-dom': 'ReactRouterDOM',
           'antd': 'Antd',
-          '@ant-design/icons': 'AntDesignIcons'
+          '@ant-design/icons': 'AntDesignIcons',
+          'dayjs': 'Dayjs'
         }
       }
     }
