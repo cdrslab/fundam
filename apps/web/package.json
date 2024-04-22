@@ -10,8 +10,8 @@
     "lint": "eslint \"src/**/*.ts\""
   },
   "dependencies": {
-    "@ant-design/icons": "^5.2.5",
-    "antd": "^5.12.7",
+    "@ant-design/icons": "^5.3.6",
+    "antd": "^5.16.2",
     "mockjs": "^1.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
