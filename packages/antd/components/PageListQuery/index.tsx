@@ -1,14 +1,11 @@
-import React, { RefObject, useCallback, useEffect, useMemo, useRef } from 'react'
+import React, { RefObject, useEffect, useRef } from 'react'
 
 import { FunFormInstance } from '../../shared/types'
-import { ProTable, ProTableColumnProps, ProTableInstance, ProTableProps } from '../ProTable'
+import { ProTable, ProTableInstance, ProTableProps } from '../ProTable'
 import { useAntFormInstance } from '../../hooks/useAntFormInstance'
-import { useSearchParams } from 'react-router-dom';
-import { getQueryBySearchParams } from '../../shared/utils';
 import { Card } from '../Card'
 import { Form } from '../Form'
-import { isDef } from '@fundam/utils';
-import queryString from 'query-string';
+import { useQueryParams } from '../../hooks/useQueryParams'
 
 interface PageListQueryProps {
   // 筛选表单项
@@ -73,9 +70,8 @@ export const PageListQuery: React.FC<PageListQueryProps> = (props) => {
   } = props
   const queryParseValueKeys = [tableProps.pageKey || tablePageKey, tableProps.pageSizeKey || tablePageSizeKey, ...parseQueryKeys]
   const [form] = useAntFormInstance()
-  const [searchParams, setSearchParams] = useSearchParams()
   // query：不含双下划线开头的隐藏字段，realQuery：含双下划线开头的隐藏字段
-  const { query, realQuery } = useMemo(() => getQueryBySearchParams(searchParams, queryParseValueKeys), [searchParams])
+  const { query, realQuery, setQuery } = useQueryParams(queryParseValueKeys)
   const currentTableRef = tableRef || useRef<ProTableInstance>(null)
 
   useEffect(() => {
@@ -89,37 +85,20 @@ export const PageListQuery: React.FC<PageListQueryProps> = (props) => {
 
   useEffect(() => {
     // 数据回显
-    form.resetFields()
-    form.setFieldsValue({ ...query })
-    currentTableRef?.current?.fetch(query, true)
+    form.resetFields();
+    form.setFieldsValue({ ...query });
+    currentTableRef?.current?.fetch(query, true);
   }, [query])
-
-  // 设置query
-  const updateQueryParams = useCallback((params: any) => {
-    const newParams: any = {}
-    Object.keys(params).forEach((key: string) => {
-      if (params[key] === 'undefined' || params[key] === 'null' || !isDef(params[key])) return
-      newParams[key] = params[key]
-    })
-    setSearchParams(newParams)
-  }, [setSearchParams])
-
-  const updateQueryAndFetch = (search: Record<string, any> | string) => {
-    if (typeof search === 'string') {
-      search = queryString.parse(search.split('?')[1])
-    }
-    updateQueryParams({ ...search })
-  }
 
   const onFormReset = async () => {
     form.resetFields()
     const newQuery = { [tablePageSizeKey]: defaultPageSize, [tablePageKey]: 1 }
-    updateQueryAndFetch(newQuery)
+    setQuery(newQuery, true)
   }
 
   const onFormFinish = async (values: Record<string, any> | null) => {
     const newQuery = { [tablePageSizeKey]: defaultPageSize, ...query, ...values, [tablePageKey]: 1 }
-    updateQueryAndFetch(newQuery)
+    setQuery(newQuery)
   }
 
   // 完善Form props
@@ -174,8 +153,7 @@ export const PageListQuery: React.FC<PageListQueryProps> = (props) => {
           </Card> : null
       }
       <ProTable
-        useQuery
-        updateQueryAndFetch={updateQueryAndFetch}
+        needUpdateQuery
         cardProps={{
           ...tableCardProps,
           title: buildTableTitle()

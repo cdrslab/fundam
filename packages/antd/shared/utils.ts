@@ -246,11 +246,11 @@ export const forceUpdateByPath = (path: string) => {
   return path
 }
 
-// 通过 useSearchParams 获取query
-export const getQueryBySearchParams = (searchParams: any, parseValueKeys: Array<string> = [], ignoreQueryKeys: Array<string> = []) => {
+// 通过 useSearchParams 获取query，queryCache：不改变query的引用
+export const getQueryBySearchParams = (searchParams: any, parseValueKeys: Array<string> = [], ignoreQueryKeys: Array<string> = [], queryCache: any = {}) => {
   // 存在getAll 为 URLSearchParams 类型
   const realQuery = searchParams?.getAll ? Object.fromEntries([...searchParams]) : searchParams
-  const query: any = {}
+  const query: any = queryCache || {}
   Object.keys(realQuery).forEach(key => {
     if (realQuery[key] === 'undefined' || realQuery[key] === 'null' || !isDef(realQuery[key])) return
     // 隐藏字段

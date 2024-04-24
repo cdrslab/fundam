@@ -45,6 +45,7 @@ import {
 import { TableResizableTitle } from '../TableResizableTitle'
 import { TextWithTooltip } from '../TextWithTooltip'
 import { FETCH_DEBOUNCE } from '../../shared/constants'
+import { useQueryParams } from '../../hooks/useQueryParams';
 
 export interface ProTableInstance {
   fetch: (params: any, replace?: Boolean) => Promise<void>
@@ -72,6 +73,8 @@ export interface ProTableColumnProps<T> extends Omit<AntTableColumnProps<T>, 'ke
 
 // T为table行（record）的Model
 export interface ProTableProps<T> extends Omit<AntTableProps, 'columns'>, GetData {
+  // 使用query
+  needUpdateQuery?: boolean
   // 行唯一key
   rowKey: string
   columns: Array<ProTableColumnProps<T>>
@@ -167,7 +170,7 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
     totalKey = 'total',
     emptyValue = '-',
     pageNumbering,
-    updateQueryAndFetch,
+    needUpdateQuery = false,
 
     // 选择相关
     initSelectedRowKeys = [],
@@ -200,6 +203,8 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<Array<any>>(initSelectedRowKeys) // 选择的行key
   const [selectedRowRecords, setSelectedRowRecords] = useState<Array<any>>([]) // 临时存储
 
+  const { setQuery } = useQueryParams()
+
   // 列表相关
   const [data, setData] = useState({
     list: [],
@@ -219,9 +224,6 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
   }, [columns, tableCache])
   // 选中的columnKeys
   const selectedColumnKeys = useMemo(() => currentColumns.map(item => item.dataIndex), [currentColumns])
-
-  useEffect(() => {
-  }, [])
 
   // 选择行变化
   useEffect(() => {
@@ -289,8 +291,9 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
       await onPaginationChange(page, pageSize)
     } else {
       const params = { ...cacheLastRequestParamsRef.current, [pageKey]: page, [pageSizeKey]: pageSize }
-      if (updateQueryAndFetch) {
-        updateQueryAndFetch(params)
+      if (needUpdateQuery) {
+        setQuery(params)
+        // updateQueryAndFetch(params)
       } else {
         await fetch(params)
       }
@@ -303,8 +306,8 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
   }
 
   const navigateQuickQuery = async (path: string) => {
-    if (!updateQueryAndFetch) return
-    updateQueryAndFetch(path)
+    if (!needUpdateQuery) return
+    navigate(path)
   }
 
   // 选中&取消选中（支持跨页多选）
@@ -437,7 +440,7 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
       <>
         {cardProps.extra}
         {
-          updateQueryAndFetch ?
+          needUpdateQuery ?
             <Dropdown
               menu={{ items: (tableCache?.quickQuery || []).map(item => ({
                   key: item.key,

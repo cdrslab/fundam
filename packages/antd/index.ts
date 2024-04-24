@@ -30,6 +30,7 @@ export { useForm } from './hooks/useForm'
 export { useFun } from './hooks/useFun'
 export { useAlias } from './hooks/useAlias'
 export { useQuery } from './hooks/useQuery'
+export { useQueryParams } from './hooks/useQueryParams'
 
 export * from './shared/utils'
 
