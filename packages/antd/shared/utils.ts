@@ -268,3 +268,30 @@ export const getQueryBySearchParams = (searchParams: any, parseValueKeys: Array<
     query
   }
 }
+
+// 转换url为 query 参数对象
+export function parseQueryParams(url: string, parseQueryKeys: string[]): Record<string, any> {
+  const queryString = url.split('?')[1]
+  if (!queryString) return {}
+
+  const params = new URLSearchParams(queryString)
+  const parsedParams: Record<string, any> = {}
+
+  // @ts-ignore
+  for (const [key, value] of params) {
+    if (parseQueryKeys.includes(key)) {
+      const numValue = Number(value)
+      if (!isNaN(numValue)) {
+        parsedParams[key] = numValue
+      } else if (value.toLowerCase() === 'true' || value.toLowerCase() === 'false') {
+        parsedParams[key] = value.toLowerCase() === 'true'
+      } else {
+        parsedParams[key] = value
+      }
+    } else {
+      parsedParams[key] = value
+    }
+  }
+
+  return parsedParams
+}

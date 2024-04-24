@@ -81,24 +81,27 @@ export const PageListQuery: React.FC<PageListQueryProps> = (props) => {
         reset: onFormReset,
       }
     }
+    currentTableRef?.current?.fetch(query, true)
   }, [])
 
   useEffect(() => {
     // 数据回显
     form.resetFields();
     form.setFieldsValue({ ...query });
-    currentTableRef?.current?.fetch(query, true);
+    // currentTableRef?.current?.fetch(query, true)
   }, [query])
 
   const onFormReset = async () => {
     form.resetFields()
     const newQuery = { [tablePageSizeKey]: defaultPageSize, [tablePageKey]: 1 }
     setQuery(newQuery, true)
+    currentTableRef?.current?.fetch(newQuery, true)
   }
 
   const onFormFinish = async (values: Record<string, any> | null) => {
     const newQuery = { [tablePageSizeKey]: defaultPageSize, ...query, ...values, [tablePageKey]: 1 }
     setQuery(newQuery)
+    currentTableRef?.current?.fetch(newQuery, true)
   }
 
   // 完善Form props
@@ -154,6 +157,7 @@ export const PageListQuery: React.FC<PageListQueryProps> = (props) => {
       }
       <ProTable
         needUpdateQuery
+        parseQueryKeys={parseQueryKeys}
         cardProps={{
           ...tableCardProps,
           title: buildTableTitle()

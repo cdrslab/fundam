@@ -40,7 +40,7 @@ import {
   copyToClipboard,
   getData,
   objArrayRemoveByValuesKey,
-  objArrayUnionByValuesKey, throttledAdjustButtonMargins
+  objArrayUnionByValuesKey, parseQueryParams, throttledAdjustButtonMargins
 } from '../../shared/utils'
 import { TableResizableTitle } from '../TableResizableTitle'
 import { TextWithTooltip } from '../TextWithTooltip'
@@ -75,6 +75,8 @@ export interface ProTableColumnProps<T> extends Omit<AntTableColumnProps<T>, 'ke
 export interface ProTableProps<T> extends Omit<AntTableProps, 'columns'>, GetData {
   // 使用query
   needUpdateQuery?: boolean
+  // 需要parse的query key，比如，传入：['page']，page: '1' => page: 1
+  parseQueryKeys?: Array<string>
   // 行唯一key
   rowKey: string
   columns: Array<ProTableColumnProps<T>>
@@ -171,6 +173,7 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
     emptyValue = '-',
     pageNumbering,
     needUpdateQuery = false,
+    parseQueryKeys = [],
 
     // 选择相关
     initSelectedRowKeys = [],
@@ -293,6 +296,7 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
       const params = { ...cacheLastRequestParamsRef.current, [pageKey]: page, [pageSizeKey]: pageSize }
       if (needUpdateQuery) {
         setQuery(params)
+        await fetch(params)
         // updateQueryAndFetch(params)
       } else {
         await fetch(params)
@@ -308,6 +312,8 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
   const navigateQuickQuery = async (path: string) => {
     if (!needUpdateQuery) return
     navigate(path)
+    const queryParams = parseQueryParams(path, parseQueryKeys)
+    await fetch(queryParams, true)
   }
 
   // 选中&取消选中（支持跨页多选）
