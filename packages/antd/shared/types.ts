@@ -18,6 +18,7 @@ export type GetData = {
   resDataPath?: string // 组件所需响应数据提取
   cacheKey?: string, // 缓存全局唯一key
   cacheExpirationSec?: string, // 缓存过期时间
+  dataRule?: boolean | (() => boolean)
 }
 
 export function isURLSearchParams(obj: any): obj is URLSearchParams {

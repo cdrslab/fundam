@@ -115,8 +115,9 @@ export const filterIgnoreFunValues = (values: Record<string, any>, filterRemoteS
 // 组件自适应请求
 export const getData = async (data: GetData, request: any) => {
   if (!data || !request) return data
-  const { dataApi, dataFunc, dataApiReqData = {}, dataApiMethod = 'get', resDataPath = '' } = data as any
-  if (!dataApi && !dataFunc) return data
+  const { dataApi, dataFunc, dataApiReqData = {}, dataApiMethod = 'get', dataRule = true, resDataPath = '' } = data as any
+  if (!dataApi && !dataFunc) return null
+  if (!dataRule || (typeof dataRule === 'function' && !dataRule())) return null
 
   if (dataFunc) {
     const res = await dataFunc(dataApiReqData)

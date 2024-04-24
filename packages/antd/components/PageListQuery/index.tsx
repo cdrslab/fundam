@@ -146,7 +146,7 @@ export const PageListQuery: React.FC<PageListQueryProps> = (props) => {
         </Form>
       )
     }
-    return tableProps.title
+    return tableCardProps.title
   }
 
   return (

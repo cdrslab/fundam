@@ -55,7 +55,7 @@ export interface ProTableColumnProps<T> extends Omit<AntTableColumnProps<T>, 'ke
   // 索引
   dataIndex: string
   // 支持自定义title
-  title: ((props: any) => React.ReactNode) | React.ReactNode | string
+  // title: ((props: any) => React.ReactNode) | React.ReactNode | string
   // 不可操作？
   disabled?: Boolean
   // 唯一key，不传使用dataIndex
@@ -181,6 +181,7 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
     dataApi,
     dataApiReqData,
     dataApiMethod,
+    dataRule,
     resDataPath,
 
     ...otherProps
@@ -259,8 +260,13 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
         dataFunc,
         dataApiMethod,
         resDataPath,
+        dataRule,
         dataApiReqData: requestData,
       }, request)
+
+      // 未请求到数据，不更新
+      if (!res) return
+
       // 缓存本次请求参数
       cacheLastRequestParamsRef.current = { ...requestData }
       setData({
