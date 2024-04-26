@@ -287,7 +287,12 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
     }
   }, FETCH_DEBOUNCE)
 
-  const refresh = async () => fetch(cacheLastRequestParamsRef.current)
+  const refresh = async () => {
+    await fetch(cacheLastRequestParamsRef.current)
+    // 清空选中项
+    setSelectedRowRecords([])
+    setSelectedRowKeys([])
+  }
 
   const handlePagination = async (page: number, pageSize: number) => {
     if (onPaginationChange) {

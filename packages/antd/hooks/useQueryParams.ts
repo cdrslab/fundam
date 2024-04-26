@@ -10,7 +10,16 @@ export function useQueryParams(parseKeys: string[] = []) {
     for (const [key, value] of searchParams) {
       if (!key.startsWith('__') && value !== 'undefined' && value !== 'null' && value !== undefined && value !== null) {
         try {
-          params[key] = parseKeys.includes(key) ? JSON.parse(value) : value
+          if (parseKeys.includes(key)) {
+            if (value.split(',')?.length > 1) {
+              // 多选
+              params[key] = value.split(',').map((item: any) => JSON.parse(item))
+            } else {
+              params[key] = JSON.parse(value)
+            }
+          } else {
+            params[key] = value
+          }
         } catch (e) {
           params[key] = value
         }

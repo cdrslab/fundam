@@ -1,5 +1,6 @@
 import React, { RefObject, useEffect, useRef } from 'react'
 
+import './index.less'
 import { FunFormInstance } from '../../shared/types'
 import { ProTable, ProTableInstance, ProTableProps } from '../ProTable'
 import { useAntFormInstance } from '../../hooks/useAntFormInstance'
@@ -27,6 +28,8 @@ interface PageListQueryProps {
   formProps?: Record<string, any>
   // Fun Card props
   formCardProps?: Record<string, any>
+  // Fun form 表单下面的内容
+  formCardFooter?: React.ReactNode
   // Fun Card props
   tableCardProps?: Record<string, any>
   // 需要parse的query key，比如，传入：['page']，page: '1' => page: 1
@@ -54,6 +57,7 @@ export const PageListQuery: React.FC<PageListQueryProps> = (props) => {
     formProps = {},
     tableProps = {} as any,
     formCardProps = {},
+    formCardFooter,
     tableCardProps = {},
     parseQueryKeys = [],
     formInTableCardTitle,
@@ -153,6 +157,13 @@ export const PageListQuery: React.FC<PageListQueryProps> = (props) => {
             >
               {formItems}
             </Form>
+            {
+              formCardFooter ?
+                <div className="fun-form-card-footer">
+                  {formCardFooter}
+                </div>
+                : null
+            }
           </Card> : null
       }
       <ProTable

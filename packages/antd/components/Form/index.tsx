@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Button, Form as AntForm, Row, Col } from 'antd'
+import { Button, Form as AntForm, Row, Col, Dropdown } from 'antd'
 import { FormProps as AntFormProps } from 'antd/es/form/Form'
 import { FormInstance } from 'antd/es/form'
 import { DownOutlined, UpOutlined } from '@ant-design/icons'
@@ -18,6 +18,8 @@ interface FormProviderProps extends Partial<Omit<FormContextProps, 'form'>>, Omi
   primaryButtonClick?: (form: FunFormInstance) => void
   collapseNames?: Array<string> // 收起的表单项（name区分）
   useFormItemBorder?: boolean // 使用FormItem边框样式
+  buttonsLeftExtra?: React.ReactNode // 按钮组左侧添加自定义组件
+  hiddenFormItems?: React.ReactNode // 嵌入的隐藏form items
 }
 
 export const Form: React.FC<FormProviderProps> = ({
@@ -39,6 +41,8 @@ export const Form: React.FC<FormProviderProps> = ({
   onFinish,
   labelCol,
   wrapperCol,
+  buttonsLeftExtra,
+  hiddenFormItems,
   ...antProps
 }) => {
   const [formCollapse, setFormCollapse] = useState(true) // 表单展开收起（默认收起）
@@ -94,6 +98,7 @@ export const Form: React.FC<FormProviderProps> = ({
             <Row gutter={[24, 12]}>
               {children}
               <Col span={6}>
+                {buttonsLeftExtra}
                 <Button type="primary" style={{ marginRight: 8 }} onClick={onPrimaryButtonClick}>
                   {primaryButtonText}
                 </Button>
@@ -136,6 +141,7 @@ export const Form: React.FC<FormProviderProps> = ({
               </>
             )
         }
+        {hiddenFormItems}
       </AntForm>
     </FormContext.Provider>
   )
