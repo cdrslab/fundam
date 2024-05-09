@@ -104,7 +104,7 @@ export const PageListQuery: React.FC<PageListQueryProps> = (props) => {
 
   const onFormFinish = async (values: Record<string, any> | null) => {
     const newQuery = { [tablePageSizeKey]: defaultPageSize, ...query, ...values, [tablePageKey]: 1 }
-    setQuery(newQuery)
+    setQuery(newQuery, true)
     currentTableRef?.current?.fetch(newQuery, true)
   }
 

@@ -220,17 +220,38 @@ export const FormItemDatePickerRangePicker: React.FC<FormItemDatePickerRangePick
 
   const buildIgnoreFormItem = () => {
     if (useNames) {
-      return names.map((n: any, index: number) => (
-        <AntFormItem
-          name={n}
-          key={n}
-          initialValue={initialValue?.[index]}
-          hidden
-          shouldUpdate={defaultShouldUpdate}
-        >
-          <Input/>
-        </AntFormItem>
-      ))
+      return (
+        <>
+          <AntFormItem
+            name={names[0]}
+            key={names[0]}
+            initialValue={initialValue?.[0]}
+            hidden
+          >
+            <Input/>
+          </AntFormItem>
+          <AntFormItem
+            name={names[1]}
+            key={names[1]}
+            initialValue={initialValue?.[1]}
+            hidden
+            shouldUpdate={defaultShouldUpdate}
+          >
+            <Input/>
+          </AntFormItem>
+        </>
+      )
+      // return names.map((n: any, index: number) => (
+      //   <AntFormItem
+      //     name={n}
+      //     key={n}
+      //     initialValue={initialValue?.[index]}
+      //     hidden
+      //     shouldUpdate={defaultShouldUpdate}
+      //   >
+      //     <Input/>
+      //   </AntFormItem>
+      // ))
     }
     return (
       <AntFormItem

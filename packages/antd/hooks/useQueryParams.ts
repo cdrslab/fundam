@@ -49,11 +49,17 @@ export function useQueryParams(parseKeys: string[] = []) {
     }
 
     if (replace) {
-      nextParams = newParams
-    } else {
-      for (const key in newParams) {
-        const value = newParams[key]
-        if (value !== undefined && value !== null) {
+      nextParams = {}
+    }
+
+    for (const key in newParams) {
+      const value = newParams[key]
+      if (value !== undefined && value !== null && value !== '') {
+        if (Array.isArray(value)) {
+          if (value.length !== 0) {
+            nextParams[key] = String(value)
+          }
+        } else {
           nextParams[key] = String(value)
         }
       }
