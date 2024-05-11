@@ -1,5 +1,5 @@
 import React, {
-  forwardRef,
+  forwardRef, useCallback,
   useEffect,
   useImperativeHandle, useMemo,
   useRef,
@@ -240,7 +240,8 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
   useImperativeHandle(ref, () => ({
     fetch,
     refresh,
-  }), [])
+    getData: () => data
+  }), [data])
 
   // table缓存属性设置
   const onTableCacheChange = (key: string, value: any) => {
