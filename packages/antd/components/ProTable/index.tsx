@@ -117,6 +117,8 @@ export interface ProTableProps<T> extends Omit<AntTableProps, 'columns'>, GetDat
   onPaginationChange?: (page: number, pageSize: number) => Promise<void>
   // 更新参数并重新请求
   updateQueryAndFetch?: (search: Record<string, any> | string) => void
+  // table顶部的额外元素
+  tableTopExtra?: React.ReactNode
 }
 
 // 对应右上角各项操作图标，使用localstorage缓存
@@ -189,6 +191,8 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
     dataApiMethod,
     dataRule,
     resDataPath,
+
+    tableTopExtra,
 
     ...otherProps
   } = props
@@ -634,6 +638,9 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
       title={cardProps.title}
       style={cardProps.style}
     >
+      <div style={{ width: '100%', marginBottom: tableTopExtra ? '12px' : 0 }}>
+        {tableTopExtra}
+      </div>
       <AntTable
         {...antTableProps}
       />

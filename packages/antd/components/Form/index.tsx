@@ -97,7 +97,7 @@ export const Form: React.FC<FormProviderProps> = ({
           direction === 'horizontal' ?
             <Row gutter={[24, 12]}>
               {children}
-              <Col span={6}>
+              <Col span={buttonsLeftExtra ? 8 : 6}>
                 {buttonsLeftExtra}
                 <Button type="primary" style={{ marginRight: 8 }} onClick={onPrimaryButtonClick}>
                   {primaryButtonText}
