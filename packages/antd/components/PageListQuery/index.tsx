@@ -34,6 +34,8 @@ interface PageListQueryProps {
   tableCardProps?: Record<string, any>
   // 需要parse的query key，比如，传入：['page']，page: '1' => page: 1
   parseQueryKeys?: Array<string>
+  // 需要在列表请求前格式化为数组的key
+  parseArrayKeys?: string[]
   // 将表单插入table card的左侧标题处
   formInTableCardTitle?: boolean
   // 需要设置默认值的form or table props
@@ -60,6 +62,7 @@ export const PageListQuery: React.FC<PageListQueryProps> = (props) => {
     formCardFooter,
     tableCardProps = {},
     parseQueryKeys = [],
+    parseArrayKeys = [],
     formInTableCardTitle,
 
     formUseFormItemBorder = false,
@@ -70,7 +73,7 @@ export const PageListQuery: React.FC<PageListQueryProps> = (props) => {
     tableRowKey = 'id',
     tablePageKey = 'page',
     tablePageSizeKey = 'pageSize',
-    defaultPageSize = 20
+    defaultPageSize = 20,
   } = props
   const queryParseValueKeys = [tableProps.pageKey || tablePageKey, tableProps.pageSizeKey || tablePageSizeKey, ...parseQueryKeys]
   const [form] = useAntFormInstance()
@@ -178,6 +181,7 @@ export const PageListQuery: React.FC<PageListQueryProps> = (props) => {
         pageSizeKey={tablePageSizeKey}
         {...tableProps as any}
         ref={currentTableRef}
+        parseArrayKeys={parseArrayKeys}
         cacheKey={cacheKey + '_ProTable'}
       />
     </div>

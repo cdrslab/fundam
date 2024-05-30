@@ -8,5 +8,4 @@ export interface FormItemTextAreaProps extends FormItemCommonProps, Omit<AntText
 }
 
 const { TextArea } = Input
-TextArea.displayName = 'TextArea'
 export const FormItemTextArea: React.FC<FormItemTextAreaProps> = withFormItem(TextArea)

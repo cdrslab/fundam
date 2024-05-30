@@ -1,6 +1,6 @@
 // @ts-ignore
 import React, { ReactNode, useEffect, useRef, useState } from 'react'
-import { Col, Form, Input } from 'antd'
+import { Cascader, Checkbox, Col, Form, Input, Radio, Select } from 'antd'
 import { isDef } from '@fundam/utils'
 import { useLocalStorage } from '@fundam/hooks'
 import { FormItemProps as AntFormItemProps } from 'antd/es/form/FormItem'
@@ -37,18 +37,6 @@ export interface FormItemOptionalProps extends FormItemCommonProps {
   valueKey?: string
   childrenKey?: string
   isLeafKey?: string // 服务端控制cascade远程加载的层数
-}
-
-const getPlaceholder = (props: any, componentName: string): string => {
-  let { placeholder } = props
-  if (placeholder) return placeholder
-  if (['Input', 'TextArea'].includes(componentName)) {
-    placeholder = '请输入'
-  }
-  if (['Select', 'Cascader'].includes(componentName)) {
-    placeholder = '请选择'
-  }
-  return placeholder
 }
 
 export function withFormItem(WrappedComponent: any) {
@@ -114,8 +102,6 @@ export function withFormItem(WrappedComponent: any) {
       ...wrappedComponentProps
     } = props
 
-    const componentName = WrappedComponent.displayName as string
-
     const [loading, setLoading] = useState(wrappedComponentProps.loading || false) // 加载中
     const [options, setOptions] = useState(wrappedComponentProps.options || []) // 下拉组件等的options
     const { request } = useFun()
@@ -144,7 +130,7 @@ export function withFormItem(WrappedComponent: any) {
 
     useEffect(() => {
       // 处理cascade + loadData回显
-      if (!formItemValue || options?.length || componentName !== 'Cascader' || !loadDataKey) return
+      if (!formItemValue || options?.length || WrappedComponent !== Cascader || !loadDataKey) return
       initCascadeText()
     }, [formItemValue])
 
@@ -195,7 +181,7 @@ export function withFormItem(WrappedComponent: any) {
           setOptions(optionsCache)
           return
         }
-        if (componentName === 'Cascader' && loadDataKey) return
+        if (WrappedComponent === Cascader && loadDataKey) return
 
         const res = await fetchData()
         if (!searchKey) {
@@ -209,7 +195,7 @@ export function withFormItem(WrappedComponent: any) {
     }
 
     const optionsFormat = (optionValues: any) => {
-      if (componentName !== 'Cascader' || !loadDataKey) return formatDataToOptions(optionValues, labelKey, valueKey, childrenKey)
+      if (WrappedComponent !== Cascader || !loadDataKey) return formatDataToOptions(optionValues, labelKey, valueKey, childrenKey)
       if (loadDataMaxLayer) {
         // 前端控制层数
         const formItemValue = form.getFieldValue(name)
@@ -236,14 +222,14 @@ export function withFormItem(WrappedComponent: any) {
     const getDisplayValue = () => {
       const formItemValue = form.getFieldValue(name)
       if (!isDef(formItemValue)) return currentDisplayTextEmpty
-      if (['Select', 'Cascader', 'Radio', 'Checkbox'].includes(componentName) && options?.length) {
+      if ((WrappedComponent === Select || WrappedComponent === Cascader || WrappedComponent === Radio || WrappedComponent === Checkbox) && options?.length) {
         return getDisplayText(options, formItemValue, '，') || currentDisplayTextEmpty
       }
       return formItemValue
     }
 
     const defaultNormalize = (value: any, prevValue: any) => {
-      if (!isNumber || componentName !== 'Input') return value
+      if (!isNumber || WrappedComponent !== Input) return value
       if (value === '') return null
       // 兼容Input输入数字
       if (/^[1-9][0-9]*$/.test(value)) {
@@ -256,13 +242,13 @@ export function withFormItem(WrappedComponent: any) {
     // 仅form.setFieldsValue会触发，setFieldValue不会触发
     const defaultShouldUpdate = (prevValue: any, curValue: any) => {
       if (prevValue[name] === curValue[name]) return false
-      if (isNumber && componentName === 'Input') {
+      if (isNumber && WrappedComponent === Input) {
         const currentFormItemValue = curValue[name]
         if (typeof currentFormItemValue === 'string') {
           curValue[name] = parseInt(currentFormItemValue)
         }
       }
-      if (['Select', 'Cascader', 'Checkbox'].includes(componentName)) {
+      if (WrappedComponent === Select || WrappedComponent === Cascader || WrappedComponent === Checkbox) {
         // 多选数组，自动处理逗号分隔的值
         if (curValue[name] && typeof curValue[name] === 'string') {
           curValue[name] = wrappedComponentProps.mode ? curValue[name].split(',') : curValue[name]
@@ -310,6 +296,18 @@ export function withFormItem(WrappedComponent: any) {
       setOptions([...options])
     }
 
+    const getPlaceholder = (): string => {
+      const { placeholder } = wrappedComponentProps
+      if (placeholder) return placeholder
+      if (WrappedComponent === Input || WrappedComponent === Input.TextArea) {
+        return '请输入'
+      }
+      if (WrappedComponent === Select || WrappedComponent === Cascader) {
+        return '请选择'
+      }
+      return placeholder
+    }
+
     const buildComponent = () => {
       if (searchKey) {
         // 需要远程搜索 - 兼容配置
@@ -334,17 +332,17 @@ export function withFormItem(WrappedComponent: any) {
         // Cascade - loadData兼容
         wrappedComponentProps.loadData = loadData
       }
-      if (['Select', 'Cascader'].includes(componentName)) {
+      if (WrappedComponent === Select || WrappedComponent === Cascader) {
         return (
           <WrappedComponent
             {...wrappedComponentProps as any}
             options={options}
             loading={loading}
-            placeholder={getPlaceholder(props, componentName)}
+            placeholder={getPlaceholder()}
             disabled={wrappedComponentProps.disabled || currentDisplayType === 'disabled'}
           />
         )
-      } else if (['Radio', 'Checkbox'].includes(componentName)) {
+      } else if (WrappedComponent === Radio || WrappedComponent === Checkbox) {
         return (
           <WrappedComponent.Group
             {...wrappedComponentProps as any}
@@ -361,7 +359,7 @@ export function withFormItem(WrappedComponent: any) {
       return (
         <WrappedComponent
           {...wrappedComponentProps as any}
-          placeholder={getPlaceholder(props, componentName)}
+          placeholder={getPlaceholder()}
           disabled={wrappedComponentProps.disabled || currentDisplayType === 'disabled'}
         />
       )

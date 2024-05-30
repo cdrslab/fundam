@@ -17,7 +17,7 @@ import {
 } from 'antd'
 import { ButtonProps as AntButtonProps } from 'antd/es/button/button'
 import { CardProps } from 'antd/es/card/Card'
-import { debounce } from 'lodash'
+import { debounce, isArray } from 'lodash'
 import {
   CoffeeOutlined,
   ColumnHeightOutlined, CopyOutlined,
@@ -77,6 +77,8 @@ export interface ProTableProps<T> extends Omit<AntTableProps, 'columns'>, GetDat
   needUpdateQuery?: boolean
   // 需要parse的query key，比如，传入：['page']，page: '1' => page: 1
   parseQueryKeys?: Array<string>
+  // 请求前格式化为数组
+  parseArrayKeys?: Array<string>
   // 行唯一key
   rowKey: string
   columns: Array<ProTableColumnProps<T>>
@@ -176,6 +178,7 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
     pageNumbering,
     needUpdateQuery = false,
     parseQueryKeys = [],
+    parseArrayKeys = [],
 
     // 选择相关
     initSelectedRowKeys = [],
@@ -255,8 +258,23 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
     })
   }
 
+  const parseFetchParams = (params: any) => {
+    if (!parseArrayKeys || !parseArrayKeys.length) return params
+    parseArrayKeys.forEach((key: string) => {
+      if (isDef(params[key]) && !isArray(params[key])) {
+        if (typeof params[key] === 'string') {
+          params[key] = params[key].split(',')
+        } else {
+          params[key] = [params[key]]
+        }
+      }
+    })
+    return params
+  }
+
   const fetch = debounce(async (params: any = {}, replace = false) => {
     if (!dataApi && !dataFunc) return
+    params = parseFetchParams(params)
     try {
       setLoading(true)
       const requestData = replace ? { ...dataApiReqData, ...params } : {
