@@ -268,6 +268,9 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
           params[key] = [params[key]]
         }
       }
+      if (isArray(params[key]) && params[key].length === 0) {
+        params[key] = null
+      }
     })
     return params
   }
