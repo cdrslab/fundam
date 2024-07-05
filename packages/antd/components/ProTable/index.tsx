@@ -497,7 +497,7 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
                   <Divider style={{ margin: '8px 0' }} />
                   <Space style={{ padding: '4px 4px 12px 12px' }}>
                     <Input
-                      placeholder="查询名称"
+                      placeholder="快捷查询名称"
                       value={quickQueryName}
                       onChange={(e) => setQuickQueryName(e.target.value)}
                       onKeyDown={(e) => e.stopPropagation()}

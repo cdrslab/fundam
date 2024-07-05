@@ -1,6 +1,6 @@
 // @ts-ignore
 import React, { ReactNode, useEffect, useRef, useState } from 'react'
-import { Cascader, Checkbox, Col, Form, Input, Radio, Select } from 'antd'
+import { Button, Cascader, Checkbox, Col, Form, Input, message, Radio, Select } from 'antd'
 import { isDef } from '@fundam/utils'
 import { useLocalStorage } from '@fundam/hooks'
 import { FormItemProps as AntFormItemProps } from 'antd/es/form/FormItem'
@@ -8,14 +8,17 @@ import { debounce, get } from 'lodash'
 
 import { useForm } from '../../hooks/useForm';
 import { useFun } from '../../hooks/useFun'
-import { formatDataToOptions, getData, getDisplayText } from '../../shared/utils'
+import { copyToClipboard, formatDataToOptions, getData, getDisplayText } from '../../shared/utils'
 import { FormDisplayType, GetData } from '../../shared/types'
 import { FormItem } from '../FormItem'
+import { CopyOutlined } from '@ant-design/icons';
 
 export interface FunFormItemProps {
   rowCol?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24
   displayType?: FormDisplayType
   displayTextEmpty?: string
+  copyable?: boolean // 可复制
+  copyText?: string // 复制展示
   noLabel?: boolean // 不展示label（关联设置colon）
   visibleRule?: (() => boolean) | string
   observe?: Array<string>
@@ -54,6 +57,8 @@ export function withFormItem(WrappedComponent: any) {
       displayTextEmpty,
       noLabel = false,
       isNumber,
+      copyable = false,
+      copyText = '',
       // 请求接口相关
       dataFunc,
       dataApi,
@@ -425,6 +430,7 @@ export function withFormItem(WrappedComponent: any) {
           </>
         )
       }
+      const text = getDisplayValue()
       // 文字展示
       return (
         <FormItem
@@ -434,7 +440,21 @@ export function withFormItem(WrappedComponent: any) {
           visibleRule={visibleRule}
           observe={observe}
         >
-          <div className="fun-form-item-display-text">{getDisplayValue()}</div>
+          <div className="fun-form-item-display-text">
+            {text}
+            {
+              copyable && text !== currentDisplayTextEmpty ?
+                <Button
+                  type="link"
+                  icon={!copyText ? <CopyOutlined /> : null}
+                  style={{ padding: '0 0 0 2px', width: 'auto' }}
+                  onClick={() => {
+                    copyToClipboard(text)
+                  }}
+                >{copyText}</Button>
+                : null
+            }
+          </div>
         </FormItem>
       )
     }

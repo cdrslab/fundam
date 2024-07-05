@@ -1,6 +1,6 @@
 {
   "name": "@fundam/antd",
-  "version": "0.1.23",
+  "version": "0.1.24",
   "main": "dist/fundam-antd.umd.js",
   "module": "dist/fundam-antd.es.js",
   "types": "dist/index.d.ts",
@@ -16,8 +16,8 @@
     "@ant-design/icons": "^5.3.6",
     "antd": "^5.16.2",
     "dayjs": "^1.11.10",
-    "react-router": "^6.15.0",
-    "react-router-dom": "^6.15.0"
+    "react-router": "6.24.0",
+    "react-router-dom": "6.24.0"
   },
   "devDependencies": {
     "@fundam/eslint-config-custom": "*",

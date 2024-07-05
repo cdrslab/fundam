@@ -8,3 +8,58 @@
     border: 1px dashed #ff4d4f !important;
   }
 }
+
+.fun-upload-file-item {
+  width: 102px;
+  height: 102px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  .anticon {
+    width: 84px;
+    height: 84px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    svg {
+      width: 80%;
+      height: 80%;
+    }
+  }
+  .fun-upload-file-item-name {
+    max-width: 84px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 8px;
+    font-size: 12px;
+    line-height: 12px;
+  }
+  .fun-upload-file-item-hover-active {
+    position: absolute;
+    width: 84px;
+    height: 84px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    &:hover {
+      background: rgba(0, 0, 0, 0.4);
+      transition: .1s;
+      .fun-upload-file-item-operate-icon {
+        display: block;
+      }
+    }
+    .fun-upload-file-item-operate-icon {
+      width: 18px;
+      height: 18px;
+      color: white;
+      display: none;
+      cursor: pointer;
+    }
+  }
+}

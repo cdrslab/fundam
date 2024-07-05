@@ -295,3 +295,94 @@ export function parseQueryParams(url: string, parseQueryKeys: string[]): Record<
 
   return parsedParams
 }
+
+export function removeLastDotAndAfter(str: string): string {
+  const lastIndex = str.lastIndexOf('.')
+  if (lastIndex === -1) {
+    return str
+  }
+  return str.substring(0, lastIndex)
+}
+
+
+const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg', '.tiff']
+export const isImageResource = (url: string): boolean => {
+  if (!url) return false
+  const urlWithoutParams = url.split('?')[0]
+  return imageExtensions.some(ext => urlWithoutParams.toLowerCase().endsWith(ext))
+}
+
+export const getFileType = (url: string): string => {
+  if (!url) return 'unknown'
+  const urlWithoutParams = url.split('?')[0]
+  const urlArray = urlWithoutParams.split('.')
+  return urlArray[urlArray.length - 1].toLowerCase()
+}
+
+const fileIconClass: Record<string, string> = {
+  doc: 'icon-file-doc',
+  '7z': 'icon-file-7z',
+  eps: 'icon-file-eps',
+  csv: 'icon-file-csv',
+  mov: 'icon-file-mov',
+  mp4: 'icon-file-mp4',
+  txt: 'icon-file-txt',
+  pdf: 'icon-file-pdf',
+  rar: 'icon-file-rar',
+  ppt: 'icon-file-ppt',
+  psd: 'icon-file-psd',
+  xls: 'icon-file-xls',
+  xlsx: 'icon-file-xlsx',
+  svg: 'icon-file-svg',
+  zip: 'icon-file-zip',
+}
+export const getFileIconByUrl = (url: string): string => {
+  if (!url) return 'icon-file-empty'
+  const fileType = getFileType(url)
+  return fileIconClass[fileType] || 'icon-file-empty'
+}
+
+export const downloadFileByFetch = async (file: any, urlKey: string = 'url', nameKey: string = 'name') => {
+  const link = document.createElement('a')
+
+  const downloadBlob = (url: string, filename: string) => {
+    fetch(url)
+      .then(response => response.blob())
+      .then(blob => {
+        const blobUrl = window.URL.createObjectURL(blob)
+        link.href = blobUrl
+        link.download = filename
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        window.URL.revokeObjectURL(blobUrl)
+      })
+      .catch(error => {
+        console.error('Error downloading file:', error)
+      })
+  }
+
+  if (typeof file === 'string') {
+    const fileType = getFileType(file)
+    const filename = 'file.' + fileType
+    downloadBlob(file, filename)
+  } else {
+    const filename = file[nameKey] || file?.extra?.[nameKey] || 'file'
+    downloadBlob(file[urlKey], filename)
+  }
+}
+
+export const downloadFile = (file: any, urlKey: string = 'url', nameKey: string = 'name') => {
+  const link = document.createElement('a')
+  if (typeof file === 'string') {
+    const fileType = getFileType(file)
+    link.href = file
+    link.download = 'file.' + fileType
+  } else {
+    link.href = file[urlKey]
+    link.download = file[nameKey] || file?.extra?.[nameKey] || 'file'
+  }
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}

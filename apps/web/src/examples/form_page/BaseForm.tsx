@@ -19,7 +19,7 @@ export default () => {
   const [formDisplayType, setFormDisplayType] = useState<FormDisplayType>('default')
 
   useEffect(() => {
-    setFormDisplayType('text')
+    setFormDisplayType('default')
     // setFormDisplayType('text')
     // start: ['2024-03-07 00:00:00', '2024-03-07 23:59:59']
     // @ts-ignore

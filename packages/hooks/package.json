@@ -10,8 +10,8 @@
     "prepare": "npm run build"
   },
   "peerDependencies": {
-    "react-router": "^6.15.0",
-    "react-router-dom": "^6.15.0"
+    "react-router": "6.24.0",
+    "react-router-dom": "6.24.0"
   },
   "devDependencies": {
     "@fundam/eslint-config-custom": "*",

@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --port=5800",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint \"src/**/*.ts\""
@@ -15,8 +15,8 @@
     "mockjs": "^1.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router": "^6.22.3",
-    "react-router-dom": "^6.22.3"
+    "react-router": "6.24.0",
+    "react-router-dom": "6.24.0"
   },
   "devDependencies": {
     "@fundam/eslint-config-custom": "*",

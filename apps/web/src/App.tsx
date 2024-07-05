@@ -16,8 +16,8 @@ import List from './examples/list_page/List'
 
 // 模拟不同环境不同baseURL
 const getBaseURL = () => {
-  if (window.location.host.includes('.test.')) return '//localhost:5174'
-  return '//localhost:5174'
+  if (window.location.host.includes('.test.')) return '//localhost:5800'
+  return '//localhost:5800'
 }
 
 const App = () => {
