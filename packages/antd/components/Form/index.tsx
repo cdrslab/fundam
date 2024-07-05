@@ -28,7 +28,7 @@ export const Form: React.FC<FormProviderProps> = ({
   defaultButtonText,
   defaultButtonClick,
   collapseNames = [],
-  primaryButtonText = '提交',
+  primaryButtonText,
   primaryButtonClick,
   useFormItemBorder = false,
   // 注释说明见FormContextProps
@@ -99,9 +99,13 @@ export const Form: React.FC<FormProviderProps> = ({
               {children}
               <Col span={buttonsLeftExtra ? 8 : 6}>
                 {buttonsLeftExtra}
-                <Button type="primary" style={{ marginRight: 8 }} onClick={onPrimaryButtonClick}>
-                  {primaryButtonText}
-                </Button>
+                {
+                  primaryButtonText ?
+                    <Button type="primary" style={{ marginRight: 8 }} onClick={onPrimaryButtonClick}>
+                      {primaryButtonText}
+                    </Button>
+                    : null
+                }
                 {
                   defaultButtonText ?
                     <Button type="default" onClick={onDefaultButtonClick}>
@@ -126,18 +130,25 @@ export const Form: React.FC<FormProviderProps> = ({
             : (
               <>
                 {children}
-                <AntForm.Item label=" " colon={false}>
-                  {
-                    defaultButtonText ?
-                      <Button type="default" style={{ marginRight: 8 }} onClick={onDefaultButtonClick}>
-                        {defaultButtonText}
-                      </Button>
-                      : null
-                  }
-                  <Button type="primary" onClick={onPrimaryButtonClick}>
-                    {primaryButtonText}
-                  </Button>
-                </AntForm.Item>
+                {
+                  !defaultButtonText && !primaryButtonText ? null :
+                    <AntForm.Item label=" " colon={false}>
+                      {
+                        defaultButtonText ?
+                          <Button type="default" style={{ marginRight: 8 }} onClick={onDefaultButtonClick}>
+                            {defaultButtonText}
+                          </Button>
+                          : null
+                      }
+                      {
+                        primaryButtonText ?
+                          <Button type="primary" onClick={onPrimaryButtonClick}>
+                            {primaryButtonText}
+                          </Button>
+                          : null
+                      }
+                    </AntForm.Item>
+                }
               </>
             )
         }

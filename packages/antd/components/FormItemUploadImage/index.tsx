@@ -8,12 +8,12 @@ import axios from 'axios'
 
 import './index.less'
 import { FunIcon } from '../FunIcon'
-import { downloadFile, getFileIconByUrl, getFileType, isImageResource, removeLastDotAndAfter } from '../../shared/utils'
+import { downloadFile, getFileIconByUrl, isImageResource, removeLastDotAndAfter } from '../../shared/utils'
 import { useForm } from '../../hooks/useForm'
 import { GetData } from '../../shared/types'
 import { UploadListType } from 'antd/es/upload/interface';
 
-interface FormItemUploadImageProps extends FormItemProps, Omit<UploadProps, 'children' | 'name' | 'fileList'>, Omit<GetData, 'dataFunc'> {
+interface FormItemUploadImageProps extends Omit<FormItemProps, 'wrapperCol' | 'labelCol'>, Omit<UploadProps, 'children' | 'name' | 'fileList'>, Omit<GetData, 'dataFunc'> {
   uploadName?: string
   isString?: boolean
   isObject?: boolean
@@ -22,6 +22,8 @@ interface FormItemUploadImageProps extends FormItemProps, Omit<UploadProps, 'chi
   separator?: string
   maxErrorMessage?: string
   displayType?: string
+  wrapperCol?: number | any
+  labelCol?: number | any
 }
 
 export const FormItemUploadImage: React.FC<FormItemUploadImageProps> = ({
@@ -177,6 +179,8 @@ export const FormItemUploadImage: React.FC<FormItemUploadImageProps> = ({
     }
   }
 
+  const currentRules = formItemProps.required ? (formItemProps.rules || [{ required: true, message: `${formItemProps.label || '该字段'}为必填字段` }]) : []
+
   const uploadProps = {
     accept,
     action,
@@ -263,8 +267,7 @@ export const FormItemUploadImage: React.FC<FormItemUploadImageProps> = ({
 
   return (
     <>
-      <Form.Item hidden name={formItemProps.name} initialValue={formItemProps.initialValue} />
-      <Form.Item {...formItemProps} name={null} style={{ marginBottom: 32 }}>
+      <Form.Item {...formItemProps} rules={currentRules} style={{ marginBottom: 32 }}>
         <Upload
           {...uploadProps}
           disabled={uploadProps.disabled || currentDisplayType === 'disabled' || currentDisplayType === 'text'}
