@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Form, Upload, Image, message } from 'antd'
-import { UploadOutlined, DownloadOutlined, DeleteOutlined, EyeOutlined, CloudDownloadOutlined } from '@ant-design/icons'
+import { UploadOutlined, DownloadOutlined, DeleteOutlined } from '@ant-design/icons'
 import { UploadProps, UploadChangeParam } from 'antd/lib/upload'
 import { FormItemProps } from 'antd/lib/form'
 import { get } from 'lodash'
@@ -10,7 +10,7 @@ import './index.less'
 import { FunIcon } from '../FunIcon'
 import { downloadFile, getFileIconByUrl, isImageResource, removeLastDotAndAfter } from '../../shared/utils'
 import { useForm } from '../../hooks/useForm'
-import { GetData } from '../../shared/types'
+import { FormDisplayType, GetData } from '../../shared/types'
 import { UploadListType } from 'antd/es/upload/interface';
 
 interface FormItemUploadImageProps extends Omit<FormItemProps, 'wrapperCol' | 'labelCol'>, Omit<UploadProps, 'children' | 'name' | 'fileList'>, Omit<GetData, 'dataFunc'> {
@@ -21,7 +21,7 @@ interface FormItemUploadImageProps extends Omit<FormItemProps, 'wrapperCol' | 'l
   objectFileNamePath?: string
   separator?: string
   maxErrorMessage?: string
-  displayType?: string
+  displayType?: FormDisplayType
   wrapperCol?: number | any
   labelCol?: number | any
 }
@@ -79,7 +79,10 @@ export const FormItemUploadImage: React.FC<FormItemUploadImageProps> = ({
   const currentDisplayType = displayType || formDisplayType
 
   useEffect(() => {
-    if (!formItemValue) return
+    if (!formItemValue) {
+      setFileList([])
+      return
+    }
     if (typeof formItemValue === 'string') {
       setFileList(formItemValue.split(separator).map(url => ({
         uid: url,
@@ -129,10 +132,17 @@ export const FormItemUploadImage: React.FC<FormItemUploadImageProps> = ({
 
   // 手动删除
   const onManualRemove = (file: any) => {
-    const newFormItemValue = formItemValue.filter((item: any) => !(file.uid === item.uid || file.uid === item.url || file.url === item.url || file.url === item.uid))
-    form.setFieldsValue({
-      [formItemProps.name]: newFormItemValue
-    })
+    if (file.status !== 'done') {
+      // 还没有上传完成，需要处理内部状态
+      const newFileList = fileList.filter((item: any) => !(file.uid === item.uid || file.uid === item.url || file.url === item.url || file.url === item.uid))
+      setFileList(newFileList)
+    } else {
+      // 上传完成直接处理表单数据
+      const newFormItemValue = formItemValue.filter((item: any) => !(file.uid === item.uid || file.uid === item.url || file.url === item.url || file.url === item.uid))
+      form.setFieldsValue({
+        [formItemProps.name]: newFormItemValue
+      })
+    }
   }
 
   const handleChange = async (info: UploadChangeParam) => {
@@ -161,6 +171,7 @@ export const FormItemUploadImage: React.FC<FormItemUploadImageProps> = ({
         return
       }
     } else if (info.file.status === 'error') {
+      onManualRemove(info.file)
       message.error(`${info.file.name} 文件上传失败`)
       return
     }
@@ -193,19 +204,28 @@ export const FormItemUploadImage: React.FC<FormItemUploadImageProps> = ({
     isImageUrl,
     itemRender: (originNode: any, file: any) => {
       if (!isImageResource(file.url)) {
+        // 动画有点丑
+        // if (file.status === 'uploading') return originNode
         return (
           <div className="fun-upload-file-item">
             <FunIcon type={getFileIconByUrl(file.url)} />
             <span className="fun-upload-file-item-name">{file?.extra?.[objectFileNamePath]}</span>
             <div className="fun-upload-file-item-hover-active">
-              <CloudDownloadOutlined
-                style={{ marginRight: 4 }}
+              <DownloadOutlined
                 className="fun-upload-file-item-operate-icon"
                 onClick={() => {
                   downloadFile(file, objectUrlPath, objectFileNamePath)
                 }}
               />
-              <DeleteOutlined className="fun-upload-file-item-operate-icon" onClick={() => onManualRemove(file)} />
+              {
+                currentDisplayType === 'default' ?
+                  <DeleteOutlined
+                    className="fun-upload-file-item-operate-icon"
+                    onClick={() => onManualRemove(file)}
+                    style={{ marginLeft: 4 }}
+                  />
+                  : null
+              }
             </div>
           </div>
         )
@@ -272,7 +292,7 @@ export const FormItemUploadImage: React.FC<FormItemUploadImageProps> = ({
           {...uploadProps}
           disabled={uploadProps.disabled || currentDisplayType === 'disabled' || currentDisplayType === 'text'}
         >
-          {fileList.length >= maxCount ? null : <div><UploadOutlined/> 上传</div>}
+          {(fileList.length >= maxCount) || currentDisplayType === 'text' ? null : <div><UploadOutlined/> 上传</div>}
         </Upload>
         <div style={{display: 'none'}}>
           <Image.PreviewGroup

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Form } from 'antd'
 import { isStringArray } from '@fundam/utils'
 import queryString from 'query-string'
-import { useLocation } from 'react-router'
+import { useLocation } from 'react-router-dom'
 
 import { evaluateExpression, extractDependenciesFromString, getData } from '../../shared/utils'
 import { useFun } from '../../hooks/useFun'

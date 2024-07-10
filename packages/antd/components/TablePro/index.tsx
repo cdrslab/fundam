@@ -26,7 +26,7 @@ import { get, union } from 'lodash'
 import { isDef } from '@fundam/utils'
 import { ButtonProps as AntButtonProps } from 'antd/es/button/button';
 import { ColumnsType, ColumnType } from 'antd/es/table';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import queryString from 'query-string';
 
 import { TableProps, CacheTableData, TableRowButton } from '../Table'

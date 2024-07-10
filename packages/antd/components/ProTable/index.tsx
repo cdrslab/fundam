@@ -26,7 +26,7 @@ import {
   ReloadOutlined,
   SettingOutlined
 } from '@ant-design/icons'
-import { useNavigate } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 import { union } from 'lodash'
 import { isDef } from '@fundam/utils'
 
@@ -69,12 +69,24 @@ export interface ProTableColumnProps<T> extends Omit<AntTableColumnProps<T>, 'ke
   onClick?: (record: T) => void
   // 可复制 & 点击触发，返回值为赋值的value
   onCopy?: (record: T) => string | undefined
+  // 改写复制为文案
+  copyButtonText?: string
 }
 
 // T为table行（record）的Model
-export interface ProTableProps<T> extends Omit<AntTableProps, 'columns'>, GetData {
+export interface ProTableProps<T> extends Omit<AntTableProps, 'columns' | 'scroll'>, GetData {
+  // 初始化请求？默认不请求
+  needInitFetch?: boolean
   // 使用query
   needUpdateQuery?: boolean
+  // 使用卡片嵌套
+  useCard?: boolean
+  // 滚动类型（参考antd）
+  scroll?: {
+    scrollToFirstRowOnChange?: boolean
+    x?: string | number | true | null
+    y?: string | number
+  }
   // 需要parse的query key，比如，传入：['page']，page: '1' => page: 1
   parseQueryKeys?: Array<string>
   // 请求前格式化为数组
@@ -121,6 +133,8 @@ export interface ProTableProps<T> extends Omit<AntTableProps, 'columns'>, GetDat
   updateQueryAndFetch?: (search: Record<string, any> | string) => void
   // table顶部的额外元素
   tableTopExtra?: React.ReactNode
+  // 响应数据格式化
+  resFormat?: (res: any) => any
 }
 
 // 对应右上角各项操作图标，使用localstorage缓存
@@ -176,9 +190,12 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
     totalKey = 'total',
     emptyValue = '-',
     pageNumbering,
+    needInitFetch = false,
     needUpdateQuery = false,
+    useCard = true,
     parseQueryKeys = [],
     parseArrayKeys = [],
+    resFormat = (res: any) => res,
 
     // 选择相关
     initSelectedRowKeys = [],
@@ -250,6 +267,11 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
     getData: () => data
   }), [data])
 
+  useEffect(() => {
+    if (!needInitFetch) return
+    fetch()
+  }, [])
+
   // table缓存属性设置
   const onTableCacheChange = (key: string, value: any) => {
     setTableCache({
@@ -286,7 +308,7 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
         [pageSizeKey]: initPageSize,
         ...params
       }
-      const res = await getData({
+      let res = await getData({
         dataApi,
         dataFunc,
         dataApiMethod,
@@ -297,6 +319,9 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
 
       // 未请求到数据，不更新
       if (!res) return
+
+      // 响应数据格式化
+      res = resFormat(res)
 
       // 缓存本次请求参数
       cacheLastRequestParamsRef.current = { ...requestData }
@@ -551,7 +576,7 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
         ),
         key: column.dataIndex
       }
-      if (column.onClick) currentColumn.render = (_: any, record: any) => <TableRowButton onClick={column.onClick}>{record[column.dataIndex]}</TableRowButton>
+      if (column.onClick) currentColumn.render = (_: any, record: any) => <TableRowButton onClick={() => column.onClick(record)}>{record[column.dataIndex]}</TableRowButton>
       tableColumns.push(currentColumn)
       return
     }
@@ -560,7 +585,7 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
       if (column.onClick) {
         tableColumns.push({
           ...column,
-          render: (text: any, record: any) => isDef(text) && text !== '' ? <TableRowButton onClick={column.onClick}>{column.maxLine ? <TextWithTooltip text={text} maxLine={column.maxLine}/> : text}</TableRowButton> : <span>{emptyValue}</span>,
+          render: (text: any, record: any) => isDef(text) && text !== '' ? <TableRowButton onClick={() => column.onClick(record)}>{column.maxLine ? <TextWithTooltip text={text} maxLine={column.maxLine}/> : text}</TableRowButton> : <span>{emptyValue}</span>,
           key: column.dataIndex
         })
       } else {
@@ -575,6 +600,13 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
     }
   })
 
+  // 兼容antd column align
+  const columnAligns: Record<string, string> = {
+    left: 'flex-start',
+    right: 'flex-end',
+    center: 'center',
+  }
+
   // 使用缓存的宽度 & onCopy处理
   tableColumns = tableColumns.map((item) => ({
     ...item,
@@ -586,13 +618,13 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
     render: (text: any, record: any, index: number) => {
       const originalRender = item.render ? item.render(text, record, index) : text
       return (
-        <span style={{ display: 'flex', alignItems: 'center' }}>
+        <span style={{ display: 'flex', alignItems: 'center', justifyContent: columnAligns[item.align || 'left'] }}>
           {originalRender}
           {
             item.onCopy ?
               <Button
                 type="link"
-                icon={<CopyOutlined />}
+                icon={item.copyButtonText ? null : <CopyOutlined />}
                 style={{ padding: '0 0 0 2px', width: 'auto' }}
                 onClick={() => {
                   const copyText = item.onCopy?.(record);
@@ -602,7 +634,7 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
                     message.error('复制失败');
                   }
                 }}
-              />
+              >{item.copyButtonText}</Button>
               : null
           }
         </span>
@@ -626,7 +658,7 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
     loading,
     columns: tableColumns,
     size: tableCache?.size || otherProps.size || 'small',
-    scroll: otherProps.scroll || { x: 'max-content' },
+    scroll: otherProps.scroll === undefined ? { x: 'max-content' } : otherProps.scroll,
     dataSource: listData,
     // 增加拖动调整宽度功能
     components: {
@@ -652,19 +684,31 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
     }
   }
 
+  if (useCard) {
+    return (
+      <Card
+        bordered={false}
+        extra={buildExtra()}
+        title={cardProps.title}
+        style={cardProps.style}
+      >
+        <div style={{ width: '100%', marginBottom: tableTopExtra ? '12px' : 0 }}>
+          {tableTopExtra}
+        </div>
+        <AntTable
+          {...antTableProps}
+        />
+      </Card>
+    )
+  }
   return (
-    <Card
-      bordered={false}
-      extra={buildExtra()}
-      title={cardProps.title}
-      style={cardProps.style}
-    >
+    <>
       <div style={{ width: '100%', marginBottom: tableTopExtra ? '12px' : 0 }}>
         {tableTopExtra}
       </div>
       <AntTable
         {...antTableProps}
       />
-    </Card>
+    </>
   )
 })
