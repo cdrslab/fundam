@@ -7,6 +7,7 @@ import { GetData } from '@fundam/antd/dist/shared/types'
 import './index.less'
 import { getData } from '../../shared/utils'
 import { useFun } from '../../hooks/useFun'
+import { isDef } from '@fundam/utils'
 
 interface ModalFormProps extends GetData {
   // 打开/关闭弹窗状态
@@ -29,6 +30,8 @@ interface ModalFormProps extends GetData {
   modalProps?: any
   // Form Props
   formProps?: any
+  // 初始化数据
+  initialValue?: any
 }
 
 export const ModalForm: React.FC<ModalFormProps> = (props) => {
@@ -48,7 +51,8 @@ export const ModalForm: React.FC<ModalFormProps> = (props) => {
     successMessage = '保存成功',
     errorMessage = '保存失败',
     modalProps = {},
-    formProps = {}
+    formProps = {},
+    initialValue
   } = props
   const [loading, setLoading] = useState(false)
   const [form] = useAntFormInstance()
@@ -57,6 +61,9 @@ export const ModalForm: React.FC<ModalFormProps> = (props) => {
   useEffect(() => {
     // 关闭弹窗时，重置表单
     if (!open) form.resetFields()
+    if (isDef(initialValue)) {
+      form.setFieldsValue(initialValue)
+    }
   }, [open])
 
   const handleOk = async () => {
@@ -90,6 +97,7 @@ export const ModalForm: React.FC<ModalFormProps> = (props) => {
         animateFailure()
       }
     } catch (error) {
+      setLoading(false)
       animateFailure()
     }
   }
