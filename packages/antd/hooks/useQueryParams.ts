@@ -33,7 +33,20 @@ export function useQueryParams(parseKeys: string[] = []) {
     // @ts-ignore
     for (const [key, value] of searchParams) {
       if (value !== 'undefined' && value !== 'null' && value !== undefined && value !== null) {
-        params[key] = value
+        try {
+          if (parseKeys.includes(key)) {
+            if (value.split(',')?.length > 1) {
+              // 多选
+              params[key] = value.split(',').map((item: any) => JSON.parse(item))
+            } else {
+              params[key] = JSON.parse(value)
+            }
+          } else {
+            params[key] = value
+          }
+        } catch (e) {
+          params[key] = value
+        }
       }
     }
     return params

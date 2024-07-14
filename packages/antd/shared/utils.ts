@@ -165,7 +165,7 @@ export const evaluateExpression = (
 // 自动收集依赖
 type ExtractDependenciesFromString = (expression: string) => string[];
 export const extractDependenciesFromString: ExtractDependenciesFromString = (expression) => {
-  if (!expression) return []
+  if (!expression || typeof expression === 'boolean') return []
 
   const regex = /(?:^|[^.\w])(?!Query\.)[a-zA-Z_$][\w$]*/g
   let match

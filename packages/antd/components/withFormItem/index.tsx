@@ -20,8 +20,9 @@ export interface FunFormItemProps {
   copyable?: boolean // 可复制
   copyText?: string // 复制展示
   noLabel?: boolean // 不展示label（关联设置colon）
-  visibleRule?: (() => boolean) | string
+  visibleRule?: (() => boolean) | string | boolean
   observe?: Array<string>
+  needInitFetch?: boolean // 是否需要首次请求（用于select、cascade等初始化数据），默认请求
   // names?: Array<string>
 }
 
@@ -55,6 +56,7 @@ export function withFormItem(WrappedComponent: any) {
       rowCol,
       displayType,
       displayTextEmpty,
+      needInitFetch = true,
       noLabel = false,
       isNumber,
       copyable = false,
@@ -127,6 +129,10 @@ export function withFormItem(WrappedComponent: any) {
     const formItemValue = Form.useWatch(name, form as any)
 
     useEffect(() => {
+      if (!needInitFetch) {
+        initRef.current = true
+        return
+      }
       if (!initRef.current) {
         init()
         initRef.current = true

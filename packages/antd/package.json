@@ -36,6 +36,7 @@
   "dependencies": {
     "@fundam/hooks": "*",
     "@fundam/utils": "*",
+    "framer-motion": "^11.3.2",
     "lodash": "^4.17.21",
     "query-string": "^9.0.0",
     "react": "^18.2.0",

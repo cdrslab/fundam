@@ -20,23 +20,16 @@ export const FormItem: React.FC<any> = ({
   ...antProps
 }) => {
   const { name } = antProps
+  const initRef = useRef(false)
+  const { request } = useFun()
+  const location = useLocation()
+  const { form } = useForm()
   const [curTooltip, setCurTooltip] = useState(null)
   const [curExtra, setCurExtra] = useState(null)
-  const { request } = useFun()
-  const { form } = useForm()
   const [isVisible, setIsVisible] = useState(true)
-  const location = useLocation()
-  const initRef = useRef(false)
 
   const curObserve = observe?.length ? observe : extractDependenciesFromString(visibleRule)
-  const watchValues = curObserve?.map((item: string) => Form.useWatch(item, form as any))
-
-  useEffect(() => {
-    if (!initRef.current) {
-      init()
-      initRef.current = true
-    }
-  }, [])
+  const watchValues = curObserve?.length ? curObserve?.map((item: string) => Form.useWatch(item, form as any)) : []
 
   // 依赖自动收集与联动实现
   useEffect(() => {
@@ -47,7 +40,14 @@ export const FormItem: React.FC<any> = ({
     if (isVisible) return
     // 隐藏时，重置
     form.resetFields([name])
-  }, [isVisible]);
+  }, [isVisible])
+
+  useEffect(() => {
+    if (!initRef.current) {
+      init()
+      initRef.current = true
+    }
+  }, [])
 
   const evaluateVisibility = () => {
     if (typeof visibleRule === 'string') {
@@ -65,7 +65,7 @@ export const FormItem: React.FC<any> = ({
     setCurExtra(isStringArray(extraRes) ? extraRes.join('\n') : extraRes)
   }
 
-  if (visibleRule && !isVisible) return null
+  if ((typeof visibleRule === 'boolean' && !visibleRule) || (visibleRule && !isVisible)) return null
 
   // 默认为联动子项，靠近父级
   const style = antProps.label === ' ' && watchValues?.length && visibleRule ? {

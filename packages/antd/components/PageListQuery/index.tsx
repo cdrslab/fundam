@@ -89,12 +89,16 @@ export const PageListQuery: React.FC<PageListQueryProps> = (props) => {
       }
     }
     currentTableRef?.current?.fetch(query, true)
+
+    // 数据回显
+    // form.resetFields();
+    // form.setFieldsValue({ ...realQuery });
   }, [])
 
   useEffect(() => {
     // 数据回显
     form.resetFields();
-    form.setFieldsValue({ ...query });
+    form.setFieldsValue({ ...realQuery });
     // currentTableRef?.current?.fetch(query, true)
   }, [query])
 

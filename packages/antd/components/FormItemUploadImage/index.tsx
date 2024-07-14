@@ -204,12 +204,15 @@ export const FormItemUploadImage: React.FC<FormItemUploadImageProps> = ({
     isImageUrl,
     itemRender: (originNode: any, file: any) => {
       if (!isImageResource(file.url)) {
+        let fileUrlArray = file.url.split('?')[0]
+        fileUrlArray = fileUrlArray.split('/')
+        const defaultFileName = fileUrlArray[fileUrlArray.length - 1]
         // 动画有点丑
         // if (file.status === 'uploading') return originNode
         return (
           <div className="fun-upload-file-item">
             <FunIcon type={getFileIconByUrl(file.url)} />
-            <span className="fun-upload-file-item-name">{file?.extra?.[objectFileNamePath]}</span>
+            <span className="fun-upload-file-item-name">{file?.extra?.[objectFileNamePath] || defaultFileName}</span>
             <div className="fun-upload-file-item-hover-active">
               <DownloadOutlined
                 className="fun-upload-file-item-operate-icon"
