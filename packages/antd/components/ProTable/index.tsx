@@ -123,6 +123,8 @@ export interface ProTableProps<T> extends Omit<AntTableProps, 'columns' | 'scrol
   selectedMaxRow?: number
   // 超出选择行数限制
   selectedMaxRowErrorMessage?: string
+  // 已选中需置灰的数据，如 [1,2]，[rowKey] 为 1 or 2 的行会置灰
+  selectedDisabledRows?: Array<string | number>
   // 选中的key改变时
   onSelectedRowKeysChange?: (selectedRowKeys: Array<any>) => void
   // 选中的record改变时
@@ -201,6 +203,7 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
     initSelectedRowKeys = [],
     selectedMaxRow,
     selectedMaxRowErrorMessage = '超出限制',
+    selectedDisabledRows = [],
     onSelectedRowKeysChange,
     onSelectedRowRecordsChange,
     onPaginationChange,
@@ -681,6 +684,9 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
       selectedRowKeys: selectedRowKeys,
       onSelect: onTableSelect,
       onSelectAll: onTableSelectAll,
+      getCheckboxProps: (record: any) => ({
+        disabled: selectedDisabledRows.includes(record[rowKey])
+      })
     }
   }
 

@@ -203,6 +203,7 @@ export const FormItemUploadImage: React.FC<FormItemUploadImageProps> = ({
     iconRender,
     isImageUrl,
     itemRender: (originNode: any, file: any) => {
+      if (!file.url) return originNode
       if (!isImageResource(file.url)) {
         let fileUrlArray = file.url.split('?')[0]
         fileUrlArray = fileUrlArray.split('/')
