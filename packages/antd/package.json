@@ -1,6 +1,6 @@
 {
   "name": "@fundam/antd",
-  "version": "0.1.28",
+  "version": "0.1.29",
   "main": "dist/fundam-antd.umd.js",
   "module": "dist/fundam-antd.es.js",
   "types": "dist/index.d.ts",

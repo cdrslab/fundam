@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { Modal, message, Button } from 'antd'
-import { Form, useAntFormInstance } from '@fundam/antd'
+
 import { motion } from 'framer-motion'
-import { GetData } from '@fundam/antd/dist/shared/types'
 
 import './index.less'
 import { getData } from '../../shared/utils'
+import { GetData } from '../../shared/types'
 import { useFun } from '../../hooks/useFun'
+import { Form } from '../Form'
+import { useAntFormInstance } from '../../hooks/useAntFormInstance'
 import { isDef } from '@fundam/utils'
 
 interface ModalFormProps extends GetData {

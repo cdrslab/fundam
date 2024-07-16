@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { Modal, message, Button } from 'antd'
 import { motion } from 'framer-motion'
-import { GetData } from '@fundam/antd/dist/shared/types'
 
 import './index.less'
 import { getData } from '../../shared/utils'
+import { GetData } from '../../shared/types'
 import { useFun } from '../../hooks/useFun'
 import {
   CheckCircleFilled,
