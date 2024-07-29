@@ -15,11 +15,13 @@ interface FormProviderProps extends Partial<Omit<FormContextProps, 'form'>>, Omi
   defaultButtonText?: string // 白色按钮文案，不传则不展示
   defaultButtonClick?: (form: FunFormInstance) => void
   primaryButtonText?: string // 蓝色按钮文案，默认：提交
-  primaryButtonClick?: (form: FunFormInstance) => void
+  primaryButtonClick?: (form: FunFormInstance) => Promise<void>
   collapseNames?: Array<string> // 收起的表单项（name区分）
   useFormItemBorder?: boolean // 使用FormItem边框样式
   buttonsLeftExtra?: React.ReactNode // 按钮组左侧添加自定义组件
   hiddenFormItems?: React.ReactNode // 嵌入的隐藏form items
+  useLoading?: boolean // 使用loading
+  loading?: boolean // 外部控制是否loading展示
 }
 
 export const Form: React.FC<FormProviderProps> = ({
@@ -43,9 +45,13 @@ export const Form: React.FC<FormProviderProps> = ({
   wrapperCol,
   buttonsLeftExtra,
   hiddenFormItems,
+  useLoading = true,
+  loading = false,
   ...antProps
 }) => {
   const [formCollapse, setFormCollapse] = useState(true) // 表单展开收起（默认收起）
+  // loading展示
+  const [primaryButtonLoading, setPrimaryButtonLoading] = useState(loading)
 
   const providerValue = {
     form,
@@ -66,8 +72,16 @@ export const Form: React.FC<FormProviderProps> = ({
     defaultButtonClick && defaultButtonClick(form)
   }
 
-  const onPrimaryButtonClick = () => {
-    primaryButtonClick && primaryButtonClick(form)
+  const onPrimaryButtonClick = async () => {
+    try {
+      console.log('-----xxxx')
+      if (useLoading) setPrimaryButtonLoading(true)
+      if (primaryButtonClick) await primaryButtonClick(form)
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setPrimaryButtonLoading(false)
+    }
   }
 
   // TODO 读取项目中的 .funconfig 基础配置 或者类似 antd 的 config provider 处理，最终 merge 系统配置替换下面 { span: 6 }....，待实现
@@ -142,7 +156,7 @@ export const Form: React.FC<FormProviderProps> = ({
                       }
                       {
                         primaryButtonText ?
-                          <Button type="primary" onClick={onPrimaryButtonClick}>
+                          <Button type="primary" onClick={onPrimaryButtonClick} loading={primaryButtonLoading}>
                             {primaryButtonText}
                           </Button>
                           : null

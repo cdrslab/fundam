@@ -137,6 +137,8 @@ export interface ProTableProps<T> extends Omit<AntTableProps, 'columns' | 'scrol
   tableTopExtra?: React.ReactNode
   // 响应数据格式化
   resFormat?: (res: any) => any
+  // 选择类似
+  rowSelectionType?: 'checkbox' | 'radio'
 }
 
 // 对应右上角各项操作图标，使用localstorage缓存
@@ -207,6 +209,7 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
     onSelectedRowKeysChange,
     onSelectedRowRecordsChange,
     onPaginationChange,
+    rowSelectionType = 'checkbox',
 
     dataFunc,
     dataApi,
@@ -381,24 +384,31 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
     return selectData && selectData.length <= selectedMaxRow
   }
   const onTableSelect = (record: any, selected: boolean) => {
-    const newSelectedRowKeys: Array<any> = [...selectedRowKeys]
-    const newSelectedRowRecords: Array<any> = [...selectedRowRecords]
 
-    if (selected) {
-      // 选中
-      newSelectedRowKeys.push(record[rowKey as string])
-      newSelectedRowRecords.push(record)
-
-      if (!selectLengthCheck(newSelectedRowKeys)) {
-        message.error(selectedMaxRowErrorMessage)
-        return
-      }
-
-      setSelectedRowKeys(newSelectedRowKeys)
-      setSelectedRowRecords(newSelectedRowRecords)
+    if (rowSelectionType === 'radio') {
+      // 单选
+      setSelectedRowKeys([record[rowKey as string]])
+      setSelectedRowRecords([record])
     } else {
-      setSelectedRowKeys(arrayRemoveByValues(newSelectedRowKeys, [record[rowKey as string]]))
-      setSelectedRowRecords(objArrayRemoveByValuesKey(newSelectedRowRecords, [record], rowKey as string))
+      // 多选
+      const newSelectedRowKeys: Array<any> = [...selectedRowKeys]
+      const newSelectedRowRecords: Array<any> = [...selectedRowRecords]
+      if (selected) {
+        // 选中
+        newSelectedRowKeys.push(record[rowKey as string])
+        newSelectedRowRecords.push(record)
+
+        if (!selectLengthCheck(newSelectedRowKeys)) {
+          message.error(selectedMaxRowErrorMessage)
+          return
+        }
+
+        setSelectedRowKeys(newSelectedRowKeys)
+        setSelectedRowRecords(newSelectedRowRecords)
+      } else {
+        setSelectedRowKeys(arrayRemoveByValues(newSelectedRowKeys, [record[rowKey as string]]))
+        setSelectedRowRecords(objArrayRemoveByValuesKey(newSelectedRowRecords, [record], rowKey as string))
+      }
     }
   }
   const onTableSelectAll = (selected: boolean) => {
@@ -681,6 +691,7 @@ export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
   // 行可选
   if ((onSelectedRowKeysChange || onSelectedRowRecordsChange) && !antTableProps.rowSelection) {
     antTableProps.rowSelection = {
+      type: rowSelectionType,
       selectedRowKeys: selectedRowKeys,
       onSelect: onTableSelect,
       onSelectAll: onTableSelectAll,
