@@ -12,6 +12,7 @@
     "build": "vite build",
     "prepare": "npm run build"
   },
+  "readme": "README.md",
   "peerDependencies": {
     "@ant-design/icons": "^5.3.6",
     "antd": "^5.16.2",
