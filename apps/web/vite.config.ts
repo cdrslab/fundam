@@ -17,6 +17,7 @@ export default defineConfig({
     alias: {
       '@fundam/antd': path.resolve(__dirname,  '../../packages/antd/index.ts'),
       '@fundam/utils': path.resolve(__dirname,  '../../packages/utils/index.ts'),
+      '@fundam/hooks': path.resolve(__dirname,  '../../packages/hooks/index.ts'),
     }
   }
 });
