@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "code": 200,
+  "data": {
+    "id": 36,
+    "nameZH": "中国",
+    "nameEN": "China",
+    "nameLocal": "中国",
+    "emojiFlag": "🇨🇳",
+    "regionCode": "86",
+    "languageCountryCode": "zh-CN",
+    "continent": "Asia",
+    "timezone": "Asia/Shanghai"
+  }
+}

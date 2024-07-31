@@ -24,8 +24,8 @@ export const FormItem: React.FC<any> = ({
   const { request } = useFun()
   const location = useLocation()
   const { form } = useForm()
-  const [curTooltip, setCurTooltip] = useState(null)
-  const [curExtra, setCurExtra] = useState(null)
+  const [curTooltip, setCurTooltip] = useState<any>(null)
+  const [curExtra, setCurExtra] = useState<any>(null)
   const [isVisible, setIsVisible] = useState(true)
 
   const curObserve = observe?.length ? observe : extractDependenciesFromString(visibleRule)
@@ -59,10 +59,21 @@ export const FormItem: React.FC<any> = ({
   }
 
   const init = async () => {
-    const tooltipRes = await getData(tooltip as any, request)
-    const extraRes = await getData(extra as any, request)
-    setCurTooltip(isStringArray(tooltipRes) ? tooltipRes.join('\n') : tooltipRes)
-    setCurExtra(isStringArray(extraRes) ? extraRes.join('\n') : extraRes)
+    if (typeof tooltip === 'string') {
+      setCurTooltip(tooltip)
+    }
+    if (tooltip?.dataFunc || tooltip?.dataApi) {
+      const tooltipRes = await getData(tooltip as any, request)
+      setCurTooltip(isStringArray(tooltipRes) ? tooltipRes.join('\n') : tooltipRes)
+    }
+
+    if (typeof extra === 'string') {
+      setCurExtra(extra)
+    }
+    if (extra?.dataFunc || extra?.dataApi) {
+      const extraRes = await getData(extra as any, request)
+      setCurExtra(isStringArray(extraRes) ? extraRes.join('\n') : extraRes)
+    }
   }
 
   if ((typeof visibleRule === 'boolean' && !visibleRule) || (visibleRule && !isVisible)) return null
@@ -75,8 +86,8 @@ export const FormItem: React.FC<any> = ({
   return (
     <AntFormItem
       {...antProps}
-      tooltip={curTooltip as any}
-      extra={curExtra as any}
+      tooltip={curTooltip}
+      extra={curExtra}
       style={style}
     >
       {children}
