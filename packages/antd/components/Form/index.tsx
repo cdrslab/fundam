@@ -74,7 +74,6 @@ export const Form: React.FC<FormProviderProps> = ({
 
   const onPrimaryButtonClick = async () => {
     try {
-      console.log('-----xxxx')
       if (useLoading) setPrimaryButtonLoading(true)
       if (primaryButtonClick) await primaryButtonClick(form)
     } catch (e) {
