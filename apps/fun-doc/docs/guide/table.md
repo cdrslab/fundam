@@ -454,8 +454,8 @@ export default () => {
         dataFunc={() => {
           // TODO 业务逻辑
           return {
-            pageNo: 1,
-            totalCount: 3,
+            page: 1,
+            total: 3,
             pageSize: 20,
             list: [
               {
