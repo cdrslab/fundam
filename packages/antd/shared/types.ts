@@ -18,12 +18,9 @@ export type GetData = {
   resDataPath?: string // 组件所需响应数据提取
   cacheKey?: string, // 缓存全局唯一key
   cacheExpirationSec?: string, // 缓存过期时间
-  dataRule?: boolean | (() => boolean)
+  dataRule?: boolean | (() => boolean) // 可以前置通过 dataRule 控制是否发起请求，dataRule值/计算值为false时不发请求
 }
 
 export function isURLSearchParams(obj: any): obj is URLSearchParams {
   return Object.prototype.toString.call(obj) === '[object URLSearchParams]';
 }
-
-// 可以包含options的组件
-// export type IncludesOptionsAntComponent = Select

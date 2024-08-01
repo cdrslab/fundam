@@ -547,7 +547,7 @@ export default () => {
 }
 ```
 
-## 外部混用与控制
+## Antd混用与控制
 
 1. 和Antd类似，可以通过 form 直接操作整个Form的数据和状态
 2. **无缝支持混用 Antd** `Form.Item` 及其它组件
@@ -605,25 +605,6 @@ export default () => {
           tooltip="这是写死的tooltip字符串"
           extra="这是写死的extra字符串"
         />
-        <FormItemInput
-          name="remote"
-          maxLength={3}
-          label="远程示例"
-          tooltip={{
-            dataApi: '/region/get.json',
-            resDataPath: 'nameEN',
-            dataApiReqData: {
-              id: 123 // 真实场景从query、状态等取得
-            },
-          }}
-          extra={{
-            dataApi: '/region/get.json',
-            resDataPath: 'timezone',
-            dataApiReqData: {
-              id: 123 // 真实场景从query、状态等取得
-            },
-          }}
-        />
         <FormItemSelect
           label="本地选项"
           name="gender"
@@ -651,7 +632,12 @@ export default () => {
 }
 ```
 
-## 远程获取数据逻辑
+## 远程数据、隐藏字段
+
+1. Fundam数据请求统一使用 <a href="https://github.com/cdrslab/fundam/blob/main/packages/antd/shared/types.ts#L13" target="_blank">GetData</a>
+2. 使用 form.validateFields() 和 form.getFieldsValue() 可以拿到隐藏字段（文案、解构前的值等），form.submit() + onFinish 会过滤隐藏字段
+3. 解构前的隐藏字段格式：['start', 'end'] => 隐藏字段为：__start_end
+4. 文案隐藏字段格式：selectId => 隐藏字段为：__selectIdText
 
 ```tsx
 import { useState, useEffect } from 'react'
@@ -676,39 +662,26 @@ import { MockContainer, ShowCode } from '../index'
 export default () => {
   const [form] = useAntFormInstance()
   const [submitValues, setSubmitValues] = useState<string>(JSON.stringify({}))
-  // 一个值动态控制表单横向、竖向、筛选展示
-  const [direction, setDirection] = useState<FormDirection>('vertical')
   
   const onSubmit = async () => {
-    // TODO 业务请求逻辑等
+    // 使用 form.validateFields() 和 form.getFieldsValue() 可以拿到隐藏字段
     const values = await form.validateFields()
     setSubmitValues(JSON.stringify(values, null, 2))
-    message.success('保存成功')
   }
   
   return (
     <MockContainer>
-      <div style={{ marginBottom: 24 }}>
-        <Button type="primary" onClick={() => setDirection('horizontal')}>横向展示</Button>
-        <Button type="primary" onClick={() => setDirection('vertical')} style={{ marginLeft: 8 }}>竖向展示</Button>
-      </div>
       <Form
         form={form}
-        direction={direction}
-        // 横向表单通常不需要校验信息展示
-        showValidateMessagesRow={direction === 'vertical'}
+        direction="vertical"
+        defaultButtonText="重置"
+        defaultButtonClick={() => form.resetFields()}
+        primaryButtonText="保存"
+        primaryButtonClick={onSubmit}
       >
         <FormItemInput
-          name="name"
-          maxLength={3}
-          label="tooltip/extra"
-          tooltip="这是写死的tooltip字符串"
-          extra="这是写死的extra字符串"
-        />
-        <FormItemInput
-          name="remote"
-          maxLength={3}
-          label="远程示例"
+          name="tooltipExtra"
+          label="远程tooltip/extra"
           tooltip={{
             dataApi: '/region/get.json',
             resDataPath: 'nameEN',
@@ -725,6 +698,108 @@ export default () => {
           }}
         />
         <FormItemSelect
+          name="regionId"
+          label="远程选项"
+          labelKey="nameZH"
+          valueKey="id"
+          dataApi="/region/getList.json"
+        />
+        <FormItemCascade
+          name="address"
+          label="远程级联"
+          labelKey="name"
+          valueKey="code"
+          childrenKey="districts"
+          dataApi="/address/getList.json"
+        />
+        <FormItemCascade
+          names={['city', 'district', 'street']}
+          label="远程级联-解构"
+          labelKey="name"
+          valueKey="code"
+          childrenKey="districts"
+          dataApi="/address/getList.json"
+        />
+        <FormItemSelect
+          name='remoteSearch'
+          label='远程搜索'
+          dataApi='/region/getList.json'
+          // 调用接口时，传给接口的参数名称
+          searchKey='name'
+          labelKey="nameZH"
+          valueKey="id"
+          extra="注意：这里mock数据写死的不会变化，请看浏览器【Network】，已做debounce"
+        />
+      </Form>
+      <ShowCode title="JSON数据">{submitValues}</ShowCode>
+    </MockContainer>
+  )
+}
+```
+
+## 联动
+
+```tsx
+import { useState, useEffect } from 'react'
+import { 
+  Form,
+  Title,
+  FormItemInput,
+  FormItemSelect,
+  FormItemTextArea,
+  FormItemCascade,
+  FormItemDatePickerRangePicker,
+  FormItemRadio,
+  FormItemCheckbox,
+  FormItemUploadImage,
+  useAntFormInstance
+} from '@fundam/antd'
+import { message, Button } from 'antd'
+
+// 仅文档展示使用
+import { MockContainer, ShowCode } from '../index'
+
+export default () => {
+  const [form] = useAntFormInstance()
+  const [submitValues, setSubmitValues] = useState<string>(JSON.stringify({}))
+  // 一个值动态控制表单横向、竖向、筛选展示
+  const [direction, setDirection] = useState<FormDirection>('vertical')
+  
+  const onFinish = async (values: any) => {
+    // TODO 业务请求逻辑等
+    setSubmitValues(JSON.stringify(values, null, 2))
+    message.success('保存成功')
+  }
+  
+  return (
+    <MockContainer>
+      <div style={{ marginBottom: 24 }}>
+        <Button type="primary" onClick={() => setDirection('horizontal')}>横向展示</Button>
+        <Button type="primary" onClick={() => setDirection('vertical')} style={{ marginLeft: 8 }}>竖向展示</Button>
+      </div>
+      <Form
+        form={form}
+        direction={direction}
+        // 横向表单通常不需要校验信息展示
+        showValidateMessagesRow={direction === 'vertical'}
+        defaultButtonText="重置"
+        defaultButtonClick={() => form.resetFields()}
+        primaryButtonText={direction === 'vertical' ? '保存' : '查询'}
+        primaryButtonClick={() => form.submit()}
+        onFinish={onFinish}
+      >
+        <FormItemInput
+          // 直接通过input输入数字
+          isNumber
+          name="id"
+          maxLength={3}
+          label="数字文本输入"
+        />
+        <FormItemDatePickerRangePicker
+          names={['start', 'end']}
+          label="时间范围-解构"
+        />
+        <FormItemSelect
           label="本地选项"
           name="gender"
           options={[
@@ -738,12 +813,29 @@ export default () => {
             },
           ]}
         />
-        <AntForm.Item label="Antd混用" name="antInput">
-          <AntInput placeholder="请输入" />
-        </AntForm.Item>
-        <AntForm.Item label=" " colon={false}>
-          <Button type="primary" onClick={onSubmit}>外部按钮提交</Button>
-        </AntForm.Item>
+        <FormItemSelect
+          name="regionId"
+          label="远程选项"
+          labelKey="nameZH"
+          valueKey="id"
+          dataApi="/region/getList.json"
+        />
+        <FormItemCascade
+          name="address"
+          label="远程级联"
+          labelKey="name"
+          valueKey="code"
+          childrenKey="districts"
+          dataApi="/address/getList.json"
+        />
+        <FormItemCascade
+          names={['city', 'district', 'street']}
+          label="远程级联-解构"
+          labelKey="name"
+          valueKey="code"
+          childrenKey="districts"
+          dataApi="/address/getList.json"
+        />
       </Form>
       <ShowCode title="JSON数据">{submitValues}</ShowCode>
     </MockContainer>
@@ -751,8 +843,7 @@ export default () => {
 }
 ```
 
-## 联动
-
 ## Table Form
 
+## 筛选展开/收起
 

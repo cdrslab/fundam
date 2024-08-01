@@ -13,3 +13,4 @@ public/dist
 apps/fun-docs/.husky
 apps/fun-docs/.dumi
 apps/fun-docs/node_modules
+apps/fun-docs/dist
