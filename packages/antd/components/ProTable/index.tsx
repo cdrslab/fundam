@@ -179,7 +179,7 @@ const CACHE_EXCLUDED_COLUMN_KEYS_KEY = 'excludedColumnKeys'
 export const ProTable = forwardRef<any, ProTableProps<any>>((props, ref) => {
   const {
     // 必须props
-    rowKey,
+    rowKey = 'id',
     cardProps = {},
     columns,
     cacheKey,

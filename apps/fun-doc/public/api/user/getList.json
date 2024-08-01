@@ -1,0 +1,29 @@
+{
+  "success": true,
+  "code": 200,
+  "data": {
+    "page": 1,
+    "pageSize": 20,
+    "total": 3,
+    "list": [
+      {
+        "id": 100000000001,
+        "name": "张三",
+        "account": "zhangsan",
+        "mobile": "13878787979"
+      },
+      {
+        "id": 100000000002,
+        "name": "李四",
+        "account": null,
+        "mobile": "13998988989"
+      },
+      {
+        "id": 100000000003,
+        "name": "王五",
+        "account": "wangwu",
+        "mobile": "15178782121"
+      }
+    ]
+  }
+}
