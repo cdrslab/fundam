@@ -1,0 +1,311 @@
+{
+  "success": true,
+  "code": 200,
+  "data": {
+    "page": 1,
+    "pageSize": 20,
+    "total": 20,
+    "list": [
+      {
+        "id": 1001,
+        "name": "达第直资源位",
+        "type": [
+          "APP",
+          "CHANNEL"
+        ],
+        "typeDesc": "APP/频道",
+        "time": "2023-11-12 08:05:59 ~ 2024-07-29 05:31:05",
+        "status": 2,
+        "statusDesc": "未开始",
+        "createUser": "毛静",
+        "createUserId": 75148,
+        "createTime": "2024-03-25 05:17:23"
+      },
+      {
+        "id": 1002,
+        "name": "与林原并资源位",
+        "type": [
+          "APP",
+          "BANNER"
+        ],
+        "typeDesc": "APP/轮播图",
+        "time": "2023-11-18 18:23:42 ~ 2024-03-19 04:43:40",
+        "status": 4,
+        "statusDesc": "已结束",
+        "createUser": "程超",
+        "createUserId": 34133,
+        "createTime": "2024-03-28 01:16:30"
+      },
+      {
+        "id": 1003,
+        "name": "里后专工消资源位",
+        "type": [
+          "APP",
+          "CHANNEL"
+        ],
+        "typeDesc": "APP/频道",
+        "time": "2023-11-27 08:12:28 ~ 2024-04-18 01:14:54",
+        "status": 4,
+        "statusDesc": "已结束",
+        "createUser": "谭洋",
+        "createUserId": 60303,
+        "createTime": "2024-02-26 08:12:07"
+      },
+      {
+        "id": 1004,
+        "name": "小该拉资源位",
+        "type": [
+          "APP",
+          "BANNER"
+        ],
+        "typeDesc": "APP/轮播图",
+        "time": "2023-12-26 09:58:04 ~ 2024-03-13 22:20:31",
+        "status": 2,
+        "statusDesc": "未开始",
+        "createUser": "方丽",
+        "createUserId": 47853,
+        "createTime": "2024-03-21 07:35:55"
+      },
+      {
+        "id": 1005,
+        "name": "温万向资源位",
+        "type": [
+          "APP",
+          "CHANNEL"
+        ],
+        "typeDesc": "APP/频道",
+        "time": "2023-10-27 02:21:36 ~ 2024-07-15 08:56:11",
+        "status": 3,
+        "statusDesc": "进行中",
+        "createUser": "万芳",
+        "createUserId": 34044,
+        "createTime": "2024-03-20 13:21:50"
+      },
+      {
+        "id": 1006,
+        "name": "今约记资源位",
+        "type": [
+          "PC",
+          "CHANNEL"
+        ],
+        "typeDesc": "PC/频道",
+        "time": "2023-11-12 15:44:26 ~ 2024-03-22 10:19:12",
+        "status": 3,
+        "statusDesc": "进行中",
+        "createUser": "顾磊",
+        "createUserId": 52135,
+        "createTime": "2024-02-28 01:02:58"
+      },
+      {
+        "id": 1007,
+        "name": "但矿细通资源位",
+        "type": [
+          "PC",
+          "LAUNCH_PAGE"
+        ],
+        "typeDesc": "PC/启动页",
+        "time": "2023-11-24 19:42:38 ~ 2024-08-24 18:32:39",
+        "status": 3,
+        "statusDesc": "进行中",
+        "createUser": "周超",
+        "createUserId": 64393,
+        "createTime": "2024-02-27 14:12:48"
+      },
+      {
+        "id": 1008,
+        "name": "日委立近集资源位",
+        "type": [
+          "PC",
+          "BANNER"
+        ],
+        "typeDesc": "PC/轮播图",
+        "time": "2023-10-23 11:45:40 ~ 2024-05-11 13:30:07",
+        "status": 3,
+        "statusDesc": "进行中",
+        "createUser": "雷杰",
+        "createUserId": 36068,
+        "createTime": "2024-03-11 10:07:37"
+      },
+      {
+        "id": 1009,
+        "name": "带圆引间资源位",
+        "type": [
+          "PC",
+          "BANNER"
+        ],
+        "typeDesc": "PC/轮播图",
+        "time": "2023-11-22 01:32:22 ~ 2024-05-17 05:14:15",
+        "status": 1,
+        "statusDesc": "待发布",
+        "createUser": "孔秀兰",
+        "createUserId": 29380,
+        "createTime": "2024-03-20 15:16:56"
+      },
+      {
+        "id": 1010,
+        "name": "圆达资源位",
+        "type": [
+          "PC",
+          "CHANNEL"
+        ],
+        "typeDesc": "PC/频道",
+        "time": "2023-12-23 01:20:58 ~ 2024-07-21 07:30:26",
+        "status": 3,
+        "statusDesc": "进行中",
+        "createUser": "汤勇",
+        "createUserId": 88673,
+        "createTime": "2024-03-26 18:33:03"
+      },
+      {
+        "id": 1011,
+        "name": "程象北资源位",
+        "type": [
+          "APP",
+          "LAUNCH_PAGE"
+        ],
+        "typeDesc": "APP/启动页",
+        "time": "2023-11-18 06:40:09 ~ 2024-07-27 18:22:28",
+        "status": 2,
+        "statusDesc": "未开始",
+        "createUser": "沈芳",
+        "createUserId": 28051,
+        "createTime": "2024-02-12 02:52:21"
+      },
+      {
+        "id": 1012,
+        "name": "小于资源位",
+        "type": [
+          "APP",
+          "CHANNEL"
+        ],
+        "typeDesc": "APP/频道",
+        "time": "2023-11-13 01:46:14 ~ 2024-01-17 17:35:14",
+        "status": 1,
+        "statusDesc": "待发布",
+        "createUser": "文杰",
+        "createUserId": 88911,
+        "createTime": "2024-03-13 11:10:02"
+      },
+      {
+        "id": 1013,
+        "name": "周众织资源位",
+        "type": [
+          "PC",
+          "LAUNCH_PAGE"
+        ],
+        "typeDesc": "PC/启动页",
+        "time": "2023-12-20 11:50:36 ~ 2024-09-13 08:14:02",
+        "status": 3,
+        "statusDesc": "进行中",
+        "createUser": "顾娟",
+        "createUserId": 44763,
+        "createTime": "2024-02-20 02:32:40"
+      },
+      {
+        "id": 1014,
+        "name": "头际计路资源位",
+        "type": [
+          "APP",
+          "LAUNCH_PAGE"
+        ],
+        "typeDesc": "APP/启动页",
+        "time": "2023-12-24 23:08:24 ~ 2024-05-25 16:42:05",
+        "status": 2,
+        "statusDesc": "未开始",
+        "createUser": "邓娟",
+        "createUserId": 89863,
+        "createTime": "2024-02-20 12:40:39"
+      },
+      {
+        "id": 1015,
+        "name": "适机总近资源位",
+        "type": [
+          "APP",
+          "CHANNEL"
+        ],
+        "typeDesc": "APP/频道",
+        "time": "2023-11-25 23:26:09 ~ 2024-05-20 08:44:40",
+        "status": 2,
+        "statusDesc": "未开始",
+        "createUser": "锺明",
+        "createUserId": 74879,
+        "createTime": "2024-02-24 15:54:44"
+      },
+      {
+        "id": 1016,
+        "name": "斯自科资源位",
+        "type": [
+          "APP",
+          "BANNER"
+        ],
+        "typeDesc": "APP/轮播图",
+        "time": "2023-10-26 15:18:08 ~ 2024-05-16 03:11:44",
+        "status": 1,
+        "statusDesc": "待发布",
+        "createUser": "段强",
+        "createUserId": 70768,
+        "createTime": "2024-03-21 16:28:48"
+      },
+      {
+        "id": 1017,
+        "name": "次空论书资源位",
+        "type": [
+          "PC",
+          "BANNER"
+        ],
+        "typeDesc": "PC/轮播图",
+        "time": "2023-11-16 21:27:05 ~ 2024-03-12 22:01:13",
+        "status": 3,
+        "statusDesc": "进行中",
+        "createUser": "何丽",
+        "createUserId": 52831,
+        "createTime": "2024-03-13 22:53:42"
+      },
+      {
+        "id": 1018,
+        "name": "部大感龙山资源位",
+        "type": [
+          "PC",
+          "CHANNEL"
+        ],
+        "typeDesc": "PC/频道",
+        "time": "2023-11-19 12:25:21 ~ 2024-03-21 12:34:50",
+        "status": 3,
+        "statusDesc": "进行中",
+        "createUser": "罗静",
+        "createUserId": 96800,
+        "createTime": "2024-02-15 11:06:36"
+      },
+      {
+        "id": 1019,
+        "name": "空问更资源位",
+        "type": [
+          "PC",
+          "CHANNEL"
+        ],
+        "typeDesc": "PC/频道",
+        "time": "2023-12-16 17:50:08 ~ 2024-07-15 10:02:36",
+        "status": 2,
+        "statusDesc": "未开始",
+        "createUser": "毛磊",
+        "createUserId": 43403,
+        "createTime": "2024-02-14 16:51:51"
+      },
+      {
+        "id": 1020,
+        "name": "低个方资源位",
+        "type": [
+          "PC",
+          "CHANNEL"
+        ],
+        "typeDesc": "PC/频道",
+        "time": "2023-11-15 02:49:59 ~ 2024-03-24 07:06:45",
+        "status": 1,
+        "statusDesc": "待发布",
+        "createUser": "贺秀英",
+        "createUserId": 29537,
+        "createTime": "2024-03-24 07:42:39"
+      }
+    ]
+  }
+}
