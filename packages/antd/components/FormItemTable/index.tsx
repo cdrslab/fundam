@@ -64,8 +64,8 @@ const DraggableRow: React.FC<DraggableRowProps> = ({index, disabled, moveRow, ch
   return (
     <tr ref={ref} style={{opacity: isDragging ? 0.5 : 1}} data-handler-id={handlerId}>
       {disabled ? null : (
-        <td className="fun-table-cell cell-sort" style={{cursor: 'move'}}>
-          <MenuOutlined ref={drag} className="cell-sort-icon"/>
+        <td className="fun-table-cell cell-sort" style={{cursor: 'move'}} ref={drag}>
+          <MenuOutlined className="cell-sort-icon"/>
         </td>
       )}
       {children}
@@ -200,7 +200,7 @@ export const FormItemTable: React.FC<FormItemTableProps> = ({
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <FormItem required label={label} labelCol={{span: labelColSpan}} wrapperCol={{span: wrapperColSpan}}>
+      <FormItem label={label} labelCol={{span: labelColSpan}} wrapperCol={{span: wrapperColSpan}}>
         <table className="fun-form-item-table">
           <thead className="fun-form-item-table-thead">
           <tr>

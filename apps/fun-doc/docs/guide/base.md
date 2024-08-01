@@ -873,7 +873,6 @@ export default () => {
       width: 130,
       render: (index: number) => (
         <FormItemInput
-          required
           placeholder="联系人"
           name={['users', index, 'userName']}
         />
@@ -885,7 +884,6 @@ export default () => {
       width: 170,
       render: (index: number) => (
         <FormItemInput
-          required
           placeholder="电话"
           name={['users', index, 'phoneNumber']}
         />
@@ -897,7 +895,6 @@ export default () => {
       width: 150,
       render: (index: number) => (
         <FormItemRadio
-          required
           name={['users', index, 'gender']}
           options={[{ label: '男', value: 1 }, { label: '女', value: 2 }]} 
         />
