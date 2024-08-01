@@ -43,22 +43,10 @@ export default () => {
         primaryButtonClick={() => form.submit()}
         onFinish={onFinish}
       >
-        <FormItemInput
-          required
-          name="name"
-          label="活动名"
-        />
-        <FormItemDatePickerRangePicker
-          required
-          // 使用names进行选值解构
-          names={['start', 'end']}
-          label="活动时间（解构）"
-        />
-        <FormItemTextArea
-          required
-          name="description"
-          label="描述"
-        />
+        <FormItemInput required name="name" label="活动名" />
+        {/*使用names进行选值解构*/}
+        <FormItemDatePickerRangePicker required names={['start', 'end']} label="活动时间（解构）"/>
+        <FormItemTextArea required name="description" label="描述" />
       </Form>
       <ShowCode title="JSON数据">{submitValues}</ShowCode>
     </MockContainer>
@@ -157,44 +145,20 @@ export default () => {
         primaryButtonClick={() => form.submit()}
         onFinish={onFinish}
       >
-        <FormItemInput
-          name="name"
-          label="文本输入"
-        />
-        <FormItemDatePickerRangePicker
-          names={['start', 'end']}
-          label="时间范围-解构"
-        />
-        <FormItemSelect
-          label="本地选项"
-          name="gender"
-          options={[
-            {
-              label: '男',
-              value: 1
-            },
-            {
-              label: '女',
-              value: 2
-            },
-          ]}
-        />
-        <FormItemSelect
-          name="regionId"
-          label="远程选项"
-          labelKey="nameZH"
-          valueKey="id"
-          dataApi="/region/getList.json"
-        />
-        <FormItemCascade
-          name="address"
-          label="远程级联"
-          labelKey="name"
-          valueKey="code"
-          childrenKey="districts"
+        <FormItemInput name="name" label="文本输入" />
+        <FormItemDatePickerRangePicker names={['start', 'end']} label="时间范围-解构" />
+        <FormItemSelect label="本地选项" name="gender" options={[{ label: '男', value: 1 }, { label: '女', value: 2 }]} />
+        <FormItemSelect name="regionId" label="远程选项" labelKey="nameZH" valueKey="id" dataApi="/region/getList.json" />
+        <FormItemCascade 
+          name="address" 
+          label="远程级联" 
+          labelKey="name" 
+          valueKey="code" 
+          childrenKey="districts" 
           dataApi="/address/getList.json"
         />
         <FormItemCascade
+          // 通过names进行解构
           names={['city', 'district', 'street']}
           label="远程级联-解构"
           labelKey="name"
@@ -224,10 +188,7 @@ export default () => {
           valueKey="code"
           dataApi="/address/getList.json"
         />
-        <FormItemTextArea
-          name="description"
-          label="描述"
-        />
+        <FormItemTextArea name="description" label="描述" />
         <FormItemUploadImage
           isObject
           label="图片"
@@ -739,6 +700,10 @@ export default () => {
 
 ## 联动
 
+1. 支持`表达式`控制联动
+2. 支持外部状态控制联动
+3. 无缝支持Antd`useWatch`等控制联动
+
 ```tsx
 import { useState, useEffect } from 'react'
 import { 
@@ -754,7 +719,7 @@ import {
   FormItemUploadImage,
   useAntFormInstance
 } from '@fundam/antd'
-import { message, Button } from 'antd'
+import { message, Button, Form as AntForm } from 'antd'
 
 // 仅文档展示使用
 import { MockContainer, ShowCode } from '../index'
@@ -762,8 +727,8 @@ import { MockContainer, ShowCode } from '../index'
 export default () => {
   const [form] = useAntFormInstance()
   const [submitValues, setSubmitValues] = useState<string>(JSON.stringify({}))
-  // 一个值动态控制表单横向、竖向、筛选展示
-  const [direction, setDirection] = useState<FormDirection>('vertical')
+  const [visible, setVisible] = useState<boolean>(false)
+  const regionIds = AntForm.useWatch('regionIds', form)
   
   const onFinish = async (values: any) => {
     // TODO 业务请求逻辑等
@@ -774,34 +739,34 @@ export default () => {
   return (
     <MockContainer>
       <div style={{ marginBottom: 24 }}>
-        <Button type="primary" onClick={() => setDirection('horizontal')}>横向展示</Button>
-        <Button type="primary" onClick={() => setDirection('vertical')} style={{ marginLeft: 8 }}>竖向展示</Button>
+        <Button type="primary" onClick={() => setVisible(!visible)}>状态控制展示/隐藏</Button>
       </div>
       <Form
         form={form}
-        direction={direction}
-        // 横向表单通常不需要校验信息展示
-        showValidateMessagesRow={direction === 'vertical'}
+        direction="vertical"
         defaultButtonText="重置"
         defaultButtonClick={() => form.resetFields()}
-        primaryButtonText={direction === 'vertical' ? '保存' : '查询'}
+        primaryButtonText={'保存'}
         primaryButtonClick={() => form.submit()}
         onFinish={onFinish}
       >
         <FormItemInput
-          // 直接通过input输入数字
           isNumber
-          name="id"
-          maxLength={3}
-          label="数字文本输入"
+          name="link1"
+          label="联动1"
+          extra="输入 111 试试"
         />
-        <FormItemDatePickerRangePicker
-          names={['start', 'end']}
-          label="时间范围-解构"
+        <FormItemInput
+          name={['link', 'link2']}
+          label="联动2"
+          extra="输入 222 试试"
+          // link1 输入 111 时展示
+          visibleRule="link1 === 111"
         />
         <FormItemSelect
-          label="本地选项"
+          label="性别"
           name="gender"
+          extra="联动1输入：111，性别选择：男"
           options={[
             {
               label: '男',
@@ -813,28 +778,58 @@ export default () => {
             },
           ]}
         />
+        <FormItemInput
+          name="link3"
+          label="联动3"
+          // link1 输入 111 时 并且 性别选择男时 展示
+          visibleRule="link1 === 111 && gender === 1"
+        />
+        <FormItemInput
+          name="link4"
+          label="联动4"
+          // 联动2多级字段输入 222 时展示
+          visibleRule="link.link2 === '222'"
+        />
         <FormItemSelect
-          name="regionId"
+          mode="multiple"
+          name="regionIds"
           label="远程选项"
           labelKey="nameZH"
           valueKey="id"
           dataApi="/region/getList.json"
+          extra="选前两个选项的任意一个+其它选项试试"
         />
-        <FormItemCascade
-          name="address"
-          label="远程级联"
-          labelKey="name"
-          valueKey="code"
-          childrenKey="districts"
-          dataApi="/address/getList.json"
+        <FormItemInput
+          name="link5"
+          label="联动5"
+          visibleRule="regionIds.some(item => item < 3)"
         />
-        <FormItemCascade
-          names={['city', 'district', 'street']}
-          label="远程级联-解构"
-          labelKey="name"
-          valueKey="code"
-          childrenKey="districts"
-          dataApi="/address/getList.json"
+        <FormItemInput
+          name="link6"
+          label="联动6"
+          visibleRule={visible}
+          extra="这是一个状态控制的联动"
+        />
+        {
+          visible ?
+            <FormItemInput
+              name="link7"
+              label="联动7"
+              visible={visible}
+              extra="这是一个状态控制的联动，react常规写法"
+            /> : null
+        }
+        <FormItemInput
+          name="link8"
+          label="联动8"
+          hidden={!visible}
+          extra="这是一个状态控制hidden"
+        />
+        <FormItemInput
+          name="link9"
+          label="联动9"
+          hidden={regionIds?.some(item => item < 3)}
+          extra="这是Ant useWatch 控制的hidden"
         />
       </Form>
       <ShowCode title="JSON数据">{submitValues}</ShowCode>
@@ -843,7 +838,168 @@ export default () => {
 }
 ```
 
-## Table Form
+## FormTable
+
+```tsx
+import { useState, useEffect } from 'react'
+import { 
+  Form,
+  FormItemTable,
+  FormItemInput,
+  FormItemRadio,
+  useAntFormInstance
+} from '@fundam/antd'
+import { message, Button, Form as AntForm } from 'antd'
+
+// 仅文档展示使用
+import { MockContainer, ShowCode } from '../index'
+
+export default () => {
+  const [form] = useAntFormInstance()
+  const [submitValues, setSubmitValues] = useState<string>(JSON.stringify({}))
+  const [visible, setVisible] = useState<boolean>(false)
+  const regionIds = AntForm.useWatch('regionIds', form)
+  
+  const onFinish = async (values: any) => {
+    // TODO 业务请求逻辑等
+    setSubmitValues(JSON.stringify(values, null, 2))
+    message.success('保存成功')
+  }
+  
+  const columns = [
+    {
+      key: 'userName',
+      title: '联系人',
+      width: 130,
+      render: (index: number) => (
+        <FormItemInput
+          required
+          placeholder="联系人"
+          name={['users', index, 'userName']}
+        />
+      ),
+    },
+    {
+      key: 'phoneNumber',
+      title: '电话',
+      width: 170,
+      render: (index: number) => (
+        <FormItemInput
+          required
+          placeholder="电话"
+          name={['users', index, 'phoneNumber']}
+        />
+      ),
+    },
+    {
+      key: 'gender',
+      title: '性别',
+      width: 150,
+      render: (index: number) => (
+        <FormItemRadio
+          required
+          name={['users', index, 'gender']}
+          options={[{ label: '男', value: 1 }, { label: '女', value: 2 }]} 
+        />
+      ),
+    },
+  ]
+  
+  const mockInit = {
+    users: [
+      {
+        userName: '张三',
+        phoneNumber: '13811112222',
+        gender: 1
+      },
+      {
+        userName: '王五',
+        phoneNumber: '13811112223',
+        gender: 2
+      }
+    ]
+  }
+  
+  return (
+    <MockContainer>
+      <Form
+        form={form}
+        direction="vertical"
+        defaultButtonText="重置"
+        defaultButtonClick={() => form.resetFields()}
+        primaryButtonText={'保存'}
+        primaryButtonClick={() => form.submit()}
+        onFinish={onFinish}
+      >
+        <FormItemTable
+          label="用户"
+          name="users"
+          form={form}
+          columns={columns}
+          // 初始值
+          formInitialValue={[]}
+          // 最小数量
+          minItems={1}
+          // 最大数量
+          maxItems={5}
+        />
+      </Form>
+      <ShowCode title="JSON数据">{submitValues}</ShowCode>
+    </MockContainer>
+  )
+}
+```
 
 ## 筛选展开/收起
+
+通过name快速设置展示/隐藏的筛选项
+
+```tsx
+import { useState } from 'react'
+import { 
+  Form,
+  Title,
+  FormItemInput,
+  FormItemTextArea,
+  FormItemDatePickerRangePicker,
+  useAntFormInstance
+} from '@fundam/antd'
+import { message } from 'antd'
+
+// 仅文档展示使用
+import { MockContainer, ShowCode } from '../index'
+
+export default () => {
+  const [form] = useAntFormInstance()
+  const [submitValues, setSubmitValues] = useState<string>(JSON.stringify({}))
+  
+  const onFinish = async (values: any) => {
+    // TODO 业务请求逻辑等
+    setSubmitValues(JSON.stringify(values, null, 2))
+    message.success('保存成功')
+  }
+  
+  return (
+    <MockContainer>
+      <Form
+        form={form}
+        direction='horizontal'
+        defaultButtonText="重置"
+        defaultButtonClick={() => form.resetFields()}
+        primaryButtonText="查询"
+        primaryButtonClick={() => form.submit()}
+        onFinish={onFinish}
+        collapseNames={['ignore1', 'ignore2', 'ignore3']}
+      >
+        <FormItemInput isNumber name="id" label="ID" />
+        <FormItemInput name="name" label="名称" />
+        <FormItemInput name="ignore1" label="不重要1" />
+        <FormItemInput name="ignore2" label="不重要2" />
+        <FormItemInput name="ignore3" label="不重要3" />
+      </Form>
+      <ShowCode title="JSON数据">{submitValues}</ShowCode>
+    </MockContainer>
+  )
+}
+```
 

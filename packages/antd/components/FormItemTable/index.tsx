@@ -1,9 +1,11 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react'
 import { DeleteOutlined, MenuOutlined, PlusOutlined } from '@ant-design/icons'
-import { Button, Popconfirm, Form } from 'antd'
+import { Button, Popconfirm } from 'antd'
 import { DndProvider, useDrag, useDrop, DropTargetMonitor } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { FormInstance } from 'antd/es/form/hooks/useForm'
+
+import { FormItem } from '../FormItem'
 
 import './index.less'
 
@@ -102,7 +104,7 @@ interface FormItemTableProps {
   label?: string
 }
 
-const FormItemTable: React.FC<FormItemTableProps> = ({
+export const FormItemTable: React.FC<FormItemTableProps> = ({
     form,
     name,
     columns,
@@ -198,7 +200,7 @@ const FormItemTable: React.FC<FormItemTableProps> = ({
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <Form.Item required label={label} labelCol={{span: labelColSpan}} wrapperCol={{span: wrapperColSpan}}>
+      <FormItem required label={label} labelCol={{span: labelColSpan}} wrapperCol={{span: wrapperColSpan}}>
         <table className="fun-form-item-table">
           <thead className="fun-form-item-table-thead">
           <tr>
@@ -223,9 +225,7 @@ const FormItemTable: React.FC<FormItemTableProps> = ({
           <PlusOutlined/> 添加{label || '一行'}
         </Button>
         {maxItems ? <div style={{color: 'red', marginTop: 8}}>最多配{maxItems}个</div> : null}
-      </Form.Item>
+      </FormItem>
     </DndProvider>
   )
 }
-
-export default FormItemTable

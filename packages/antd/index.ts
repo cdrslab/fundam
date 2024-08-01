@@ -5,9 +5,6 @@ export { Space } from './components/Space'
 export { Title } from './components/Title'
 export { Table, TableRowButton } from './components/Table'
 export { Badge } from './components/Badge'
-// 请使用最新的 ProTable
-export { TablePro } from './components/TablePro'
-export { ListFilter } from './components/ListFilter'
 export { PageListQuery } from './components/PageListQuery'
 export { ProTable } from './components/ProTable'
 export { Tabs } from './components/Tabs'
@@ -27,6 +24,7 @@ export { FormItemRadio } from './components/FormItemRadio'
 export { FormItemSelect } from './components/FormItemSelect'
 export { FormItemUploadImage } from './components/FormItemUploadImage'
 export { FormItemTextArea } from './components/FormItemTextArea'
+export { FormItemTable } from './components/FormItemTable'
 
 // hooks
 export { useAntFormInstance } from './hooks/useAntFormInstance'
@@ -41,3 +39,7 @@ export * from './shared/utils'
 
 export type { TableAlias } from './components/Table'
 export type { FormDisplayType, FunFormInstance } from './shared/types'
+
+// TODO 不要使用，下个版本删除 - 请使用最新的 ProTable
+export { TablePro } from './components/TablePro'
+export { ListFilter } from './components/ListFilter'
