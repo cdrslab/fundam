@@ -13,34 +13,130 @@ order: 1
 
 ## 与AI交互对话示例
 
+### 图片生成代码-示例图（来源antd官网）
+
+![](/images/image-form-1.png)
+
+### 真实对话
+
+![](/images/ai-2.png)
+
+### AI生成代码效果
+
+```tsx
+import { Form, FormItemInput, FormItemTextArea, useAntFormInstance } from '@fundam/antd'
+
+// 仅文档展示使用
+import { MockContainer } from '../index'
+
+export default () => {
+  const [form] = useAntFormInstance()
+
+  const onFinish = (values: any) => {
+    console.log(values)
+  }
+
+  return (
+    // 文档展示需要用MockContainer，故在AI生成的代码基础上增加此嵌套，正常情况直接使用AI生成的代码即可
+    <MockContainer>
+      <Form
+        form={form}
+        direction="vertical"
+        primaryButtonText="Submit"
+        primaryButtonClick={() => form.submit()}
+        onFinish={onFinish}
+      >
+        <FormItemInput name="name" label="Name" required />
+        <FormItemInput name="email" label="Email" />
+        <FormItemInput name="age" label="Age" />
+        <FormItemInput name="website" label="Website" />
+        <FormItemTextArea name="introduction" label="Introduction" maxLength={200} />
+      </Form>
+    </MockContainer>
+  )
+}
+```
+
 ### 生成代码描述
 
 ```text
-帮我生成一个列表页面，其中
-## 筛选项
+帮我生成下面说明对应的代码，不要进行额外的说明，直接给我tsx代码：
+## 横项表单
 用户ID,userId,number
-用户名称,userName,仅能输入中文字符串，不超过10个字
-用户性别，gender，固定1-男，2-女两个选项，可清空
-用户地址，解构province,city,distinct,级联，调用/api/address get接口获取数据，labelKey为name，valueKey为id，childrenKey为children，本字段默认在表单中收起
-点击查询，调用接口 /api/userList get接口
-## 列表
-序号，前端管理
-用户ID，userId
-用户名称，userName
-用户性别，gender，1-男，2-女
-用户地址，address
-操作
-- 删除，点击弹窗二次确认是否删除，确定后调用/api/deleteUser post接口，传入userId
-- 编辑，点击弹窗，仅能修改用户地址，用户ID、姓名、性别全都文本展示，确定后调用/api/updateUser post接口
-所有操作成功后均刷新列表
+用户名称,userName,不超过10个字
+用户性别，gender，下拉框，固定1-男，2-女两个选项，可清空，本字段默认在表单中收起
+用户地址，解构province,city,distinct,级联，调用/address/getList.json接口获取数据，labelKey为name，valueKey为code，childrenKey为districts
+点击查询，打印提交的values
 ```
 
-### AI生成代码
+### 真实对话
+
+![](/images/ai-1.png)
+
+### AI生成代码效果
 
 ```tsx
-import { Title } from '@fundam/antd'
+import { useState } from 'react'
+import {
+  Form,
+  FormItemInput,
+  FormItemSelect,
+  FormItemCascade,
+  useAntFormInstance
+} from '@fundam/antd'
 
-export default () => <Title content="111" />
+// 仅文档展示使用
+import { MockContainer } from '../index'
+
+export default () => {
+  const [form] = useAntFormInstance()
+
+  const onFinish = (values: any) => {
+    console.log(values)
+  }
+
+  return (
+    // 文档展示需要用MockContainer，故在AI生成的代码基础上增加此嵌套，正常情况直接使用AI生成的代码即可
+    <MockContainer>
+      <Form
+        form={form}
+        direction="horizontal"
+        primaryButtonText="查询"
+        primaryButtonClick={() => form.submit()}
+        onFinish={onFinish}
+        collapseNames={['gender']}
+      >
+        <FormItemInput
+          name="userId"
+          label="用户ID"
+          isNumber
+        />
+        <FormItemInput
+          name="userName"
+          label="用户名称"
+          maxLength={10}
+        />
+        <FormItemSelect
+          name="gender"
+          label="用户性别"
+          options={[
+            { label: '男', value: 1 },
+            { label: '女', value: 2 }
+          ]}
+          allowClear
+        />
+        <FormItemCascade
+          names={['province', 'city', 'distinct']}
+          label="用户地址"
+          labelKey="name"
+          valueKey="code"
+          childrenKey="districts"
+          dataApi="/address/getList.json"
+        />
+      </Form>
+    </MockContainer>
+  )
+}
 ```
 
 ## 常见问题
