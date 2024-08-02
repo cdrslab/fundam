@@ -1,21 +1,21 @@
 ---
-title: 各组件Props
+title: Form
 order: 7
 ---
 
-## Form
+# Form
 
-### 描述
+## 描述
 
 这个是一个`Fundam`UI库中的Form组件，使用类似antd的Form组件，可以结合Fundam UI库中的各个由"FormItem"开头的组件，如：FormItemInput、FormItemSelect等，也支持直接套用antd的 Form.Item 组件使用
 
-### 导入
+## 导入
 
 ```ts
 import { Form } from '@fundam/antd'
 ```
 
-### 使用示例
+## 使用示例
 
 ```tsx | pure
 import { useState } from 'react'
@@ -207,9 +207,9 @@ export default () => {
 }
 ```
 
-### Props
+## Props
 
-#### 在Antd Form Props基础上额外新增
+### 在Antd Form Props基础上额外新增
 
 | 属性             | 是否必须 | 类型                                                                                      | 默认值          | 描述                                                                                                                        |
 |----------------|------|-----------------------------------------------------------------------------------------|--------------|---------------------------------------------------------------------------------------------------------------------------|
@@ -232,11 +232,6 @@ export default () => {
 | displayTextEmpty | 否    | 'string'                                                              | '-'          | 当displayType为text时，表单项为空，则根据此属性展示空值，默认：-（横线展示）                                                                            |
 | formCollapse | 否    | boolean                                                                      | true         | 表单展开与收起控制，默认：收起                                                                                                           |
 
-#### 原Antd Form Props除重名的外，其它全部支持
+### 原Antd Form Props除重名的外，其它全部支持
 
 [Props文档地址](https://ant.design/components/form-cn#form)
-
-
-每个组件都有自己的Props定义说明，更多请访问：
-
-<a href="https://github.com/cdrslab/fundam/tree/main/packages/antd/components" target="_blank">Github</a>

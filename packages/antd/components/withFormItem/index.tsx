@@ -23,7 +23,6 @@ export interface FunFormItemProps {
   visibleRule?: (() => boolean) | string | boolean
   observe?: Array<string>
   needInitFetch?: boolean // 是否需要首次请求（用于select、cascade等初始化数据），默认请求
-  // names?: Array<string>
 }
 
 export interface FormItemCommonProps extends Omit<AntFormItemProps, 'tooltip' | 'extra'>, FunFormItemProps {

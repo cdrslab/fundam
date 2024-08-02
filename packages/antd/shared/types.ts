@@ -16,8 +16,8 @@ export type GetData = {
   dataApiReqData?: any // 请求数据
   dataApiMethod?: 'get' | 'post' | 'delete' | 'put'
   resDataPath?: string // 组件所需响应数据提取
-  cacheKey?: string, // 缓存全局唯一key
-  cacheExpirationSec?: string, // 缓存过期时间
+  cacheKey?: string // 缓存全局唯一key
+  cacheExpirationSec?: string // 缓存过期时间
   dataRule?: boolean | (() => boolean) // 可以前置通过 dataRule 控制是否发起请求，dataRule值/计算值为false时不发请求
 }
 
