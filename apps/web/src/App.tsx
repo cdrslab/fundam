@@ -15,6 +15,7 @@ import ListBasePage from './examples/list_base_page'
 import List from './examples/list_page/List'
 
 import AIChar from './examples/ai_char'
+import AIDemo from './examples/ai_demo'
 
 // 模拟不同环境不同baseURL
 const getBaseURL = () => {
@@ -58,7 +59,8 @@ const App = () => {
             <BaseHeader />
             <div className="content">
               <Routes>
-                <Route path="/" element={<Navigate to="/ai_char" />} />
+                <Route path="/" element={<Navigate to="/ai_demo" />} />
+                <Route path="/ai_demo" element={<AIDemo />}></Route>
                 <Route path="/ai_char" element={<AIChar />}></Route>
                 <Route path="/list_pro_2" element={<ListProTwo />}></Route>
                 <Route path="/list_pro" element={<ListPro />}></Route>

@@ -60,6 +60,10 @@ const App = () => {
 
 ## 与AI交互对话示例
 
+### PRD图生成页面示例
+
+![](/images/ai-page.gif)
+
 ### 图片生成代码-示例图（来源antd官网）
 
 ![](/images/image-form-1.png)
