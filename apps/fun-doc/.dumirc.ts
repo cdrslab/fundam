@@ -3,7 +3,8 @@ import path from 'path'
 
 export default defineConfig({
   themeConfig: {
-    name: 'Fundam',
+    name: 'Fundamjs',
+    logo: false
   },
   alias: {
     '@fundam/antd': path.resolve(__dirname,  '../../packages/antd/index.ts'),
