@@ -409,8 +409,8 @@ export default () => {
 | dataApiReqData      | 否    | any                                  | -      | 请求额外参数                                                                                                   |
 | dataApiMethod      | 否    | 'get' \| 'post' \| 'delete' \| 'put' | -      | 请求方法                                                                                                     |
 | resDataPath      | 否    | string                               | -      | 响应数据提取的path，类似于 _.get(res, resDataPath)                                                                  |
-| cacheKey      | 否    | string                               | -      | 注意cacheKey的唯一性，设置后，会对通过dataApi或dataFunc获取的options进行localstorage缓存，默认120s                                 |
-| cacheExpirationSec      | 否    | number                               | 120    | 结合cacheKey可以对通过dataApi或dataFunc获取的options进行缓存，默认120s，可以更改此值，更改缓存时间                                       |
+| cacheKey      | 否    | string                               | -      | 注意cacheKey的唯一性，设置后，会对通过dataApi或dataFunc获取的数据进行localstorage缓存，默认120s                                      |
+| cacheExpirationSec      | 否    | number                               | 120    | 结合cacheKey可以对通过dataApi或dataFunc获取的数据进行缓存，默认120s，可以更改此值，更改缓存时间                                       |
 | dataRule      | 否    | boolean \| (() => boolean)           | -                                                                                                        | 可以前置通过 dataRule 控制是否发起请求，dataRule值/函数返回值为false时不发请求                                                      |
 
 ### FormItemUploadImage额外的Props

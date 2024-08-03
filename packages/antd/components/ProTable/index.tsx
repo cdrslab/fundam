@@ -55,12 +55,8 @@ export interface ProTableInstance {
 export interface ProTableColumnProps<T> extends Omit<AntTableColumnProps<T>, 'key'> {
   // 索引
   dataIndex: string
-  // 支持自定义title
-  // title: ((props: any) => React.ReactNode) | React.ReactNode | string
   // 不可操作？
   disabled?: Boolean
-  // 唯一key，不传使用dataIndex
-  // key?: string // TODO 不使用key
   // 提示
   tooltip?: string
   // 最大行数，超过展示...
