@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { FunConfigProvider } from '@fundam/antd'
 import { message } from 'antd'
 import { createAPI } from '@fundam/utils'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 
 // import '@fundam/antd/dist/style.css'
 import './app.css'
@@ -13,6 +13,8 @@ import ListProTwo from './examples/list_pro2'
 import BaseForm from './examples/form_page/BaseForm'
 import ListBasePage from './examples/list_base_page'
 import List from './examples/list_page/List'
+
+import AIChar from './examples/ai_char'
 
 // 模拟不同环境不同baseURL
 const getBaseURL = () => {
@@ -56,6 +58,8 @@ const App = () => {
             <BaseHeader />
             <div className="content">
               <Routes>
+                <Route path="/" element={<Navigate to="/ai_char" />} />
+                <Route path="/ai_char" element={<AIChar />}></Route>
                 <Route path="/list_pro_2" element={<ListProTwo />}></Route>
                 <Route path="/list_pro" element={<ListPro />}></Route>
                 <Route path="/list" element={<List />}></Route>

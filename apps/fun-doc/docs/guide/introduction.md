@@ -11,6 +11,59 @@ order: 1
 
 为此首先需要 `@fundam/antd` 这样对antd完全“傻瓜化”的封装的组件包，也额外实现了更加贴合实际使用场景的一些组件，如：`FormItemTable`、`ModalForm`等等，便于使用者和AI快速理解组件设计、联动、数据请求等逻辑，能快速用最简短的代码表达你想要的逻辑。这样做的好处是：不需要大量的数据对AI进行大量的训练；无论是使用者还是AI都能快速理解简洁的代码
 
+## 快速使用
+
+### 依赖安装
+
+```shell
+$ yarn add @fundam/antd @fundam/hooks @fundam/utils antd
+```
+
+### APP引入Provider
+
+```tsx | pure
+// APP.tsx
+
+// ...省略其它import...
+import { FunConfigProvider } from '@fundam/antd'
+
+const App = () => {
+  // TODO 需要实现一个请求拦截器给 Fundam，用于各组件快速获取数据使用
+  const request = useMemo(() => createAPI({
+    baseURL: getBaseURL(),
+  }, (res: any) => {
+    const { status, data } = res
+    if (!data.ok) {
+      message.error(data.error?.message ?? '请求失败，请重试')
+      return Promise.reject(data)
+    }
+    return data.result || data.ok
+  }, (error: any) => {
+    if (error.response) {
+      const { status } = error.response
+      if (status === 401) {
+        // TODO 跳转登录？
+        return
+      }
+    }
+    throw error
+  }), [])
+
+  return (
+    <BrowserRouter>
+      {/*引入FunConfigProvider*/}
+      <FunConfigProvider
+        request={request}
+      >
+        <Routes>
+          <Route path="/demo" element={<Demo />}></Route>
+        </Routes>
+      </FunConfigProvider>
+    </BrowserRouter>
+  )
+}
+```
+
 ## 与AI交互对话示例
 
 ### 图片生成代码-示例图（来源antd官网）
@@ -138,23 +191,3 @@ export default () => {
   )
 }
 ```
-
-## 常见问题
-
-### 对Antd做了哪些事？
-
-1. 对antd的各组件进行了常用props组合进行了封装，如Table行的多选/单选各props组合逻辑的简化
-2. 简化联动逻辑
-3. FormItem 多选值解构，如：级联组件、日期起止选择等
-4. 对Form、FormItem、Table等进行功能增强实现，如，给Form直接传入`displayType`属性直接改变整个表单的展示形式（也可以单独为某个FormItem设置）：'default' | 'text' | 'disabled' 分别对应 表单展示、文字展示（Fundam会自动处理下拉、远程下拉等的文案）、置灰展示
-5. ...还有很多... 等你探索
-
-### 会影响antd原生的props吗？
-
-1. 不会，`Fundam`的所有组件实现都是基于antd的，当然也可以直接传入原生的props
-
-### 页面组件都不做拆分，代码质量、性能堪忧？
-
-1. 不一定直接使用`AI+Fundam`直接一次性生成一个完整的复杂页面，可以直接生成某个组件，如：表单弹窗组件。这样组件拆分还是靠使用者自己，当然AI也可以做这样的事情，不妨试试～
-
-
