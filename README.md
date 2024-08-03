@@ -20,7 +20,7 @@ $ yarn add @fundam/antd @fundam/hooks @fundam/utils antd
 
 ### APP引入Provider
 
-```tsx | pure
+```tsx
 // APP.tsx
 
 // ...省略其它import...

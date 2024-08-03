@@ -29,24 +29,18 @@ import { FunConfigProvider } from '@fundam/antd'
 
 const App = () => {
   // TODO 需要实现一个请求拦截器给 Fundam，用于各组件快速获取数据使用
+  // 示例
   const request = useMemo(() => createAPI({
     baseURL: getBaseURL(),
   }, (res: any) => {
     const { status, data } = res
-    if (!data.ok) {
+    if (!data.success) {
       message.error(data.error?.message ?? '请求失败，请重试')
       return Promise.reject(data)
     }
-    return data.result || data.ok
+    return data.data || data.success
   }, (error: any) => {
-    if (error.response) {
-      const { status } = error.response
-      if (status === 401) {
-        // TODO 跳转登录？
-        return
-      }
-    }
-    throw error
+    // TODO 异常处理
   }), [])
 
   return (
