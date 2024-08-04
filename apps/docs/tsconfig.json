@@ -1,7 +1,0 @@
-{
-  "extends": "@fundam/tsconfig/vite.json",
-  "include": ["src"],
-  "compilerOptions": {
-    "jsx": "react"
-  }
-}
