@@ -1,0 +1,15 @@
+{
+  "extends": "@fundam/tsconfig/vite.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "jsx": "react-jsx",
+    "paths": {
+      "@fundam/antd": ["../../packages/antd/index.ts"],
+      "@fundam/utils": ["../../packages/utils/index.ts"],
+      "@fundam/hooks": ["../../packages/hooks/index.ts"]
+    }
+  },
+  "include": [
+    "src"
+  ]
+}
