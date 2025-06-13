@@ -31,7 +31,7 @@ export interface DropPosition {
 // 属性类型定义
 export interface PropTypeDefinition {
   name: string
-  type: 'string' | 'number' | 'boolean' | 'select' | 'color' | 'textarea' | 'json'
+  type: 'string' | 'number' | 'boolean' | 'select' | 'color' | 'textarea' | 'json' | 'tabs_config' | 'collapse_config'
   label: string
   defaultValue?: any
   options?: Array<{ label: string; value: any }>

@@ -24,6 +24,8 @@ import TableScrollConfig from './TableScrollConfig'
 import TablePaginationConfig from './TablePaginationConfig'
 import PageListQueryFormConfig from './PageListQueryFormConfig'
 import ApiSelector from './ApiSelector'
+import TabsConfigEditor from './TabsConfigEditor'
+import CollapseConfigEditor from './CollapseConfigEditor'
 
 const { Title, Text } = Typography
 const { TextArea } = Input
@@ -174,6 +176,28 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
               placeholder={`请输入${label}（JSON格式）`}
               autoSize={{ minRows: 3, maxRows: 8 }}
             />
+          </Form.Item>
+        )
+
+      case 'tabs_config':
+        return (
+          <Form.Item
+            key={name}
+            label={label}
+            name={name}
+          >
+            <TabsConfigEditor />
+          </Form.Item>
+        )
+
+      case 'collapse_config':
+        return (
+          <Form.Item
+            key={name}
+            label={label}
+            name={name}
+          >
+            <CollapseConfigEditor />
           </Form.Item>
         )
 

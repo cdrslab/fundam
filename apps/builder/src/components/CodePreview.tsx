@@ -1,12 +1,12 @@
 import React, { useState, useMemo } from 'react'
 import { Modal, Tabs, Button, message, Typography } from 'antd'
+import type { TabsProps } from 'antd'
 import { CopyOutlined, DownloadOutlined } from '@ant-design/icons'
 import Editor from '@monaco-editor/react'
 
 import { ComponentConfig } from '../types'
 import { generateFullPageCode } from '../utils/codeGenerator'
 
-const { TabPane } = Tabs
 const { Text } = Typography
 
 interface CodePreviewProps {
@@ -75,6 +75,68 @@ const CodePreview: React.FC<CodePreviewProps> = ({
     return activeTab === 'tsx' ? 'Page.tsx' : 'page-config.json'
   }
 
+  // 为Tabs组件生成items
+  const tabItems: TabsProps['items'] = [
+    {
+      key: 'tsx',
+      label: 'TSX代码',
+      children: (
+        <>
+          <div style={{ marginBottom: '8px' }}>
+            <Text type="secondary">
+              生成的React组件代码，可直接在项目中使用
+            </Text>
+          </div>
+          <div style={{ border: '1px solid #d9d9d9', borderRadius: '6px' }}>
+            <Editor
+              height="500px"
+              language="typescript"
+              value={generatedCode}
+              options={{
+                readOnly: true,
+                minimap: { enabled: false },
+                fontSize: 14,
+                lineNumbers: 'on',
+                scrollBeyondLastLine: false,
+                automaticLayout: true,
+                theme: 'vs-light'
+              }}
+            />
+          </div>
+        </>
+      )
+    },
+    {
+      key: 'json',
+      label: '配置JSON',
+      children: (
+        <>
+          <div style={{ marginBottom: '8px' }}>
+            <Text type="secondary">
+              页面配置数据，可用于保存和恢复页面设计
+            </Text>
+          </div>
+          <div style={{ border: '1px solid #d9d9d9', borderRadius: '6px' }}>
+            <Editor
+              height="500px"
+              language="json"
+              value={configJson}
+              options={{
+                readOnly: true,
+                minimap: { enabled: false },
+                fontSize: 14,
+                lineNumbers: 'on',
+                scrollBeyondLastLine: false,
+                automaticLayout: true,
+                theme: 'vs-light'
+              }}
+            />
+          </div>
+        </>
+      )
+    }
+  ]
+
   return (
     <Modal
       title="代码预览"
@@ -102,55 +164,11 @@ const CodePreview: React.FC<CodePreviewProps> = ({
         </Button>
       ]}
     >
-      <Tabs activeKey={activeTab} onChange={setActiveTab}>
-        <TabPane tab="TSX代码" key="tsx">
-          <div style={{ marginBottom: '8px' }}>
-            <Text type="secondary">
-              生成的React组件代码，可直接在项目中使用
-            </Text>
-          </div>
-          <div style={{ border: '1px solid #d9d9d9', borderRadius: '6px' }}>
-            <Editor
-              height="500px"
-              language="typescript"
-              value={generatedCode}
-              options={{
-                readOnly: true,
-                minimap: { enabled: false },
-                fontSize: 14,
-                lineNumbers: 'on',
-                scrollBeyondLastLine: false,
-                automaticLayout: true,
-                theme: 'vs-light'
-              }}
-            />
-          </div>
-        </TabPane>
-        
-        <TabPane tab="配置JSON" key="json">
-          <div style={{ marginBottom: '8px' }}>
-            <Text type="secondary">
-              页面配置数据，可用于保存和恢复页面设计
-            </Text>
-          </div>
-          <div style={{ border: '1px solid #d9d9d9', borderRadius: '6px' }}>
-            <Editor
-              height="500px"
-              language="json"
-              value={configJson}
-              options={{
-                readOnly: true,
-                minimap: { enabled: false },
-                fontSize: 14,
-                lineNumbers: 'on',
-                scrollBeyondLastLine: false,
-                automaticLayout: true,
-                theme: 'vs-light'
-              }}
-            />
-          </div>
-        </TabPane>
-      </Tabs>
+      <Tabs 
+        activeKey={activeTab} 
+        onChange={setActiveTab}
+        items={tabItems}
+      />
     </Modal>
   )
 }

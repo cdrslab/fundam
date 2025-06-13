@@ -1,18 +1,57 @@
 import React, { useState } from 'react'
 import { Tabs } from 'antd'
-import { AppstoreOutlined, MessageOutlined } from '@ant-design/icons'
+import { AppstoreOutlined, UnorderedListOutlined } from '@ant-design/icons'
 
 import ComponentPanel from './ComponentPanel'
-import AIChat from './AIChat'
-
-const { TabPane } = Tabs
+import ComponentTreeView from './ComponentTreeView'
+import { ComponentConfig } from '../types'
 
 interface SidebarProps {
   onAddComponent: (componentType: string, defaultProps: Record<string, any>) => void
+  components: ComponentConfig[]
+  selectedId: string | null
+  onSelectComponent: (id: string | null) => void
+  onDeleteComponent: (id: string) => void
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ onAddComponent }) => {
+const Sidebar: React.FC<SidebarProps> = ({ 
+  onAddComponent, 
+  components, 
+  selectedId, 
+  onSelectComponent, 
+  onDeleteComponent 
+}) => {
   const [activeTab, setActiveTab] = useState('components')
+
+  const tabItems = [
+    {
+      key: 'components',
+      label: (
+        <span>
+          <AppstoreOutlined />
+          组件库
+        </span>
+      ),
+      children: <ComponentPanel onAddComponent={onAddComponent} />
+    },
+    {
+      key: 'tree',
+      label: (
+        <span>
+          <UnorderedListOutlined />
+          组件树
+        </span>
+      ),
+      children: (
+        <ComponentTreeView
+          components={components}
+          selectedId={selectedId}
+          onSelect={onSelectComponent}
+          onDelete={onDeleteComponent}
+        />
+      )
+    }
+  ]
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -21,36 +60,15 @@ const Sidebar: React.FC<SidebarProps> = ({ onAddComponent }) => {
         onChange={setActiveTab}
         centered
         size="small"
-        style={{ borderBottom: '1px solid #e8e8e8' }}
-      >
-        <TabPane
-          tab={
-            <span>
-              <AppstoreOutlined />
-              组件库
-            </span>
-          }
-          key="components"
-        />
-        <TabPane
-          tab={
-            <span>
-              <MessageOutlined />
-              AI助手
-            </span>
-          }
-          key="ai"
-        />
-      </Tabs>
-
-      <div style={{ flex: 1, overflow: 'auto' }}>
-        {activeTab === 'components' && (
-          <ComponentPanel onAddComponent={onAddComponent} />
-        )}
-        {activeTab === 'ai' && (
-          <AIChat onGenerateComponent={onAddComponent} />
-        )}
-      </div>
+        items={tabItems}
+        style={{ 
+          borderBottom: '1px solid #e8e8e8',
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column'
+        }}
+        tabBarStyle={{ marginBottom: 0 }}
+      />
     </div>
   )
 }

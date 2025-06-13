@@ -109,18 +109,19 @@ const Canvas: React.FC<CanvasProps> = ({
   const rootComponents = components.filter(c => !c.parentId)
 
   return (
-    <div
-      ref={drop}
-      className="canvas-container"
-      onClick={handleCanvasClick}
-      style={{ 
-        position: 'relative', 
-        padding: '20px',
-        minHeight: '500px',
-        backgroundColor: isOver ? 'rgba(24, 144, 255, 0.05)' : 'transparent',
-        transition: 'background-color 0.2s ease'
-      }}
-    >
+    <div style={{ flex: 1, overflow: 'auto', position: 'relative' }}>
+      <div
+        ref={drop}
+        className="canvas-container"
+        onClick={handleCanvasClick}
+        style={{ 
+          position: 'relative', 
+          padding: '20px',
+          minHeight: 'calc(100vh - 60px)',
+          backgroundColor: isOver ? 'rgba(24, 144, 255, 0.05)' : 'transparent',
+          transition: 'background-color 0.2s ease'
+        }}
+      >
       {rootComponents.length === 0 ? (
         <div
           className="empty-canvas"
@@ -145,6 +146,7 @@ const Canvas: React.FC<CanvasProps> = ({
           {renderComponentTree(rootComponents)}
         </div>
       )}
+      </div>
     </div>
   )
 }

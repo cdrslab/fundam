@@ -17,7 +17,7 @@ import { PlusOutlined, EditOutlined, DeleteOutlined, SettingOutlined } from '@an
 
 import { globalConfigManager, ApiConfig, ModalConfig } from '../store/globalConfig'
 
-const { TabPane } = Tabs
+// const { TabPane } = Tabs  // 已废弃，使用items替代
 const { Text } = Typography
 
 interface GlobalConfigPanelProps {
@@ -184,56 +184,74 @@ const GlobalConfigPanel: React.FC<GlobalConfigPanelProps> = ({ visible, onClose 
         width={1000}
         footer={null}
       >
-        <Tabs activeKey={activeTab} onChange={setActiveTab}>
-          <TabPane tab="API接口" key="apis">
-            <div style={{ marginBottom: 16 }}>
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={handleAddApi}
-              >
-                添加API
-              </Button>
-            </div>
-            <Table
-              columns={apiColumns}
-              dataSource={config.apis}
-              rowKey="id"
-              size="small"
-              pagination={{ pageSize: 10 }}
-            />
-          </TabPane>
-
-          <TabPane tab="弹窗配置" key="modals">
-            <div style={{ marginBottom: 16 }}>
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={handleAddModal}
-              >
-                添加弹窗
-              </Button>
-            </div>
-            <Table
-              columns={modalColumns}
-              dataSource={config.modals}
-              rowKey="id"
-              size="small"
-              pagination={{ pageSize: 10 }}
-            />
-          </TabPane>
-
-          <TabPane tab="主题设置" key="theme">
-            <Form layout="vertical">
-              <Form.Item label="主色调">
-                <Input value={config.theme.primaryColor} disabled />
-              </Form.Item>
-              <Form.Item label="圆角大小">
-                <InputNumber value={config.theme.borderRadius} disabled />
-              </Form.Item>
-            </Form>
-          </TabPane>
-        </Tabs>
+        <Tabs 
+          activeKey={activeTab} 
+          onChange={setActiveTab}
+          items={[
+            {
+              key: 'apis',
+              label: 'API接口',
+              children: (
+                <>
+                  <div style={{ marginBottom: 16 }}>
+                    <Button
+                      type="primary"
+                      icon={<PlusOutlined />}
+                      onClick={handleAddApi}
+                    >
+                      添加API
+                    </Button>
+                  </div>
+                  <Table
+                    columns={apiColumns}
+                    dataSource={config.apis}
+                    rowKey="id"
+                    size="small"
+                    pagination={{ pageSize: 10 }}
+                  />
+                </>
+              )
+            },
+            {
+              key: 'modals',
+              label: '弹窗配置',
+              children: (
+                <>
+                  <div style={{ marginBottom: 16 }}>
+                    <Button
+                      type="primary"
+                      icon={<PlusOutlined />}
+                      onClick={handleAddModal}
+                    >
+                      添加弹窗
+                    </Button>
+                  </div>
+                  <Table
+                    columns={modalColumns}
+                    dataSource={config.modals}
+                    rowKey="id"
+                    size="small"
+                    pagination={{ pageSize: 10 }}
+                  />
+                </>
+              )
+            },
+            {
+              key: 'theme',
+              label: '主题设置',
+              children: (
+                <Form layout="vertical">
+                  <Form.Item label="主色调">
+                    <Input value={config.theme.primaryColor} disabled />
+                  </Form.Item>
+                  <Form.Item label="圆角大小">
+                    <InputNumber value={config.theme.borderRadius} disabled />
+                  </Form.Item>
+                </Form>
+              )
+            }
+          ]}
+        />
       </Modal>
 
       {/* API编辑弹窗 */}

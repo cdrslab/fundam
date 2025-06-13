@@ -9,6 +9,8 @@ import Canvas from './components/Canvas'
 import PropertiesPanel from './components/PropertiesPanel'
 import CodePreview from './components/CodePreview'
 import GlobalConfigPanel from './components/GlobalConfigPanel'
+import AIAssistant from './components/AIAssistant'
+import CodeRenderer from './components/CodeRenderer'
 import { ComponentConfig, CanvasState, DropPosition } from './types'
 import { generateId } from './utils/helpers'
 import { CanvasContext } from './hooks/useCanvasComponents'
@@ -20,6 +22,8 @@ const App: React.FC = () => {
   })
   const [showCode, setShowCode] = useState(false)
   const [showGlobalConfig, setShowGlobalConfig] = useState(false)
+  const [aiGeneratedCode, setAiGeneratedCode] = useState<string>('')
+  const [showAiPreview, setShowAiPreview] = useState(false)
 
   // 添加组件到画布
   const addComponent = useCallback((
@@ -166,12 +170,24 @@ const App: React.FC = () => {
   // 获取选中的组件
   const selectedComponent = canvasState.components.find(comp => comp.id === canvasState.selectedId)
 
+  // 处理AI生成的代码
+  const handleCodeGenerated = useCallback((code: string) => {
+    setAiGeneratedCode(code)
+    setShowAiPreview(true)
+  }, [])
+
   return (
     <CanvasContext.Provider value={{ components: canvasState.components }}>
       <DndProvider backend={HTML5Backend}>
         <div className="builder-layout">
           <div className="builder-sidebar">
-            <Sidebar onAddComponent={addComponent} />
+            <Sidebar 
+              onAddComponent={addComponent}
+              components={canvasState.components}
+              selectedId={canvasState.selectedId}
+              onSelectComponent={selectComponent}
+              onDeleteComponent={deleteComponent}
+            />
           </div>
           
           <div className="builder-canvas">
@@ -205,10 +221,18 @@ const App: React.FC = () => {
           </div>
           
           <div className="builder-properties">
-            <PropertiesPanel
-              component={selectedComponent}
-              onUpdateComponent={updateComponent}
-            />
+            <div style={{ height: '50%', marginBottom: '8px' }}>
+              <PropertiesPanel
+                component={selectedComponent}
+                onUpdateComponent={updateComponent}
+              />
+            </div>
+            <div style={{ height: '50%' }}>
+              <AIAssistant 
+                selectedComponent={selectedComponent} 
+                onCodeGenerated={handleCodeGenerated}
+              />
+            </div>
           </div>
         </div>
 
@@ -225,6 +249,13 @@ const App: React.FC = () => {
         <GlobalConfigPanel
           visible={showGlobalConfig}
           onClose={() => setShowGlobalConfig(false)}
+        />
+
+        {/* AI代码预览 */}
+        <CodeRenderer
+          code={aiGeneratedCode}
+          visible={showAiPreview}
+          onClose={() => setShowAiPreview(false)}
         />
       </DndProvider>
     </CanvasContext.Provider>

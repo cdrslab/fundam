@@ -40,7 +40,11 @@ const ComponentItem: React.FC<ComponentItemProps> = ({
   const componentDef = componentDefinitions.find(def => def.type === component.type)
   const isContainer = componentDef?.isContainer
   const hasChildren = children && React.Children.count(children) > 0
-  const isInputComponent = ['Input', 'TextArea', 'Select', 'DatePicker', 'Button'].includes(component.type)
+  const isInputComponent = [
+    'Input', 'TextArea', 'Select', 'DatePicker', 'Button', 
+    'Text', 'Title', 'Image', 'Divider', 'Tag', 'Checkbox', 
+    'Radio', 'Switch', 'Slider', 'Rate', 'Progress', 'Badge'
+  ].includes(component.type)
 
   // 拖拽设置
   const [{ isDraggingThis }, drag, dragPreview] = useDrag({
