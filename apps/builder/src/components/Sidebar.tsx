@@ -4,7 +4,7 @@ import { AppstoreOutlined, UnorderedListOutlined } from '@ant-design/icons'
 
 import ComponentPanel from './ComponentPanel'
 import ComponentTreeView from './ComponentTreeView'
-import { ComponentConfig } from '../types'
+import type { ComponentConfig } from '../types'
 
 interface SidebarProps {
   onAddComponent: (componentType: string, defaultProps: Record<string, any>) => void
@@ -14,12 +14,12 @@ interface SidebarProps {
   onDeleteComponent: (id: string) => void
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ 
-  onAddComponent, 
-  components, 
-  selectedId, 
-  onSelectComponent, 
-  onDeleteComponent 
+const Sidebar: React.FC<SidebarProps> = ({
+  onAddComponent,
+  components,
+  selectedId,
+  onSelectComponent,
+  onDeleteComponent
 }) => {
   const [activeTab, setActiveTab] = useState('components')
 
@@ -60,13 +60,13 @@ const Sidebar: React.FC<SidebarProps> = ({
       centered
       size="small"
       items={tabItems}
-      style={{ 
+      style={{
         height: '100%',
         display: 'flex',
         flexDirection: 'column'
       }}
-      tabBarStyle={{ 
-        marginBottom: 0, 
+      tabBarStyle={{
+        marginBottom: 0,
         flexShrink: 0,
         borderBottom: '1px solid #e8e8e8'
       }}

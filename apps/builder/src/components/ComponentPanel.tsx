@@ -3,9 +3,9 @@ import { useDrag } from 'react-dnd'
 import { Collapse, Typography, Space, Input } from 'antd'
 import type { CollapseProps } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
-import { 
-  FormOutlined, 
-  TableOutlined, 
+import {
+  FormOutlined,
+  TableOutlined,
   AppstoreOutlined,
   FileTextOutlined,
   LayoutOutlined,
@@ -31,7 +31,7 @@ import {
 
 import { componentsByCategory, categoryNames } from '../config/components'
 import type { ComponentDefinition } from '../types'
-import { DragItem } from '../types'
+import type { DragItem } from '../types'
 
 const { Text } = Typography
 
@@ -56,7 +56,7 @@ const componentIcons: Record<string, React.ReactNode> = {
   Rate: <StarOutlined />,
   Form: <FormOutlined />,
   ModalForm: <FormOutlined />,
-  
+
   // 布局组件
   Card: <FileTextOutlined />,
   Row: <LayoutOutlined />,
@@ -64,13 +64,13 @@ const componentIcons: Record<string, React.ReactNode> = {
   Space: <LayoutOutlined />,
   Tabs: <BlockOutlined />,
   Collapse: <MenuFoldOutlined />,
-  
+
   // 数据展示组件
   Table: <TableOutlined />,
   Statistic: <NumberOutlined />,
   Progress: <PercentageOutlined />,
   Badge: <NumberOutlined />,
-  
+
   // 通用组件
   Text: <FontSizeOutlined />,
   Title: <FontSizeOutlined />,
@@ -78,10 +78,10 @@ const componentIcons: Record<string, React.ReactNode> = {
   Divider: <LineOutlined />,
   Tag: <TagOutlined />,
   Alert: <AlertOutlined />,
-  
+
   // 页面模板
   PageListQuery: <DashboardOutlined />,
-  
+
   // 业务组件
   UserProfile: <FormOutlined />,
   StatsCard: <BarChartOutlined />,
@@ -90,7 +90,7 @@ const componentIcons: Record<string, React.ReactNode> = {
   ContactInfo: <FormOutlined />
 }
 
-// 类别图标映射  
+// 类别图标映射
 const categoryIcons: Record<string, React.ReactNode> = {
   general: <AppstoreOutlined />,
   layout: <LayoutOutlined />,
@@ -143,18 +143,18 @@ const ComponentPanel: React.FC<ComponentPanelProps> = ({ onAddComponent }) => {
     if (!searchText) return componentsByCategory
 
     const filtered: Record<string, ComponentDefinition[]> = {}
-    
+
     Object.entries(componentsByCategory).forEach(([category, components]) => {
       const filteredComponents = components.filter(component =>
         component.name.toLowerCase().includes(searchText.toLowerCase()) ||
         component.type.toLowerCase().includes(searchText.toLowerCase())
       )
-      
+
       if (filteredComponents.length > 0) {
         filtered[category] = filteredComponents
       }
     })
-    
+
     return filtered
   }, [searchText])
 
@@ -200,16 +200,16 @@ const ComponentPanel: React.FC<ComponentPanelProps> = ({ onAddComponent }) => {
       {/* 组件列表 */}
       <div style={{ flex: 1, overflow: 'auto' }}>
         {Object.keys(filteredComponentsByCategory).length === 0 ? (
-          <div style={{ 
-            textAlign: 'center', 
-            color: '#999', 
+          <div style={{
+            textAlign: 'center',
+            color: '#999',
             padding: '20px',
             fontSize: '14px'
           }}>
             未找到匹配的组件
           </div>
         ) : (
-          <Collapse 
+          <Collapse
             defaultActiveKey={Object.keys(filteredComponentsByCategory)}
             activeKey={searchText ? Object.keys(filteredComponentsByCategory) : undefined}
             ghost

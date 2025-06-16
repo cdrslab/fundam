@@ -1,11 +1,11 @@
 import React from 'react'
-import { 
-  Button, 
-  Input, 
-  Card, 
-  Space, 
-  Form, 
-  Table, 
+import {
+  Button,
+  Input,
+  Card,
+  Space,
+  Form,
+  Table,
   Alert,
   Typography,
   Select,
@@ -28,16 +28,16 @@ import {
   Avatar,
   Timeline
 } from 'antd'
-import { 
-  ArrowUpOutlined, 
-  ArrowDownOutlined, 
-  PhoneOutlined, 
-  MailOutlined, 
-  EnvironmentOutlined, 
-  GlobalOutlined 
+import {
+  ArrowUpOutlined,
+  ArrowDownOutlined,
+  PhoneOutlined,
+  MailOutlined,
+  EnvironmentOutlined,
+  GlobalOutlined
 } from '@ant-design/icons'
 
-import { ComponentConfig } from '../types'
+import type { ComponentConfig } from '../types'
 import { ActionExecutor } from '../utils/actionExecutor'
 
 const { Text, Title } = Typography
@@ -48,8 +48,8 @@ interface ComponentRendererProps {
   children?: React.ReactNode
 }
 
-const ComponentRenderer: React.FC<ComponentRendererProps> = ({ 
-  component, 
+const ComponentRenderer: React.FC<ComponentRendererProps> = ({
+  component,
   children
 }) => {
   const { type, props } = component
@@ -68,7 +68,7 @@ const ComponentRenderer: React.FC<ComponentRendererProps> = ({
       switch (type) {
         case 'Button':
           const buttonProps = { ...props }
-          
+
           // 如果有配置的动作，添加点击事件
           if (props.actions && props.actions.length > 0) {
             buttonProps.onClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -79,7 +79,7 @@ const ComponentRenderer: React.FC<ComponentRendererProps> = ({
               })
             }
           }
-          
+
           return <Button {...buttonProps}>{props.children || '按钮'}</Button>
 
         case 'Input':
@@ -89,8 +89,8 @@ const ComponentRenderer: React.FC<ComponentRendererProps> = ({
           return <TextArea {...props} />
 
         case 'Select':
-          const selectOptions = typeof props.options === 'string' 
-            ? JSON.parse(props.options) 
+          const selectOptions = typeof props.options === 'string'
+            ? JSON.parse(props.options)
             : props.options || []
           return (
             <Select {...props} style={{ minWidth: '120px' }}>
@@ -108,9 +108,9 @@ const ComponentRenderer: React.FC<ComponentRendererProps> = ({
         case 'Card':
           return (
             <Card {...props} style={{ minHeight: '120px', ...props.style }}>
-              {renderChildren() || <div style={{ 
-                padding: '20px', 
-                textAlign: 'center', 
+              {renderChildren() || <div style={{
+                padding: '20px',
+                textAlign: 'center',
                 color: '#999',
                 minHeight: '80px',
                 display: 'flex',
@@ -123,10 +123,10 @@ const ComponentRenderer: React.FC<ComponentRendererProps> = ({
         case 'Row':
           return (
             <Row {...props} style={{ minHeight: '60px', ...props.style }}>
-              {renderChildren() || <div style={{ 
+              {renderChildren() || <div style={{
                 width: '100%',
-                padding: '20px', 
-                textAlign: 'center', 
+                padding: '20px',
+                textAlign: 'center',
                 color: '#999',
                 border: '1px dashed #e8e8e8',
                 borderRadius: '4px'
@@ -137,9 +137,9 @@ const ComponentRenderer: React.FC<ComponentRendererProps> = ({
         case 'Col':
           return (
             <Col {...props} style={{ minHeight: '60px', ...props.style }}>
-              {renderChildren() || <div style={{ 
-                padding: '20px', 
-                textAlign: 'center', 
+              {renderChildren() || <div style={{
+                padding: '20px',
+                textAlign: 'center',
                 color: '#999',
                 border: '1px dashed #e8e8e8',
                 borderRadius: '4px',
@@ -190,10 +190,10 @@ const ComponentRenderer: React.FC<ComponentRendererProps> = ({
           const tableProps = {
             ...props,
             columns: processedColumns,
-            pagination: props.pagination ? 
+            pagination: props.pagination ?
               (typeof props.pagination === 'string' ? JSON.parse(props.pagination) : props.pagination) :
               { pageSize: 10 },
-            scroll: props.scroll ? 
+            scroll: props.scroll ?
               (typeof props.scroll === 'string' ? JSON.parse(props.scroll) : props.scroll) :
               undefined
           }
@@ -228,7 +228,7 @@ const ComponentRenderer: React.FC<ComponentRendererProps> = ({
                 }
               })
             }
-            
+
             // 默认搜索框
             return (
               <Form.Item label="搜索">
@@ -452,9 +452,9 @@ const ComponentRenderer: React.FC<ComponentRendererProps> = ({
               overflowCount={props.overflowCount}
               status={props.status}
             >
-              <div style={{ 
-                padding: '10px 20px', 
-                background: '#f0f0f0', 
+              <div style={{
+                padding: '10px 20px',
+                background: '#f0f0f0',
                 borderRadius: '4px',
                 display: 'inline-block'
               }}>
@@ -465,7 +465,7 @@ const ComponentRenderer: React.FC<ComponentRendererProps> = ({
 
         case 'Tabs':
           // 如果有子组件，将子组件分配到标签页中
-          const tabItems = React.Children.count(children) > 0 
+          const tabItems = React.Children.count(children) > 0
             ? React.Children.map(children, (child, index) => ({
                 key: `tab-${index + 1}`,
                 label: `标签页${index + 1}`,
@@ -475,7 +475,7 @@ const ComponentRenderer: React.FC<ComponentRendererProps> = ({
                 { key: '1', label: '标签页1', children: '内容1' },
                 { key: '2', label: '标签页2', children: '内容2' }
               ])
-          
+
           return (
             <Tabs
               type={props.type}
@@ -488,7 +488,7 @@ const ComponentRenderer: React.FC<ComponentRendererProps> = ({
 
         case 'Collapse':
           // 如果有子组件，将子组件分配到折叠面板中
-          const collapseItems = React.Children.count(children) > 0 
+          const collapseItems = React.Children.count(children) > 0
             ? React.Children.map(children, (child, index) => ({
                 key: `panel-${index + 1}`,
                 label: `面板${index + 1}`,
@@ -498,7 +498,7 @@ const ComponentRenderer: React.FC<ComponentRendererProps> = ({
                 { key: '1', label: '面板标题1', children: '面板内容1' },
                 { key: '2', label: '面板标题2', children: '面板内容2' }
               ])
-          
+
           return (
             <Collapse
               items={collapseItems}
@@ -577,11 +577,11 @@ const ComponentRenderer: React.FC<ComponentRendererProps> = ({
                   ¥{props.price}
                 </span>
                 {props.originalPrice && (
-                  <span style={{ 
-                    marginLeft: 8, 
-                    color: '#999', 
-                    fontSize: 14, 
-                    textDecoration: 'line-through' 
+                  <span style={{
+                    marginLeft: 8,
+                    color: '#999',
+                    fontSize: 14,
+                    textDecoration: 'line-through'
                   }}>
                     ¥{props.originalPrice}
                   </span>
@@ -675,13 +675,13 @@ const ComponentRenderer: React.FC<ComponentRendererProps> = ({
 
   // 判断是否为输入类组件，这些组件不需要额外的边框
   const isInputComponent = [
-    'Input', 'TextArea', 'Select', 'DatePicker', 'Button', 
-    'Text', 'Title', 'Image', 'Divider', 'Tag', 'Checkbox', 
+    'Input', 'TextArea', 'Select', 'DatePicker', 'Button',
+    'Text', 'Title', 'Image', 'Divider', 'Tag', 'Checkbox',
     'Radio', 'Switch', 'Slider', 'Rate', 'Progress', 'Badge'
   ].includes(type)
-  
+
   return (
-    <div style={{ 
+    <div style={{
       width: '100%',
       // 输入类组件不需要额外的容器样式
       ...(isInputComponent ? {} : {})

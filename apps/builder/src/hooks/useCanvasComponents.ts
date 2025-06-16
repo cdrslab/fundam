@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react'
-import { ComponentConfig } from '../types'
+import type { ComponentConfig } from '../types'
 
 interface CanvasContextType {
   components: ComponentConfig[]

@@ -23,7 +23,7 @@ import {
   CodeOutlined
 } from '@ant-design/icons'
 
-import { ChatMessage } from '../types'
+import type { ChatMessage } from '../types'
 import { aiService, ChatResponse } from '../services/aiService'
 import { aiConfigManager } from '../store/aiConfig'
 import AIConfigModal from './AIConfigModal'
@@ -63,7 +63,7 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ selectedComponent, onCodeGene
 
     const prompt = input.trim()
     setInput('')
-    
+
     // 使用新的上下文发送方法
     await handleSendWithContext(prompt)
   }
@@ -209,16 +209,16 @@ const GeneratedPage: React.FC = () => {
           response = await aiService.chat([...messages, userMessage], chatSystemPrompt)
           break
       }
-      
+
       // 如果返回了代码且需要渲染，保存代码但不立即应用
       if (response.success && response.shouldRender && response.code) {
         // 代码已保存在response中，由消息显示处理
       }
-      
+
       const assistantMessage: ChatMessage = {
         id: `assistant-${Date.now()}`,
         role: 'assistant',
-        content: response.success 
+        content: response.success
           ? response.message
           : `错误: ${response.error}`,
         timestamp: Date.now(),
@@ -302,7 +302,7 @@ const GeneratedPage: React.FC = () => {
             配置AI助手
           </Button>
         </Empty>
-        
+
         <AIConfigModal
           visible={configVisible}
           onCancel={() => setConfigVisible(false)}
@@ -332,17 +332,17 @@ const GeneratedPage: React.FC = () => {
             </Button>
           </Dropdown>
           <Tooltip title="清空对话">
-            <Button 
-              size="small" 
-              icon={<ClearOutlined />} 
+            <Button
+              size="small"
+              icon={<ClearOutlined />}
               onClick={handleClear}
               disabled={messages.length === 0}
             />
           </Tooltip>
           <Tooltip title="AI配置">
-            <Button 
-              size="small" 
-              icon={<SettingOutlined />} 
+            <Button
+              size="small"
+              icon={<SettingOutlined />}
               onClick={() => setConfigVisible(true)}
             />
           </Tooltip>
@@ -350,9 +350,9 @@ const GeneratedPage: React.FC = () => {
       }
     >
       {/* 消息列表 */}
-      <div style={{ 
-        flex: 1, 
-        padding: '16px', 
+      <div style={{
+        flex: 1,
+        padding: '16px',
         overflowY: 'auto',
         maxHeight: 'calc(100vh - 300px)'
       }}>
@@ -369,9 +369,9 @@ const GeneratedPage: React.FC = () => {
               <List.Item style={{ border: 'none', padding: '8px 0' }}>
                 <List.Item.Meta
                   avatar={
-                    <Avatar 
+                    <Avatar
                       icon={message.role === 'user' ? <UserOutlined /> : <RobotOutlined />}
-                      style={{ 
+                      style={{
                         backgroundColor: message.role === 'user' ? '#1890ff' : '#52c41a'
                       }}
                     />
@@ -388,9 +388,9 @@ const GeneratedPage: React.FC = () => {
                   }
                   description={
                     <div>
-                      <Paragraph 
-                        style={{ 
-                          margin: 0, 
+                      <Paragraph
+                        style={{
+                          margin: 0,
                           whiteSpace: 'pre-wrap',
                           backgroundColor: message.role === 'user' ? '#f6f8ff' : '#f6ffed',
                           padding: '8px 12px',
@@ -402,8 +402,8 @@ const GeneratedPage: React.FC = () => {
                       </Paragraph>
                       {message.code && onCodeGenerated && (
                         <div style={{ marginTop: '8px' }}>
-                          <Button 
-                            type="primary" 
+                          <Button
+                            type="primary"
                             size="small"
                             icon={<CodeOutlined />}
                             onClick={() => onCodeGenerated(message.code!)}
@@ -431,8 +431,8 @@ const GeneratedPage: React.FC = () => {
       </div>
 
       {/* 输入框 */}
-      <div style={{ 
-        padding: '16px', 
+      <div style={{
+        padding: '16px',
         borderTop: '1px solid #f0f0f0',
         backgroundColor: '#fafafa'
       }}>

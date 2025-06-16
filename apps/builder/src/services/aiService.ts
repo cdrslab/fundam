@@ -1,5 +1,5 @@
 import { aiConfigManager } from '../store/aiConfig'
-import { ChatMessage } from '../types'
+import type { ChatMessage } from '../types'
 
 export interface ChatResponse {
   message: string
@@ -13,7 +13,7 @@ class AIService {
   async chat(messages: ChatMessage[], systemPrompt?: string): Promise<ChatResponse> {
     const config = aiConfigManager.getConfig()
     const provider = aiConfigManager.getCurrentProvider()
-    
+
     if (!provider || !aiConfigManager.isConfigured()) {
       return {
         message: '',
@@ -58,13 +58,13 @@ class AIService {
       }
 
       const data = await response.json()
-      
+
       if (!data.choices || !data.choices[0] || !data.choices[0].message) {
         throw new Error('无效的API响应格式')
       }
 
       const responseContent = data.choices[0].message.content
-      
+
       // 检查是否包含TSX代码
       const codeMatch = responseContent.match(/```tsx\n([\s\S]*?)\n```/)
       if (codeMatch) {
@@ -75,7 +75,7 @@ class AIService {
           shouldRender: true
         }
       }
-      
+
       return {
         message: responseContent,
         success: true
@@ -91,7 +91,7 @@ class AIService {
   }
 
   async generateComponent(description: string, currentComponents?: any[]): Promise<ChatResponse> {
-    const componentsInfo = currentComponents && currentComponents.length > 0 
+    const componentsInfo = currentComponents && currentComponents.length > 0
       ? `\n\n当前页面已有组件：\n${JSON.stringify(currentComponents.map(c => ({
           type: c.type,
           id: c.id.slice(-6),
@@ -236,7 +236,7 @@ ${description}${componentsInfo}
     ]
 
     const response = await this.chat(messages, systemPrompt)
-    
+
     if (response.success) {
       const codeMatch = response.message.match(/```tsx\n([\s\S]*?)\n```/)
       if (codeMatch) {
@@ -247,7 +247,7 @@ ${description}${componentsInfo}
         }
       }
     }
-    
+
     return response
   }
 
@@ -320,7 +320,7 @@ ${improvement}
     ]
 
     const response = await this.chat(messages, systemPrompt)
-    
+
     if (response.success) {
       const codeMatch = response.message.match(/```tsx\n([\s\S]*?)\n```/)
       if (codeMatch) {
@@ -331,7 +331,7 @@ ${improvement}
         }
       }
     }
-    
+
     return response
   }
 
@@ -402,7 +402,7 @@ ${JSON.stringify(components, null, 2)}
     ]
 
     const response = await this.chat(messages, systemPrompt)
-    
+
     if (response.success) {
       const codeMatch = response.message.match(/```tsx\n([\s\S]*?)\n```/)
       if (codeMatch) {
@@ -413,7 +413,7 @@ ${JSON.stringify(components, null, 2)}
         }
       }
     }
-    
+
     return response
   }
 }

@@ -1,14 +1,14 @@
 import React from 'react'
 import { Tree, Card, Typography, Space, Button } from 'antd'
-import { 
-  EyeOutlined, 
-  EyeInvisibleOutlined, 
+import {
+  EyeOutlined,
+  EyeInvisibleOutlined,
   DeleteOutlined,
-  AppstoreOutlined 
+  AppstoreOutlined
 } from '@ant-design/icons'
 import type { DataNode } from 'antd/es/tree'
 
-import { ComponentConfig } from '../types'
+import type { ComponentConfig } from '../types'
 import { componentDefinitions } from '../config/components'
 
 const { Title } = Typography
@@ -30,17 +30,17 @@ const ComponentTreeView: React.FC<ComponentTreeViewProps> = ({
   const buildTreeData = (components: ComponentConfig[]): DataNode[] => {
     const componentMap = new Map(components.map(comp => [comp.id, comp]))
     const rootComponents = components.filter(comp => !comp.parentId)
-    
+
     const buildNode = (component: ComponentConfig): DataNode => {
       const componentDef = componentDefinitions.find(def => def.type === component.type)
       const children = components.filter(comp => comp.parentId === component.id)
-      
+
       return {
         key: component.id,
         title: (
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
             alignItems: 'center',
             padding: '2px 0'
           }}>
@@ -71,7 +71,7 @@ const ComponentTreeView: React.FC<ComponentTreeViewProps> = ({
         isLeaf: children.length === 0
       }
     }
-    
+
     return rootComponents.map(buildNode)
   }
 
@@ -104,9 +104,9 @@ const ComponentTreeView: React.FC<ComponentTreeViewProps> = ({
           style={{ fontSize: '12px' }}
         />
       ) : (
-        <div style={{ 
-          textAlign: 'center', 
-          color: '#999', 
+        <div style={{
+          textAlign: 'center',
+          color: '#999',
           padding: '20px',
           fontSize: '12px'
         }}>

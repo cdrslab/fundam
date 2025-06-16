@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react'
 import { useDrop } from 'react-dnd'
 import { Empty } from 'antd'
 
-import { ComponentConfig, DragItem, DropPosition } from '../types'
+import type { ComponentConfig, DragItem, DropPosition } from '../types'
 import { componentDefinitions } from '../config/components'
 import ComponentItem from './ComponentItem'
 
@@ -87,7 +87,7 @@ const Canvas: React.FC<CanvasProps> = ({
   const renderComponentTree = (componentList: ComponentConfig[]): React.ReactNode => {
     return componentList.map(component => {
       const children = components.filter(c => c.parentId === component.id)
-      
+
       return (
         <ComponentItem
           key={component.id}
@@ -107,15 +107,15 @@ const Canvas: React.FC<CanvasProps> = ({
 
   // 获取根组件（没有parentId的组件）
   const rootComponents = components.filter(c => !c.parentId)
-  
+
   return (
     <div style={{ flex: 1, overflow: 'auto', position: 'relative' }}>
       <div
         ref={drop}
         className="canvas-container"
         onClick={handleCanvasClick}
-        style={{ 
-          position: 'relative', 
+        style={{
+          position: 'relative',
           padding: '20px',
           minHeight: 'calc(100vh - 60px)',
           backgroundColor: isOver ? 'rgba(24, 144, 255, 0.05)' : 'transparent',
@@ -125,7 +125,7 @@ const Canvas: React.FC<CanvasProps> = ({
       {rootComponents.length === 0 ? (
         <div
           className="empty-canvas"
-          style={{ 
+          style={{
             minHeight: '400px',
             display: 'flex',
             alignItems: 'center',

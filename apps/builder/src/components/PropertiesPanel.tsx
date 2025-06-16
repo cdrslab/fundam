@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react'
-import { 
-  Typography, 
-  Form, 
-  Input, 
-  Select, 
-  Switch, 
-  InputNumber, 
+import {
+  Typography,
+  Form,
+  Input,
+  Select,
+  Switch,
+  InputNumber,
   ColorPicker,
   Empty,
   Card,
@@ -14,7 +14,7 @@ import {
 } from 'antd'
 import { SettingOutlined } from '@ant-design/icons'
 
-import { ComponentConfig, PropTypeDefinition } from '../types'
+import type { ComponentConfig, PropTypeDefinition } from '../types'
 import { componentDefinitions } from '../config/components'
 import TableColumnEditor from './TableColumnEditor'
 import ButtonActionEditor from './ButtonActionEditor'
@@ -47,14 +47,14 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
     if (component) {
       const formValues: Record<string, any> = {}
       const componentDef = componentDefinitions.find(def => def.type === component.type)
-      
+
       if (componentDef) {
         componentDef.propTypes.forEach(propType => {
           const currentValue = component.props[propType.name] ?? propType.defaultValue
           formValues[propType.name] = currentValue
         })
       }
-      
+
       form.setFieldsValue(formValues)
     }
   }, [component?.id, form]) // 只在组件ID变化时触发
@@ -172,7 +172,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
             label={label}
             name={name}
           >
-            <TextArea 
+            <TextArea
               placeholder={`请输入${label}（JSON格式）`}
               autoSize={{ minRows: 3, maxRows: 8 }}
             />
@@ -357,7 +357,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                   placeholder="请选择数据接口"
                 />
               </Form.Item>
-              
+
               <Form.Item label="表格列配置">
                 <FormBasedTableColumnEditor
                   columns={component.props.tableProps?.columns || []}

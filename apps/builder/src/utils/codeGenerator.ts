@@ -1,4 +1,4 @@
-import { ComponentConfig } from '../types'
+import type { ComponentConfig } from '../types'
 
 // 组件导入映射
 const componentImports: Record<string, string> = {
@@ -20,7 +20,7 @@ const componentImports: Record<string, string> = {
 // 递归收集所有组件类型（包括子组件）
 const collectAllComponentTypes = (components: ComponentConfig[]): Set<string> => {
   const types = new Set<string>()
-  
+
   const traverse = (componentList: ComponentConfig[]) => {
     componentList.forEach(component => {
       types.add(component.type)
@@ -30,7 +30,7 @@ const collectAllComponentTypes = (components: ComponentConfig[]): Set<string> =>
       }
     })
   }
-  
+
   traverse(components)
   return types
 }
@@ -39,7 +39,7 @@ const collectAllComponentTypes = (components: ComponentConfig[]): Set<string> =>
 export const generateImports = (components: ComponentConfig[]): string => {
   const imports = new Map<string, Set<string>>()
   const allTypes = collectAllComponentTypes(components)
-  
+
   allTypes.forEach(type => {
     const importFrom = componentImports[type]
     if (importFrom) {
@@ -51,15 +51,15 @@ export const generateImports = (components: ComponentConfig[]): string => {
   })
 
   const importStatements = []
-  
+
   // React导入
   importStatements.push("import React from 'react'")
-  
+
   // 检查是否需要导入 ActionExecutor
-  const hasButtonActions = components.some(comp => 
+  const hasButtonActions = components.some(comp =>
     comp.type === 'Button' && comp.props.actions && comp.props.actions.length > 0
   )
-  
+
   // 特殊导入处理
   if (allTypes.has('TextArea')) {
     // TextArea 需要特殊导入
@@ -81,7 +81,7 @@ export const generateImports = (components: ComponentConfig[]): string => {
       }
     })
   }
-  
+
   // 添加 ActionExecutor 导入（如果有按钮动作）
   if (hasButtonActions) {
     importStatements.push("import { ActionExecutor } from '../utils/actionExecutor'")
@@ -93,15 +93,15 @@ export const generateImports = (components: ComponentConfig[]): string => {
 // 生成属性字符串
 const generateProps = (props: Record<string, any>): string => {
   const propStrings = []
-  
+
   for (const [key, value] of Object.entries(props)) {
     if (value === undefined || value === null) continue
-    
+
     if (key === 'children') {
       // children特殊处理，不作为prop
       continue
     }
-    
+
     if (typeof value === 'boolean') {
       if (value) {
         propStrings.push(key)
@@ -118,7 +118,7 @@ const generateProps = (props: Record<string, any>): string => {
       propStrings.push(`${key}={${JSON.stringify(value)}}`)
     }
   }
-  
+
   return propStrings.length > 0 ? ' ' + propStrings.join(' ') : ''
 }
 
@@ -126,10 +126,10 @@ const generateProps = (props: Record<string, any>): string => {
 const generateComponentJSX = (component: ComponentConfig, indent: number = 0): string => {
   const indentStr = '  '.repeat(indent)
   const { type, props } = component
-  
+
   const propsStr = generateProps(props)
   const children = props.children
-  
+
   // 特殊组件处理
   if (type === 'PageListQuery') {
     return `${indentStr}<PageListQuery
@@ -140,13 +140,13 @@ ${indentStr}    dataApi: "${props.tableProps?.dataApi || '/api/list'}"
 ${indentStr}  }}
 ${indentStr}/>`
   }
-  
+
   if (type === 'ModalForm') {
     return `${indentStr}<ModalForm${propsStr}>
 ${indentStr}  {/* 在这里添加表单项 */}
 ${indentStr}</ModalForm>`
   }
-  
+
   if (type === 'Form') {
     return `${indentStr}<Form${propsStr}>
 ${indentStr}  <Form.Item label="示例字段" name="example">
@@ -157,7 +157,7 @@ ${indentStr}    <Button type="primary">提交</Button>
 ${indentStr}  </Form.Item>
 ${indentStr}</Form>`
   }
-  
+
   if (type === 'Table') {
     return `${indentStr}<Table${propsStr}
 ${indentStr}  columns={${JSON.stringify(props.columns || [], null, 2).replace(/\n/g, '\n' + indentStr + '  ')}}
@@ -166,12 +166,12 @@ ${indentStr}    // 在这里添加数据
 ${indentStr}  ]}
 ${indentStr}/>`
   }
-  
+
   // 按钮特殊处理
   if (type === 'Button' && props.actions && props.actions.length > 0) {
     const buttonProps = { ...props }
     delete buttonProps.actions // 移除actions属性，避免在props中显示
-    
+
     return `${indentStr}<Button
 ${indentStr}  ${Object.entries(buttonProps).map(([key, value]) => 
       `${key}=${typeof value === 'string' ? `"${value}"` : `{${JSON.stringify(value)}}`}`
@@ -185,7 +185,7 @@ ${indentStr}>
 ${indentStr}  ${props.children || '按钮'}
 ${indentStr}</Button>`
   }
-  
+
   // 普通组件
   if (children) {
     if (typeof children === 'string') {
@@ -204,12 +204,12 @@ ${indentStr}</${type}>`
 const buildComponentTree = (components: ComponentConfig[]): ComponentConfig[] => {
   const componentMap = new Map<string, ComponentConfig>()
   const rootComponents: ComponentConfig[] = []
-  
+
   // 创建组件映射
   components.forEach(component => {
     componentMap.set(component.id, { ...component, children: [] })
   })
-  
+
   // 构建父子关系
   components.forEach(component => {
     const comp = componentMap.get(component.id)!
@@ -223,7 +223,7 @@ const buildComponentTree = (components: ComponentConfig[]): ComponentConfig[] =>
       rootComponents.push(comp)
     }
   })
-  
+
   return rootComponents
 }
 
@@ -231,20 +231,20 @@ const buildComponentTree = (components: ComponentConfig[]): ComponentConfig[] =>
 const generateComponentTreeJSX = (components: ComponentConfig[], indent: number = 3): string => {
   return components.map(component => {
     const componentJSX = generateComponentJSX(component, indent)
-    
+
     if (component.children && component.children.length > 0) {
       const childrenJSX = generateComponentTreeJSX(component.children, indent + 1)
-      
+
       // 对于容器组件，将子组件嵌套在内部
       if (['Card', 'Row', 'Col', 'Space', 'Form'].includes(component.type)) {
         const indentStr = '  '.repeat(indent)
-        
+
         return `${indentStr}<${component.type}${generateProps(component.props)}>
 ${childrenJSX}
 ${indentStr}</${component.type}>`
       }
     }
-    
+
     return componentJSX
   }).join('\n\n')
 }
@@ -285,7 +285,7 @@ export default Page`
 // 生成TypeScript接口定义
 export const generateTypeDefinitions = (components: ComponentConfig[]): string => {
   const interfaces = new Set<string>()
-  
+
   components.forEach(component => {
     if (component.type === 'Table' && component.props.columns) {
       interfaces.add(`interface TableItem {
@@ -293,7 +293,7 @@ export const generateTypeDefinitions = (components: ComponentConfig[]): string =
   ${component.props.columns.map((col: any) => `${col.dataIndex}: any`).join('\n  ')}
 }`)
     }
-    
+
     if (component.type === 'PageListQuery') {
       interfaces.add(`interface QueryParams {
   // 在这里定义查询参数类型
@@ -304,7 +304,7 @@ interface ListItem {
 }`)
     }
   })
-  
+
   return interfaces.size > 0 ? Array.from(interfaces).join('\n\n') + '\n\n' : ''
 }
 
@@ -312,17 +312,17 @@ interface ListItem {
 export const generateFullPageCode = (components: ComponentConfig[]): string => {
   const typeDefinitions = generateTypeDefinitions(components)
   const componentCode = generateComponentCode(components)
-  
+
   if (typeDefinitions) {
     const lines = componentCode.split('\n')
     const importEndIndex = lines.findIndex(line => line.startsWith('const Page'))
-    
+
     return [
       ...lines.slice(0, importEndIndex),
       typeDefinitions,
       ...lines.slice(importEndIndex)
     ].join('\n')
   }
-  
+
   return componentCode
 }

@@ -3,7 +3,7 @@ import { useDrag, useDrop } from 'react-dnd'
 import { Button } from 'antd'
 import { DeleteOutlined, DragOutlined } from '@ant-design/icons'
 
-import { ComponentConfig, DragItem, DropPosition } from '../types'
+import type { ComponentConfig, DragItem, DropPosition } from '../types'
 import { componentDefinitions } from '../config/components'
 import ComponentRenderer from './ComponentRenderer'
 
@@ -41,8 +41,8 @@ const ComponentItem: React.FC<ComponentItemProps> = ({
   const isContainer = componentDef?.isContainer
   const hasChildren = children && React.Children.count(children) > 0
   const isInputComponent = [
-    'Input', 'TextArea', 'Select', 'DatePicker', 'Button', 
-    'Text', 'Title', 'Image', 'Divider', 'Tag', 'Checkbox', 
+    'Input', 'TextArea', 'Select', 'DatePicker', 'Button',
+    'Text', 'Title', 'Image', 'Divider', 'Tag', 'Checkbox',
     'Radio', 'Switch', 'Slider', 'Rate', 'Progress', 'Badge'
   ].includes(component.type)
 
@@ -51,8 +51,8 @@ const ComponentItem: React.FC<ComponentItemProps> = ({
     type: 'COMPONENT_MOVE',
     item: () => {
       onDragStateChange(true, 'COMPONENT_MOVE')
-      return { 
-        type: 'COMPONENT_MOVE', 
+      return {
+        type: 'COMPONENT_MOVE',
         componentType: component.type,
         componentId: component.id,
         component: component
@@ -74,10 +74,10 @@ const ComponentItem: React.FC<ComponentItemProps> = ({
         setDropZone({ position: null, isActive: false })
         return
       }
-      
+
       const hoverBoundingRect = elementRef.current.getBoundingClientRect()
       const clientOffset = monitor.getClientOffset()
-      
+
       if (!clientOffset) {
         setDropZone({ position: null, isActive: false })
         return
@@ -96,9 +96,9 @@ const ComponentItem: React.FC<ComponentItemProps> = ({
         // 容器组件且无子组件时，优先判断内部放置
         const margin = 20 // 边缘区域
         if (
-          hoverClientY > margin && 
+          hoverClientY > margin &&
           hoverClientY < hoverBoundingRect.height - margin &&
-          hoverClientX > margin && 
+          hoverClientX > margin &&
           hoverClientX < hoverBoundingRect.width - margin
         ) {
           position = 'inside'
@@ -118,8 +118,8 @@ const ComponentItem: React.FC<ComponentItemProps> = ({
         }
       }
 
-      setDropZone({ 
-        position, 
+      setDropZone({
+        position,
         isActive: position !== null
       })
     },
@@ -231,7 +231,7 @@ const ComponentItem: React.FC<ComponentItemProps> = ({
       ref={combinedRef}
       className={`component-item ${isSelected ? 'selected' : ''}`}
       onClick={handleClick}
-      style={{ 
+      style={{
         position: 'relative',
         margin: isInputComponent ? '4px 0' : '8px 0',
         opacity: isDraggingThis ? 0.5 : 1,
@@ -269,7 +269,7 @@ const ComponentItem: React.FC<ComponentItemProps> = ({
           >
             <DragOutlined />
           </div>
-          
+
           <Button
             type="primary"
             danger

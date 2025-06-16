@@ -4,7 +4,7 @@ import type { TabsProps } from 'antd'
 import { CopyOutlined, DownloadOutlined } from '@ant-design/icons'
 import Editor from '@monaco-editor/react'
 
-import { ComponentConfig } from '../types'
+import type { ComponentConfig } from '../types'
 import { generateFullPageCode } from '../utils/codeGenerator'
 
 const { Text } = Typography
@@ -164,8 +164,8 @@ const CodePreview: React.FC<CodePreviewProps> = ({
         </Button>
       ]}
     >
-      <Tabs 
-        activeKey={activeTab} 
+      <Tabs
+        activeKey={activeTab}
         onChange={setActiveTab}
         items={tabItems}
       />
