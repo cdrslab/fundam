@@ -200,25 +200,76 @@ const ComponentRenderer: React.FC<ComponentRendererProps> = ({
           return <Table {...tableProps} />
 
         case 'PageListQuery':
+          // 渲染查询表单项
+          const renderFormItems = () => {
+            if (props.formItems && Array.isArray(props.formItems)) {
+              return props.formItems.map((item: any, index: number) => {
+                switch (item.type) {
+                  case 'FormItemInput':
+                    return (
+                      <Form.Item key={index} label={item.label} name={item.name}>
+                        <Input placeholder={`请输入${item.label}`} />
+                      </Form.Item>
+                    )
+                  case 'FormItemSelect':
+                    return (
+                      <Form.Item key={index} label={item.label} name={item.name}>
+                        <Select placeholder={`请选择${item.label}`} style={{ minWidth: 120 }}>
+                          {item.options?.map((option: any, optIndex: number) => (
+                            <Select.Option key={optIndex} value={option.value}>
+                              {option.label}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      </Form.Item>
+                    )
+                  default:
+                    return null
+                }
+              })
+            }
+            
+            // 默认搜索框
+            return (
+              <Form.Item label="搜索">
+                <Input placeholder="请输入搜索关键词" />
+              </Form.Item>
+            )
+          }
+
+          // 处理表格列，确保操作列有正确的render函数
+          const processedTableColumns = props.tableProps?.columns?.map((col: any) => {
+            if (col.render === 'action' || col.dataIndex === 'action' || col.title === '操作') {
+              return {
+                ...col,
+                render: () => (
+                  <Space>
+                    <Button size="small" type="link">编辑</Button>
+                    <Button size="small" type="link" danger>删除</Button>
+                  </Space>
+                )
+              }
+            }
+            return col
+          }) || [
+            { title: 'ID', dataIndex: 'id', key: 'id' },
+            { title: '名称', dataIndex: 'name', key: 'name' }
+          ]
+
           return (
             <div>
               <Card title="查询条件" size="small" style={{ marginBottom: 16 }}>
                 <Form layout="inline">
-                  <Form.Item label="搜索">
-                    <Input placeholder="请输入搜索关键词" />
-                  </Form.Item>
+                  {renderFormItems()}
                   <Form.Item>
                     <Button type="primary">查询</Button>
                     <Button style={{ marginLeft: 8 }}>重置</Button>
                   </Form.Item>
                 </Form>
               </Card>
-              <Card title="数据列表">
+              <Card title={props.tableProps?.title || "数据列表"}>
                 <Table
-                  columns={props.tableProps?.columns || [
-                    { title: 'ID', dataIndex: 'id', key: 'id' },
-                    { title: '名称', dataIndex: 'name', key: 'name' }
-                  ]}
+                  columns={processedTableColumns}
                   dataSource={props.tableProps?.dataSource || [
                     { key: '1', id: 1, name: '示例数据1' },
                     { key: '2', id: 2, name: '示例数据2' }
