@@ -13,7 +13,8 @@ import {
   Dropdown,
   type MenuProps,
   Alert,
-  Tag
+  Tag,
+  message
 } from 'antd'
 import {
   SendOutlined,
@@ -24,12 +25,15 @@ import {
   CodeOutlined,
   ThunderboltOutlined,
   ApiOutlined,
-  BugOutlined
+  BugOutlined,
+  SettingOutlined
 } from '@ant-design/icons'
 
 import type { ComponentConfig, ChatMessage } from '../types'
 import { aiService } from '../services/aiService'
 import useCodeBuilderStore from '../store'
+import { aiConfigManager } from '../store/aiConfig'
+import AIConfigModal from './AIConfigModal'
 import { v4 as uuidv4 } from 'uuid'
 
 const { TextArea } = Input
@@ -42,11 +46,13 @@ interface AIAssistantProps {
 const AIAssistant: React.FC<AIAssistantProps> = ({ selectedComponent }) => {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
+  const [configModalVisible, setConfigModalVisible] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const {
     chatMessages,
     addChatMessage,
+    clearChatMessages,
     components,
     globalConfig,
     updateCode,
@@ -62,9 +68,81 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ selectedComponent }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
+  // 检查AI配置
+  const isAIConfigured = aiConfigManager.isConfigured()
+
+  // 发送指定内容的消息
+  const handleSendMessageWithPrompt = async (promptText: string) => {
+    if (!promptText.trim() || loading) return
+
+    if (!isAIConfigured) {
+      message.warning('请先配置AI服务')
+      setConfigModalVisible(true)
+      return
+    }
+
+    const userMessage: ChatMessage = {
+      id: uuidv4(),
+      role: 'user',
+      content: promptText.trim(),
+      timestamp: Date.now(),
+      componentId: selectedComponent?.identity.id
+    }
+
+    addChatMessage(userMessage)
+    setLoading(true)
+
+    try {
+      const response = await aiService.chat(userMessage.content, {
+        selectedComponent,
+        pageComponents: components,
+        globalConfig,
+        currentCode: editorState.code
+      })
+
+      if (!response.success) {
+        throw new Error(response.error || '请求失败')
+      }
+
+      const assistantMessage: ChatMessage = {
+        id: uuidv4(),
+        role: 'assistant',
+        content: response.message,
+        timestamp: Date.now(),
+        componentId: selectedComponent?.identity.id,
+        changes: response.changes
+      }
+
+      addChatMessage(assistantMessage)
+
+      // 如果AI返回了代码，应用到编辑器
+      if (response.code) {
+        console.log('AI返回的代码:', response.code)
+        updateCode(response.code)
+        message.success('AI生成的代码已应用到页面')
+      }
+    } catch (error) {
+      const errorMessage: ChatMessage = {
+        id: uuidv4(),
+        role: 'assistant',
+        content: `抱歉，发生了错误：${error instanceof Error ? error.message : '未知错误'}`,
+        timestamp: Date.now()
+      }
+      addChatMessage(errorMessage)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   // 发送普通消息
   const handleSendMessage = async () => {
     if (!input.trim() || loading) return
+
+    if (!isAIConfigured) {
+      message.warning('请先配置AI服务')
+      setConfigModalVisible(true)
+      return
+    }
 
     const userMessage: ChatMessage = {
       id: uuidv4(),
@@ -82,8 +160,13 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ selectedComponent }) => {
       const response = await aiService.chat(userMessage.content, {
         selectedComponent,
         pageComponents: components,
-        globalConfig
+        globalConfig,
+        currentCode: editorState.code
       })
+
+      if (!response.success) {
+        throw new Error(response.error || '请求失败')
+      }
 
       const assistantMessage: ChatMessage = {
         id: uuidv4(),
@@ -98,7 +181,9 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ selectedComponent }) => {
 
       // 如果AI返回了代码，应用到编辑器
       if (response.code) {
+        console.log('AI返回的代码:', response.code)
         updateCode(response.code)
+        message.success('AI生成的代码已应用到页面')
       }
     } catch (error) {
       const errorMessage: ChatMessage = {
@@ -116,6 +201,12 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ selectedComponent }) => {
   // 智能完善功能
   const handleIntelligentEnhancement = async () => {
     if (!selectedComponent || loading) return
+
+    if (!isAIConfigured) {
+      message.warning('请先配置AI服务')
+      setConfigModalVisible(true)
+      return
+    }
 
     setLoading(true)
 
@@ -135,6 +226,10 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ selectedComponent }) => {
         components,
         globalConfig
       )
+
+      if (!response.success) {
+        throw new Error(response.error || '智能完善失败')
+      }
 
       const assistantMessage: ChatMessage = {
         id: uuidv4(),
@@ -180,6 +275,12 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ selectedComponent }) => {
 
   // 快速操作
   const handleQuickAction = async (action: string) => {
+    if (!isAIConfigured) {
+      message.warning('请先配置AI服务')
+      setConfigModalVisible(true)
+      return
+    }
+
     let prompt = ''
 
     switch (action) {
@@ -202,13 +303,14 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ selectedComponent }) => {
         return
     }
 
-    setInput(prompt)
+    // 直接发送快速操作消息
+    handleSendMessageWithPrompt(prompt)
   }
 
   // 清空对话
   const handleClearChat = () => {
-    // 清空当前组件相关的对话
-    // TODO: 实现清空功能
+    clearChatMessages()
+    message.success('对话已清空')
   }
 
   // 快速操作菜单
@@ -260,13 +362,23 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ selectedComponent }) => {
             <RobotOutlined />
             <span>AI助手</span>
             {selectedComponent && (
-              <Tag size="small" color="blue">
+              <Tag color="blue">
                 {selectedComponent.identity.name}
               </Tag>
             )}
           </Space>
 
           <Space>
+            <Tooltip title="AI配置">
+              <Button
+                size="small"
+                icon={<SettingOutlined />}
+                onClick={() => setConfigModalVisible(true)}
+                type={isAIConfigured ? 'default' : 'primary'}
+                danger={!isAIConfigured}
+              />
+            </Tooltip>
+            
             {selectedComponent && (
               <Tooltip title="智能完善">
                 <Button
@@ -302,6 +414,24 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ selectedComponent }) => {
       style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
       styles={{ body: { flex: 1, display: 'flex', flexDirection: 'column', padding: 0 } }}
     >
+      {/* AI配置状态提示 */}
+      {!isAIConfigured && (
+        <div style={{
+          padding: '12px 16px',
+          background: '#fff2e8',
+          borderBottom: '1px solid #ffbb96',
+          borderLeft: '3px solid #ff7a45'
+        }}>
+          <Alert
+            message="AI服务未配置"
+            description="请点击右上角设置按钮配置AI服务以使用智能功能"
+            type="warning"
+            showIcon
+            style={{ border: 'none', background: 'transparent', padding: 0 }}
+          />
+        </div>
+      )}
+
       {/* 当前组件信息 */}
       {selectedComponent && (
         <div style={{
@@ -414,7 +544,6 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ selectedComponent }) => {
                               </div>
                             }
                             type="info"
-                            size="small"
                             showIcon
                           />
                         </div>
@@ -482,6 +611,12 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ selectedComponent }) => {
           </Button>
         </div>
       </div>
+      
+      {/* AI配置弹窗 */}
+      <AIConfigModal 
+        visible={configModalVisible}
+        onClose={() => setConfigModalVisible(false)}
+      />
     </Card>
   )
 }

@@ -9,6 +9,7 @@ import {
   PlayCircleOutlined
 } from '@ant-design/icons'
 import ComponentTree from './ComponentTree'
+import ComponentLibrary from './ComponentLibrary'
 import CodeEditor from './CodeEditor'
 import ComponentPreview from './ComponentPreview'
 import PropertiesPanel from './PropertiesPanel'
@@ -21,6 +22,7 @@ const { Title } = Typography
 
 const CodeBuilderLayout: React.FC = () => {
   const [configVisible, setConfigVisible] = React.useState(false)
+  const [leftPanelTab, setLeftPanelTab] = React.useState<'tree' | 'library'>('tree')
   
   const { 
     editorState, 
@@ -85,9 +87,59 @@ const CodeBuilderLayout: React.FC = () => {
 
       {/* 主体内容区域 */}
       <Content className="layout-content">
-        {/* 左侧边栏 - 组件树 */}
+        {/* 左侧边栏 - 组件树/组件库 */}
         <div className="layout-sidebar">
-          <ComponentTree />
+          <div style={{ 
+            height: '100%', 
+            display: 'flex', 
+            flexDirection: 'column',
+            borderRight: '1px solid #e8e8e8'
+          }}>
+            {/* 标签切换 */}
+            <div style={{
+              display: 'flex',
+              borderBottom: '1px solid #e8e8e8',
+              background: '#fafafa'
+            }}>
+              <button
+                onClick={() => setLeftPanelTab('tree')}
+                style={{
+                  flex: 1,
+                  padding: '12px 16px',
+                  border: 'none',
+                  background: leftPanelTab === 'tree' ? '#fff' : 'transparent',
+                  borderBottom: leftPanelTab === 'tree' ? '2px solid #1890ff' : '2px solid transparent',
+                  cursor: 'pointer',
+                  fontSize: '13px',
+                  fontWeight: leftPanelTab === 'tree' ? 500 : 400,
+                  color: leftPanelTab === 'tree' ? '#1890ff' : '#666'
+                }}
+              >
+                组件树
+              </button>
+              <button
+                onClick={() => setLeftPanelTab('library')}
+                style={{
+                  flex: 1,
+                  padding: '12px 16px',
+                  border: 'none',
+                  background: leftPanelTab === 'library' ? '#fff' : 'transparent',
+                  borderBottom: leftPanelTab === 'library' ? '2px solid #1890ff' : '2px solid transparent',
+                  cursor: 'pointer',
+                  fontSize: '13px',
+                  fontWeight: leftPanelTab === 'library' ? 500 : 400,
+                  color: leftPanelTab === 'library' ? '#1890ff' : '#666'
+                }}
+              >
+                组件库
+              </button>
+            </div>
+            
+            {/* 内容区域 */}
+            <div style={{ flex: 1, overflow: 'hidden' }}>
+              {leftPanelTab === 'tree' ? <ComponentTree /> : <ComponentLibrary />}
+            </div>
+          </div>
         </div>
 
         {/* 中间主区域 */}

@@ -1,5 +1,6 @@
 import type { ChatMessage, ComponentConfig, GlobalConfig, CodeChange } from '../types'
 import { CodeTemplateManager } from '../utils/codeTemplate'
+import { aiConfigManager, type AIProvider } from '../store/aiConfig'
 
 export interface AIResponse {
   success: boolean
@@ -10,20 +11,116 @@ export interface AIResponse {
   error?: string
 }
 
+interface ChatCompletionMessage {
+  role: 'system' | 'user' | 'assistant'
+  content: string
+}
+
 /**
  * AI服务 - 处理智能对话和代码生成
  */
 export class AIService {
-  private apiKey: string = ''
-  private baseUrl: string = ''
-  private provider: string = ''
+  constructor() {
+    // 配置通过aiConfigManager管理，不需要构造函数参数
+  }
 
-  constructor(config?: { apiKey?: string; baseUrl?: string; provider?: string }) {
-    if (config) {
-      this.apiKey = config.apiKey || ''
-      this.baseUrl = config.baseUrl || ''
-      this.provider = config.provider || ''
+  /**
+   * 检查AI服务是否已配置
+   */
+  private checkConfiguration(): { success: boolean; error?: string } {
+    const provider = aiConfigManager.getCurrentProvider()
+    if (!provider) {
+      return { success: false, error: '请先配置AI服务提供商' }
     }
+
+    if (!aiConfigManager.isConfigured()) {
+      return { success: false, error: '请先配置API Key' }
+    }
+
+    return { success: true }
+  }
+
+  /**
+   * 获取System Prompt
+   */
+  private getSystemPrompt(): string {
+    return `你是一个专业的前端开发助手，专门用于帮助用户使用Fundam组件库开发React应用。
+
+## 重要：代码格式要求
+当用户要求生成页面或组件时，你必须按照以下格式返回完整的TSX代码：
+
+\`\`\`tsx
+import React from 'react'
+import { Button, Card } from 'antd'
+import { PageListQuery, FormItemInput } from '@fundam/antd'
+
+const GeneratedPage: React.FC = () => {
+  return (
+    <div className="page-container">
+      {/* 生成的组件放在这里 */}
+    </div>
+  )
+}
+
+export default GeneratedPage
+\`\`\`
+
+## Fundam组件库核心组件
+- PageListQuery: 列表查询页面，整合搜索表单和数据表格
+- FormItemInput: 输入框表单项
+- FormItemSelect: 下拉选择表单项
+- ModalForm: 模态框表单
+- ProTable: 增强型表格
+- Button: 操作按钮
+
+## 代码规范
+- 使用TypeScript严格模式
+- 遵循React Hooks最佳实践
+- 组件采用函数式写法
+- 组件名固定为 GeneratedPage
+- 容器div必须使用 className="page-container"
+- 必须包含完整的import语句
+
+## 响应格式
+如果用户要求生成页面代码，请：
+1. 直接返回完整的TSX代码块
+2. 代码必须包含在 \`\`\`tsx 中
+3. 如果是修改现有代码，返回完整的修改后代码，不要只返回片段
+
+请确保生成的代码符合最佳实践，可以直接使用。`
+  }
+
+  /**
+   * 获取全局代码生成的System Prompt
+   */
+  private getGlobalSystemPrompt(): string {
+    return `你是一个专业的React页面生成助手，专门用于生成基于Fundam组件库的完整页面代码。
+
+## 技术栈
+- React 18+ with TypeScript
+- Fundam组件库 (基于Ant Design)
+- 现代React Hooks开发模式
+
+## 代码要求
+1. **完整性**: 生成完整可运行的页面代码
+2. **规范性**: 严格遵循TypeScript和React最佳实践
+3. **可读性**: 代码结构清晰，注释适当
+4. **实用性**: 生成的页面具有实际业务价值
+
+## 组件优先级
+1. 优先使用Fundam组件库组件
+2. 其次使用Ant Design原生组件
+3. 避免使用HTML原生标签
+
+## 响应格式
+直接返回完整的TSX代码，包含：
+- 必要的import语句
+- 完整的组件定义
+- 合理的状态管理
+- 事件处理逻辑
+- 默认导出
+
+请确保代码可以直接使用，无需额外修改。`
   }
 
   /**
@@ -38,7 +135,8 @@ export class AIService {
     try {
       const prompt = this.buildEnhancementPrompt(selectedComponent, pageComponents, globalConfig)
 
-      const response = await this.callAI(prompt)
+      const systemPrompt = this.getSystemPrompt()
+      const response = await this.callAI(prompt, systemPrompt)
 
       if (response.success) {
         // 解析AI返回的代码和配置变更
@@ -329,6 +427,7 @@ ${pageContext}
       selectedComponent?: ComponentConfig
       pageComponents?: ComponentConfig[]
       globalConfig?: GlobalConfig
+      currentCode?: string
     }
   ): Promise<AIResponse> {
     try {
@@ -339,7 +438,22 @@ ${pageContext}
         prompt = this.buildContextualPrompt(message, context)
       }
 
-      return await this.callAI(prompt)
+      const systemPrompt = this.getSystemPrompt()
+      const response = await this.callAI(prompt, systemPrompt)
+      
+      if (response.success) {
+        // 尝试从AI回复中提取代码
+        const extractedCode = this.extractCodeFromResponse(response.message)
+        
+        return {
+          success: true,
+          message: response.message,
+          code: extractedCode,
+          summary: '对话成功'
+        }
+      }
+      
+      return response
     } catch (error) {
       return {
         success: false,
@@ -358,6 +472,7 @@ ${pageContext}
       selectedComponent?: ComponentConfig
       pageComponents?: ComponentConfig[]
       globalConfig?: GlobalConfig
+      currentCode?: string
     }
   ): string {
     let prompt = `你是一个专业的前端开发助手，帮助用户使用Fundam组件库开发React应用。
@@ -385,6 +500,15 @@ ${context.pageComponents.map(comp =>
 `
     }
 
+    if (context.currentCode) {
+      prompt += `## 当前页面代码
+\`\`\`tsx
+${context.currentCode}
+\`\`\`
+
+`
+    }
+
     if (context.globalConfig) {
       prompt += `## 全局配置
 - API接口: ${Object.keys(context.globalConfig.apis).join(', ')}
@@ -393,7 +517,14 @@ ${context.pageComponents.map(comp =>
 `
     }
 
-    prompt += `请结合上下文信息，提供准确的建议和解决方案。如果需要生成代码，请使用Fundam组件库的组件。`
+    prompt += `## 重要指导原则
+1. 如果用户要求生成或修改页面，请返回完整的TSX代码，包含import语句和组件定义
+2. 优先使用Fundam组件库：PageListQuery, FormItemInput, FormItemSelect, ModalForm, ProTable等
+3. 确保代码可以直接使用，无需额外修改
+4. 如果是修改现有代码，请返回完整的修改后代码
+5. 代码必须符合TypeScript和React最佳实践
+
+请结合上下文信息，提供准确的建议和解决方案。`
 
     return prompt
   }
@@ -401,24 +532,69 @@ ${context.pageComponents.map(comp =>
   /**
    * 调用AI API
    */
-  private async callAI(prompt: string): Promise<AIResponse> {
-    // 这里应该调用实际的AI API
-    // 当前返回模拟响应
+  private async callAI(prompt: string, systemPrompt?: string): Promise<AIResponse> {
+    const configCheck = this.checkConfiguration()
+    if (!configCheck.success) {
+      return {
+        success: false,
+        message: '',
+        error: configCheck.error
+      }
+    }
 
-    // 模拟AI响应延迟
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    const provider = aiConfigManager.getCurrentProvider()!
+    const config = aiConfigManager.getConfig()
+    const apiKey = aiConfigManager.getApiKey(provider.id)
 
-    return {
-      success: true,
-      message: `AI助手理解了您的需求。基于当前上下文，我建议：
+    try {
+      const messages: ChatCompletionMessage[] = []
+      
+      if (systemPrompt) {
+        messages.push({ role: 'system', content: systemPrompt })
+      }
+      
+      messages.push({ role: 'user', content: prompt })
 
-1. **功能分析**: 根据组件类型和页面结构，该组件适合添加以下功能...
-2. **代码建议**: 建议使用Fundam组件库的相关组件...
-3. **最佳实践**: 考虑用户体验和性能优化...
+      const response = await fetch(`${provider.baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: config.currentModel,
+          messages,
+          temperature: config.temperature,
+          max_tokens: config.maxTokens
+        })
+      })
 
-如需具体实现，请告诉我更多细节。`,
-      code: '// AI生成的代码将在这里显示',
-      summary: 'AI成功分析了您的需求并提供了建议'
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error?.message || `HTTP ${response.status}: ${response.statusText}`)
+      }
+
+      const data = await response.json()
+      
+      if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+        throw new Error('无效的API响应格式')
+      }
+
+      const aiMessage = data.choices[0].message.content
+
+      return {
+        success: true,
+        message: aiMessage,
+        summary: `AI响应完成 (${data.usage?.total_tokens || 0} tokens)`
+      }
+
+    } catch (error) {
+      console.error('AI API调用失败:', error)
+      return {
+        success: false,
+        message: '',
+        error: error instanceof Error ? error.message : '未知错误'
+      }
     }
   }
 
@@ -451,7 +627,49 @@ ${JSON.stringify(globalConfig, null, 2)}
 
 请提供完整的页面代码和修改说明。`
 
-    return await this.callAI(prompt)
+    const systemPrompt = this.getGlobalSystemPrompt()
+    return await this.callAI(prompt, systemPrompt)
+  }
+
+  /**
+   * 从AI回复中提取代码
+   */
+  private extractCodeFromResponse(responseMessage: string): string | undefined {
+    // 尝试提取tsx代码块
+    const tsxMatch = responseMessage.match(/```tsx\n([\s\S]*?)\n```/)
+    if (tsxMatch) {
+      return tsxMatch[1].trim()
+    }
+
+    // 尝试提取typescript代码块
+    const tsMatch = responseMessage.match(/```typescript\n([\s\S]*?)\n```/)
+    if (tsMatch) {
+      return tsMatch[1].trim()
+    }
+
+    // 尝试提取js代码块
+    const jsMatch = responseMessage.match(/```javascript\n([\s\S]*?)\n```/)
+    if (jsMatch) {
+      return jsMatch[1].trim()
+    }
+
+    // 尝试提取普通代码块
+    const codeMatch = responseMessage.match(/```\n([\s\S]*?)\n```/)
+    if (codeMatch) {
+      const code = codeMatch[1].trim()
+      // 检查是否看起来像React代码
+      if (code.includes('import React') || code.includes('export default') || code.includes('<')) {
+        return code
+      }
+    }
+
+    // 如果没有代码块，查找可能的React组件代码
+    const reactComponentMatch = responseMessage.match(/import React[\s\S]*?export default \w+/)
+    if (reactComponentMatch) {
+      return reactComponentMatch[0].trim()
+    }
+
+    return undefined
   }
 }
 

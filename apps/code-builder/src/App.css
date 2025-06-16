@@ -168,7 +168,6 @@ body {
 .layout-sidebar {
   width: 300px;
   background: white;
-  border-right: 1px solid #e8e8e8;
   display: flex;
   flex-direction: column;
 }

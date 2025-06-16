@@ -17,14 +17,82 @@ import {
   Tabs,
   Collapse
 } from 'antd'
-import {
-  PageListQuery,
-  FormItemInput,
-  FormItemSelect,
-  ModalForm,
-  ProTable
-} from '@fundam/antd'
 import type { ComponentConfig, GlobalConfig } from '../types'
+
+// 模拟Fundam组件（实际项目中应该从@fundam/antd导入）
+const PageListQuery = (props: any) => (
+  <div style={{ border: '1px solid #d9d9d9', borderRadius: 6, padding: 16 }}>
+    <div style={{ marginBottom: 16, padding: 16, background: '#fafafa', borderRadius: 4 }}>
+      <Typography.Title level={5} style={{ margin: 0, marginBottom: 8 }}>查询条件</Typography.Title>
+      <Space>
+        <Input placeholder="请输入用户名" style={{ width: 200 }} />
+        <Select placeholder="请选择状态" style={{ width: 120 }}>
+          <Select.Option value="active">启用</Select.Option>
+          <Select.Option value="inactive">禁用</Select.Option>
+        </Select>
+        <Button type="primary">查询</Button>
+        <Button>重置</Button>
+      </Space>
+    </div>
+    <Table 
+      columns={[
+        { title: 'ID', dataIndex: 'id', key: 'id' },
+        { title: '用户名', dataIndex: 'username', key: 'username' },
+        { title: '状态', dataIndex: 'status', key: 'status' },
+        { title: '操作', key: 'action', render: () => <Space><Button size="small">编辑</Button><Button size="small" danger>删除</Button></Space> }
+      ]}
+      dataSource={[
+        { id: 1, username: '用户1', status: '启用' },
+        { id: 2, username: '用户2', status: '禁用' }
+      ]}
+      pagination={{ pageSize: 10 }}
+      {...props}
+    />
+  </div>
+)
+
+const FormItemInput = (props: any) => (
+  <Form.Item label={props.label || '输入框'} name={props.name || 'input'}>
+    <Input placeholder={props.placeholder || '请输入'} {...props} />
+  </Form.Item>
+)
+
+const FormItemSelect = (props: any) => (
+  <Form.Item label={props.label || '下拉选择'} name={props.name || 'select'}>
+    <Select placeholder={props.placeholder || '请选择'} {...props}>
+      <Select.Option value="option1">选项1</Select.Option>
+      <Select.Option value="option2">选项2</Select.Option>
+    </Select>
+  </Form.Item>
+)
+
+const ModalForm = (props: any) => (
+  <Modal 
+    title={props.title || '表单'}
+    open={props.visible || true}
+    onOk={() => {}}
+    onCancel={() => {}}
+    {...props}
+  >
+    <Form layout="vertical">
+      <FormItemInput label="示例输入" />
+      <FormItemSelect label="示例选择" />
+    </Form>
+  </Modal>
+)
+
+const ProTable = (props: any) => (
+  <Table 
+    columns={props.columns || [
+      { title: '列1', dataIndex: 'col1', key: 'col1' },
+      { title: '列2', dataIndex: 'col2', key: 'col2' }
+    ]}
+    dataSource={props.dataSource || [
+      { col1: '数据1', col2: '数据2' }
+    ]}
+    {...props}
+  />
+)
 
 const { Title, Text } = Typography
 const { TextArea } = Input
@@ -79,6 +147,55 @@ const ComponentRenderer: React.FC<ComponentRendererProps> = ({
         globalConfig={globalConfig}
       />
     ))
+  }
+
+  // 包装组件以添加选择状态
+  const wrapWithSelection = (component: React.ReactNode) => {
+    return (
+      <div
+        onClick={handleComponentClick}
+        style={{
+          position: 'relative',
+          border: isSelected ? '2px solid #1890ff' : '2px solid transparent',
+          borderRadius: '4px',
+          padding: isSelected ? '4px' : '6px',
+          cursor: 'pointer',
+          transition: 'all 0.2s',
+          background: isSelected ? 'rgba(24, 144, 255, 0.05)' : 'transparent'
+        }}
+        onMouseEnter={(e) => {
+          if (!isSelected) {
+            e.currentTarget.style.border = '2px dashed #1890ff'
+            e.currentTarget.style.background = 'rgba(24, 144, 255, 0.02)'
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!isSelected) {
+            e.currentTarget.style.border = '2px solid transparent'
+            e.currentTarget.style.background = 'transparent'
+          }
+        }}
+      >
+        {component}
+        {isSelected && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '-8px',
+              left: '8px',
+              background: '#1890ff',
+              color: 'white',
+              fontSize: '10px',
+              padding: '2px 6px',
+              borderRadius: '2px',
+              zIndex: 10
+            }}
+          >
+            {identity.name}
+          </div>
+        )}
+      </div>
+    )
   }
 
   // 渲染具体的组件
@@ -440,36 +557,7 @@ const ComponentRenderer: React.FC<ComponentRendererProps> = ({
     } : {})
   }
 
-  return (
-    <div
-      style={containerStyle}
-      onClick={handleComponentClick}
-      data-component-id={identity.id}
-      data-component-type={identity.type}
-      data-component-name={identity.name}
-    >
-      {/* 组件标识（调试模式下显示） */}
-      {isSelected && (
-        <div style={{
-          position: 'absolute',
-          top: -24,
-          left: 0,
-          background: '#1890ff',
-          color: 'white',
-          padding: '2px 8px',
-          borderRadius: '4px 4px 0 0',
-          fontSize: '11px',
-          zIndex: 1000,
-          whiteSpace: 'nowrap'
-        }}>
-          {identity.name} ({identity.type})
-        </div>
-      )}
-
-      {/* 实际组件内容 */}
-      {renderComponent()}
-    </div>
-  )
+  return wrapWithSelection(renderComponent())
 }
 
 export default ComponentRenderer

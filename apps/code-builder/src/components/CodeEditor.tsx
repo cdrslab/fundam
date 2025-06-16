@@ -1,13 +1,15 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import { Editor } from '@monaco-editor/react'
-import { Card, Space, Button, Typography, Tooltip, message } from 'antd'
+import { Card, Space, Button, Typography, Tooltip, message, Badge } from 'antd'
 import { 
   SaveOutlined, 
   UndoOutlined, 
   RedoOutlined,
   FormatPainterOutlined,
   BugOutlined,
-  CopyOutlined
+  CopyOutlined,
+  CheckCircleOutlined,
+  ExclamationCircleOutlined
 } from '@ant-design/icons'
 import useCodeBuilderStore from '../store'
 import * as prettier from 'prettier'
@@ -16,12 +18,15 @@ const { Title } = Typography
 
 const CodeEditor: React.FC = () => {
   const editorRef = useRef<any>(null)
+  const [syntaxErrors, setSyntaxErrors] = useState<any[]>([])
+  const [isValid, setIsValid] = useState(true)
+  
   const { 
     editorState, 
     updateCode,
     astParser,
     selectedComponent,
-    componentSelector
+    components
   } = useCodeBuilderStore()
 
   // 当选中组件变化时，定位到对应代码位置
@@ -56,6 +61,26 @@ const CodeEditor: React.FC = () => {
   const handleCodeChange = (value: string | undefined) => {
     if (value !== undefined) {
       updateCode(value)
+      // 实时语法检查
+      performSyntaxCheck(value)
+    }
+  }
+
+  // 执行语法检查
+  const performSyntaxCheck = (code: string) => {
+    try {
+      // 使用AST解析器进行语法检查
+      astParser.updateCode(code)
+      setSyntaxErrors([])
+      setIsValid(true)
+    } catch (error) {
+      const errorInfo = {
+        message: error instanceof Error ? error.message : '语法错误',
+        line: 1, // 简化处理，实际应该解析错误位置
+        column: 1
+      }
+      setSyntaxErrors([errorInfo])
+      setIsValid(false)
     }
   }
 
@@ -134,7 +159,7 @@ const CodeEditor: React.FC = () => {
     selectOnLineNumbers: true,
     roundedSelection: false,
     readOnly: false,
-    cursorStyle: 'line',
+    cursorStyle: 'line' as const,
     automaticLayout: true,
     fontSize: 14,
     fontFamily: 'Consolas, "Courier New", monospace',
@@ -173,12 +198,31 @@ const CodeEditor: React.FC = () => {
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <Title level={5} style={{ margin: 0 }}>
-              代码编辑器
-            </Title>
+            <Space>
+              <Title level={5} style={{ margin: 0 }}>
+                代码编辑器
+              </Title>
+              <Badge 
+                count={components.length} 
+                style={{ backgroundColor: '#52c41a' }}
+                title={`当前页面有 ${components.length} 个组件`}
+              />
+              {syntaxErrors.length > 0 && (
+                <Badge 
+                  count={syntaxErrors.length} 
+                  style={{ backgroundColor: '#ff4d4f' }}
+                  title={`发现 ${syntaxErrors.length} 个语法错误`}
+                />
+              )}
+              {isValid ? (
+                <CheckCircleOutlined style={{ color: '#52c41a' }} title="代码语法正确" />
+              ) : (
+                <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} title="代码存在问题" />
+              )}
+            </Space>
             {selectedComponent && (
               <div style={{ fontSize: '12px', color: '#666', marginTop: 2 }}>
-                当前选中: {selectedComponent.identity.name}
+                当前选中: {selectedComponent.identity.name} ({selectedComponent.identity.type})
               </div>
             )}
           </div>
@@ -282,7 +326,7 @@ const CodeEditor: React.FC = () => {
             })
             
             // 当光标位置变化时，尝试选中对应的组件
-            editor.onDidChangeCursorPosition((e) => {
+            editor.onDidChangeCursorPosition(() => {
               // TODO: 根据光标位置选中对应的组件
               // 这需要实现从代码位置到组件ID的反向映射
             })
