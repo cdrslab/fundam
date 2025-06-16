@@ -107,7 +107,7 @@ const Canvas: React.FC<CanvasProps> = ({
 
   // 获取根组件（没有parentId的组件）
   const rootComponents = components.filter(c => !c.parentId)
-
+  
   return (
     <div style={{ flex: 1, overflow: 'auto', position: 'relative' }}>
       <div
@@ -137,7 +137,7 @@ const Canvas: React.FC<CanvasProps> = ({
           }}
         >
           <Empty
-            description="拖拽组件到这里开始搭建页面"
+            description="拖拽组件到这里开始搭建页面，或使用AI助手生成页面"
             image={Empty.PRESENTED_IMAGE_SIMPLE}
           />
         </div>

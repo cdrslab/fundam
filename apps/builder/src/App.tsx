@@ -13,6 +13,7 @@ import AIAssistant from './components/AIAssistant'
 import CodeRenderer from './components/CodeRenderer'
 import { ComponentConfig, CanvasState, DropPosition } from './types'
 import { generateId } from './utils/helpers'
+import { parseAiCodeToComponents } from './utils/aiCodeParser'
 import { CanvasContext } from './hooks/useCanvasComponents'
 
 const App: React.FC = () => {
@@ -173,7 +174,18 @@ const App: React.FC = () => {
   // 处理AI生成的代码
   const handleCodeGenerated = useCallback((code: string) => {
     setAiGeneratedCode(code)
-    setShowAiPreview(true)
+    
+    // 解析AI代码为组件配置
+    const parsedComponents = parseAiCodeToComponents(code)
+    
+    if (parsedComponents.length > 0) {
+      // 清空现有组件，添加新的AI生成组件
+      setCanvasState(prev => ({
+        ...prev,
+        components: parsedComponents,
+        selectedId: parsedComponents[0]?.id || null
+      }))
+    }
   }, [])
 
   return (
@@ -221,13 +233,13 @@ const App: React.FC = () => {
           </div>
           
           <div className="builder-properties">
-            <div style={{ height: '50%', marginBottom: '8px' }}>
+            <div className="properties-panel">
               <PropertiesPanel
                 component={selectedComponent}
                 onUpdateComponent={updateComponent}
               />
             </div>
-            <div style={{ height: '50%' }}>
+            <div className="ai-assistant-container">
               <AIAssistant 
                 selectedComponent={selectedComponent} 
                 onCodeGenerated={handleCodeGenerated}
@@ -251,12 +263,7 @@ const App: React.FC = () => {
           onClose={() => setShowGlobalConfig(false)}
         />
 
-        {/* AI代码预览 */}
-        <CodeRenderer
-          code={aiGeneratedCode}
-          visible={showAiPreview}
-          onClose={() => setShowAiPreview(false)}
-        />
+        {/* AI代码预览功能已移动到Canvas中 */}
       </DndProvider>
     </CanvasContext.Provider>
   )

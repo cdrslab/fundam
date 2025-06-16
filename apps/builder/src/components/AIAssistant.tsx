@@ -210,20 +210,20 @@ const GeneratedPage: React.FC = () => {
           break
       }
       
-      // 如果返回了代码且需要渲染，则立即渲染到预览区域
-      if (response.success && response.shouldRender && response.code && onCodeGenerated) {
-        onCodeGenerated(response.code)
+      // 如果返回了代码且需要渲染，保存代码但不立即应用
+      if (response.success && response.shouldRender && response.code) {
+        // 代码已保存在response中，由消息显示处理
       }
       
       const assistantMessage: ChatMessage = {
         id: `assistant-${Date.now()}`,
         role: 'assistant',
         content: response.success 
-          ? (response.shouldRender 
-              ? '代码已生成并应用到预览区域，您可以继续说明修改需求。' 
-              : response.message)
+          ? response.message
           : `错误: ${response.error}`,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        // 如果有代码，保存在消息中
+        code: response.shouldRender && response.code ? response.code : undefined
       }
 
       setMessages(prev => [...prev, assistantMessage])
@@ -387,18 +387,32 @@ const GeneratedPage: React.FC = () => {
                     </Space>
                   }
                   description={
-                    <Paragraph 
-                      style={{ 
-                        margin: 0, 
-                        whiteSpace: 'pre-wrap',
-                        backgroundColor: message.role === 'user' ? '#f6f8ff' : '#f6ffed',
-                        padding: '8px 12px',
-                        borderRadius: '8px',
-                        border: message.role === 'user' ? '1px solid #d9e5ff' : '1px solid #d9f7be'
-                      }}
-                    >
-                      {message.content}
-                    </Paragraph>
+                    <div>
+                      <Paragraph 
+                        style={{ 
+                          margin: 0, 
+                          whiteSpace: 'pre-wrap',
+                          backgroundColor: message.role === 'user' ? '#f6f8ff' : '#f6ffed',
+                          padding: '8px 12px',
+                          borderRadius: '8px',
+                          border: message.role === 'user' ? '1px solid #d9e5ff' : '1px solid #d9f7be'
+                        }}
+                      >
+                        {message.content}
+                      </Paragraph>
+                      {message.code && onCodeGenerated && (
+                        <div style={{ marginTop: '8px' }}>
+                          <Button 
+                            type="primary" 
+                            size="small"
+                            icon={<CodeOutlined />}
+                            onClick={() => onCodeGenerated(message.code!)}
+                          >
+                            应用到画布
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                   }
                 />
               </List.Item>
