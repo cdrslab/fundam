@@ -1,8 +1,16 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { Card, Alert, Spin, Button, Space } from 'antd'
 import { StopOutlined, ReloadOutlined } from '@ant-design/icons'
+import { MemoryRouter } from 'react-router-dom'
 import * as antd from 'antd'
 import * as fundamAntd from '@fundam/antd'
+
+// 动态加载Babel
+declare global {
+  interface Window {
+    Babel: any;
+  }
+}
 
 interface CodeRendererProps {
   code: string
@@ -14,14 +22,57 @@ const CodeRenderer: React.FC<CodeRendererProps> = ({ code, visible, onClose }) =
   const [error, setError] = useState<string | null>(null)
   const [isRunning, setIsRunning] = useState(false)
   const [Component, setComponent] = useState<React.ComponentType | null>(null)
+  const [babelLoaded, setBabelLoaded] = useState(false)
+  
+  // 加载Babel
+  useEffect(() => {
+    if (!window.Babel) {
+      const script = document.createElement('script')
+      script.src = 'https://unpkg.com/@babel/standalone/babel.min.js'
+      script.onload = () => setBabelLoaded(true)
+      document.head.appendChild(script)
+    } else {
+      setBabelLoaded(true)
+    }
+  }, [])
 
   // 安全的代码执行环境
   const executeCode = useMemo(() => {
-    if (!code.trim()) return null
+    if (!code.trim() || !babelLoaded) return null
 
     try {
+      // 先清理TypeScript语法，再用Babel转换
+      const cleanedForBabel = code
+        // 移除TypeScript类型注解
+        .replace(/:\s*React\.FC\b/g, '') // 移除React.FC类型
+        .replace(/:\s*React\.Component\b/g, '') // 移除React.Component类型
+        .replace(/:\s*[A-Z]\w*<[^>]*>/g, '') // 移除泛型类型
+        .replace(/:\s*Record<[^>]*>/g, '') // 移除Record类型
+        .replace(/:\s*\w+\[\]/g, '') // 移除数组类型
+        .replace(/:\s*\w+\s*\|\s*\w+(\s*\|\s*\w+)*/g, '') // 移除联合类型
+        .replace(/:\s*any/g, '') // 移除any类型
+        .replace(/:\s*string/g, '') // 移除string类型
+        .replace(/:\s*number/g, '') // 移除number类型
+        .replace(/:\s*boolean/g, '') // 移除boolean类型
+        .replace(/:\s*object/g, '') // 移除object类型
+        .replace(/:\s*void/g, '') // 移除void类型
+        .replace(/:\s*null/g, '') // 移除null类型
+        .replace(/:\s*undefined/g, '') // 移除undefined类型
+        // 移除interface和type定义
+        .replace(/interface\s+\w+\s*{[^}]*}/gs, '')
+        .replace(/type\s+\w+\s*=\s*[^;]+;?/g, '');
+      
+      console.log('清理TypeScript后的代码:', cleanedForBabel);
+      
+      // 使用Babel转换JSX
+      const transformedCode = window.Babel.transform(cleanedForBabel, {
+        presets: ['react'],
+        filename: 'virtual.jsx'
+      }).code
+      
+      console.log('Babel转换后的代码:', transformedCode);
       // 更彻底地清理代码，移除所有import语句和export语句
-      let cleanCode = code
+      let cleanCode = transformedCode
         .replace(/import\s+.*?from\s+['"][^'"]*['"];?\n?/g, '') // 移除所有import
         .replace(/import\s+\{[^}]*\}\s+from\s+['"][^'"]*['"];?\n?/g, '') // 移除解构import
         .replace(/export\s+default\s+\w+;?\s*$/gm, '') // 移除export default
@@ -34,7 +85,7 @@ const CodeRenderer: React.FC<CodeRendererProps> = ({ code, visible, onClose }) =
         .replace(/:\s*Record<[^>]*>/g, '') // 移除Record类型
         .replace(/:\s*[A-Z]\w*<[^>]*>/g, '') // 移除泛型类型
         .replace(/:\s*\w+\[\]/g, '') // 移除数组类型
-        .replace(/:\s*\w+\s*\|[^=,;}\n]*/g, '') // 移除联合类型
+        .replace(/:\s*\w+\s*\|\s*\w+(\s*\|\s*\w+)*/g, '') // 移除联合类型（更精确）
         .replace(/:\s*any/g, '') // 移除any类型
         .replace(/:\s*string/g, '') // 移除string类型
         .replace(/:\s*number/g, '') // 移除number类型
@@ -43,9 +94,9 @@ const CodeRenderer: React.FC<CodeRendererProps> = ({ code, visible, onClose }) =
         .replace(/:\s*void/g, '') // 移除void类型
         .replace(/:\s*null/g, '') // 移除null类型
         .replace(/:\s*undefined/g, '') // 移除undefined类型
-        // 特殊处理常见的问题模式 - 移除不完整的const声明
-        .replace(/const\s+(\w+)\s*:\s*[^=]+$/gm, '') // 移除不完整的const声明
-        .replace(/const\s+(\w+)\s*:\s*[^=\n]*\n/gm, '') // 移除跨行的不完整const声明
+        // 特殊处理常见的问题模式 - 移除不完整的const声明（但保留函数组件）
+        .replace(/const\s+(\w+)\s*:\s*(?!React\.FC)[^=]+$/gm, '') // 移除不完整的const声明，但保留React.FC
+        .replace(/const\s+(\w+)\s*:\s*(?!React\.FC)[^=\n]*\n/gm, '') // 移除跨行的不完整const声明
         // 清理空行和多余的空白
         .replace(/\n\s*\n\s*\n/g, '\n\n') // 移除多余的空行
         .replace(/^\s*\n/gm, '') // 移除空行
@@ -64,13 +115,19 @@ const CodeRenderer: React.FC<CodeRendererProps> = ({ code, visible, onClose }) =
             console.log('移除问题行:', trimmed);
             return false;
           }
-          // 过滤掉只有类型注解的行
-          if (trimmed.match(/^\w+\s*:\s*[^=]+$/)) {
-            console.log('移除类型注解行:', trimmed);
+          // 过滤掉纯类型声明行（但保留对象属性、数组和函数调用）
+          if (trimmed.match(/^\w+\s*:\s*[A-Z]\w*(\s*\|\s*\w+)*\s*$/) && 
+              !trimmed.includes('[') && 
+              !trimmed.includes('{') && 
+              !trimmed.includes('(') &&
+              !trimmed.includes('<') &&
+              !trimmed.includes('dataIndex') &&
+              !trimmed.includes('title')) {
+            console.log('移除纯类型声明行:', trimmed);
             return false;
           }
-          // 过滤掉空的或只有类型的行
-          if (!trimmed || trimmed.match(/^[a-zA-Z]\w*\s*:\s*[^=]*$/)) {
+          // 过滤掉空行
+          if (!trimmed) {
             return false;
           }
           return true;
@@ -173,7 +230,7 @@ const CodeRenderer: React.FC<CodeRendererProps> = ({ code, visible, onClose }) =
       setError(err instanceof Error ? err.message : '代码执行失败')
       return null
     }
-  }, [code])
+  }, [code, babelLoaded])
 
   useEffect(() => {
     if (executeCode) {
@@ -296,7 +353,11 @@ const CodeRenderer: React.FC<CodeRendererProps> = ({ code, visible, onClose }) =
         
         {Component && !error && (
           <div style={{ border: '1px solid #f0f0f0', borderRadius: '6px', padding: '16px' }}>
-            <Component />
+            <fundamAntd.FunConfigProvider>
+              <MemoryRouter>
+                <Component />
+              </MemoryRouter>
+            </fundamAntd.FunConfigProvider>
           </div>
         )}
         

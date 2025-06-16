@@ -125,10 +125,11 @@ const GeneratedPage: React.FC = () => {
 7. **组件名必须是GeneratedPage**
 8. **图标用Emoji**: 🔍 ➕ ✏️ 🗑️ 👤 ⬇️ ⬆️
 
+
 # 必须使用的Fundam组件
 ## 🏆 核心页面组件
 - **PageListQuery**: 列表查询页面(包含搜索+表格)，这是最重要的组件！
-- **ModalForm**: 模态框表单，用于新增/编辑
+- **ModalForm**: 模态框表单组件（注意：这是一个组件，不是函数）
 
 ## 📋 表单组件 (必须使用)
 - **Form**: Fundam增强表单(不是antd Form!)
@@ -163,27 +164,56 @@ const GeneratedPage: React.FC = () => {
 用户要求列表页面时，必须使用这个模式：
 \`\`\`tsx
 const GeneratedPage: React.FC = () => {
-  const form = useAntFormInstance()
+  const [modalVisible, setModalVisible] = useState(false)
+  const [currentRecord, setCurrentRecord] = useState(null)
+  
+  const columns = [
+    { title: '姓名', dataIndex: 'name' },
+    { title: '状态', dataIndex: 'status' },
+    {
+      title: '操作',
+      render: (_, record) => (
+        <Button type="link" onClick={() => {
+          setCurrentRecord(record)
+          setModalVisible(true)
+        }}>编辑</Button>
+      )
+    }
+  ]
   
   return (
-    <PageListQuery
-      formItems={
-        <>
-          <FormItemInput name="name" label="姓名" />
-          <FormItemSelect name="status" label="状态" />
-        </>
-      }
-      tableProps={{
-        columns: [
-          { title: '姓名', dataIndex: 'name' },
-          { title: '状态', dataIndex: 'status' }
-        ],
-        dataSource: mockData
-      }}
-    />
+    <>
+      <PageListQuery
+        formItems={
+          <>
+            <FormItemInput name="name" label="姓名" />
+            <FormItemSelect name="status" label="状态" />
+          </>
+        }
+        tableProps={{
+          columns: columns,
+          dataSource: mockData
+        }}
+      />
+      
+      <ModalForm
+        visible={modalVisible}
+        title="编辑"
+        onCancel={() => setModalVisible(false)}
+        onFinish={(values) => {
+          console.log(values)
+          setModalVisible(false)
+        }}
+      >
+        <FormItemInput name="name" label="姓名" />
+        <FormItemSelect name="status" label="状态" />
+      </ModalForm>
+    </>
   )
 }
 \`\`\`
+
+重要：ModalForm是一个React组件，不是函数！必须作为JSX元素使用，需要用visible属性控制显示隐藏。
 
 # 用户需求
 ${description}${componentsInfo}
