@@ -54,22 +54,23 @@ const Sidebar: React.FC<SidebarProps> = ({
   ]
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <Tabs
-        activeKey={activeTab}
-        onChange={setActiveTab}
-        centered
-        size="small"
-        items={tabItems}
-        style={{ 
-          borderBottom: '1px solid #e8e8e8',
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column'
-        }}
-        tabBarStyle={{ marginBottom: 0 }}
-      />
-    </div>
+    <Tabs
+      activeKey={activeTab}
+      onChange={setActiveTab}
+      centered
+      size="small"
+      items={tabItems}
+      style={{ 
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column'
+      }}
+      tabBarStyle={{ 
+        marginBottom: 0, 
+        flexShrink: 0,
+        borderBottom: '1px solid #e8e8e8'
+      }}
+    />
   )
 }
 

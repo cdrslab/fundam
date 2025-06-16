@@ -215,15 +215,15 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   }
 
   return (
-    <div style={{ height: '100%', overflow: 'auto' }}>
-      <div style={{ padding: '16px', borderBottom: '1px solid #e8e8e8' }}>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ padding: '16px', borderBottom: '1px solid #e8e8e8', flexShrink: 0 }}>
         <Space>
           <SettingOutlined />
           <Title level={5} style={{ margin: 0 }}>属性配置</Title>
         </Space>
       </div>
 
-      <div style={{ padding: '16px' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
         <Card size="small" style={{ marginBottom: '16px' }}>
           <Space direction="vertical" size="small" style={{ width: '100%' }}>
             <div>

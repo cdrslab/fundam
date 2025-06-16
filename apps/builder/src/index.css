@@ -36,6 +36,33 @@ body {
   flex-direction: column;
 }
 
+.sidebar-header {
+  flex-shrink: 0;
+}
+
+.sidebar-content {
+  height: calc(100vh - 80px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px;
+}
+
+/* Antd Tabs内容区域滚动支持 */
+.builder-sidebar .ant-tabs-content-holder {
+  flex: 1;
+  overflow: hidden;
+}
+
+.builder-sidebar .ant-tabs-content {
+  height: 100%;
+  overflow: hidden;
+}
+
+.builder-sidebar .ant-tabs-tabpane {
+  height: 100%;
+  overflow-y: auto;
+}
+
 .builder-canvas {
   flex: 1;
   background: #fafafa;
@@ -60,8 +87,7 @@ body {
 
 .properties-panel {
   flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 .ai-assistant-container {
@@ -69,6 +95,16 @@ body {
   border-top: 1px solid #e8e8e8;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+
+/* AI助手内部滚动 */
+.ai-assistant-container .ant-card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
 }
 
 .component-item {
